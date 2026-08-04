@@ -1,0 +1,28 @@
+YeSymbol v1.0.0-rc14 interface report
+
+Implemented in this release:
+- Recent usage moved out of the left sidebar into a dedicated top section.
+- Recent section defaults to expanded and displays at most 14 symbols in one row.
+- Recent section can be collapsed/expanded with "最近使用 ▼/▶".
+- Recent history can be cleared from the trash button with confirmation.
+- Search label and separate clear button removed.
+- Search edit uses a cue banner and an internal right-side × clear button.
+- "点击后自动粘贴" renamed to "自动插入".
+- AutoInsert is persisted as REG_DWORD under HKCU\Software\YeTools\YeSymbol.
+- Sidebar starts with 常用符号.
+- 全部符号 is forced to the item immediately before 自定义.
+- 自定义 is forced to the last sidebar item.
+- Sidebar uses a 30px owner-drawn fixed item height.
+- Custom symbol input moved into the 自定义 main page.
+- Footer changed to one compact right-aligned information line with a separator.
+
+Catalog/runtime data:
+- 16,679 bilingual symbol records retained.
+- No catalog symbol additions/removals in rc14.
+- catalog.generated.json ui_categories updated to match the new visible sidebar order.
+
+Deferred to the next version:
+- Automatic insertion latency optimization.
+- Startup timing and optimization.
+- Search debounce.
+- Large-category virtualized layout/drawing.

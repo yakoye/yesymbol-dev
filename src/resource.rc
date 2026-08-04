@@ -1,0 +1,30 @@
+#pragma code_page(65001)
+#include <windows.h>
+#include "../include/resource.h"
+
+IDI_YESYMBOL ICON "../assets/yesymbol.ico"
+1 RT_MANIFEST "yesymbol.manifest"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,15
+ PRODUCTVERSION 1,0,0,15
+ FILEFLAGSMASK 0x3fL
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+BEGIN
+ BLOCK "StringFileInfo"
+ BEGIN
+  BLOCK "080404B0"
+  BEGIN
+   VALUE "CompanyName", "YeTools\0"
+   VALUE "FileDescription", "YeSymbol 原生高速符号与 Emoji 面板\0"
+   VALUE "FileVersion", "1.0.0-rc15\0"
+   VALUE "InternalName", "yesymbol\0"
+   VALUE "OriginalFilename", "yesymbol.exe\0"
+   VALUE "ProductName", "YeSymbol（符号大全）\0"
+   VALUE "ProductVersion", "1.0.0-rc15\0"
+   VALUE "Comments", "联系邮箱：yuxiang_163com@163.com\0"
+  END
+ END
+ BLOCK "VarFileInfo" BEGIN VALUE "Translation", 0x0804, 1200 END
+END

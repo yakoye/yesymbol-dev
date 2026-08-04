@@ -1,0 +1,40 @@
+# CMake / Visual Studio build outputs
+/build/
+/dist/
+/dist-debug/
+/.vs/
+/out/
+
+# CMake local files
+CMakeUserPresets.json
+CMakeSettings.json
+
+# Visual Studio user files
+*.user
+*.suo
+*.VC.db
+*.VC.VC.opendb
+
+# Compiled objects and binaries
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exp
+*.lib
+*.dll
+*.exe
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local release artifacts
+*.sha256.local
+*-release.zip

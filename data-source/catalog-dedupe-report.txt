@@ -1,0 +1,18 @@
+YeSymbol catalog normalization report
+=====================================
+categories (including generated 全部符号): 24
+unique symbol definitions: 16679
+symbol definition duplicates removed: 0
+duplicates removed inside the same group: 0
+duplicate references removed inside the same category: 0
+unreferenced definitions removed: 0
+missing definitions created: 0
+Chinese names replaced from pinned CLDR TTS cache: 1798
+default-common duplicates removed: 0
+
+Deduplication boundary:
+- exact duplicates inside one group are removed;
+- repeated references inside one category are removed; named groups win over unnamed rows;
+- the same symbol may remain in different categories intentionally;
+- unreferenced #@symbols records remain compiled/searchable but are not forced into 补充符号;
+- 全部符号 is regenerated as one unique union and is not maintained in catalog.txt.

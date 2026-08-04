@@ -1,0 +1,17 @@
+YeSymbol catalog.txt v2 migration report
+========================================
+
+Rules:
+- one physical symbol line equals one UI row;
+- comma separates entries;
+- cols is generated from the number of entries on that line;
+- row is generated from line order inside the category;
+- each line accepts at most 12 entries;
+- quotes remain only where CSV ambiguity requires them, such as a space, the comma symbol, or the quote symbol;
+- symbol annotations use: @symbol text|Chinese name|English name|emoji/false.
+
+Catalog preservation:
+- unique symbols: 13,931
+- no symbols removed by the format migration
+- category-level deduplication remains enabled
+- 全部符号 remains an automatically generated unique union

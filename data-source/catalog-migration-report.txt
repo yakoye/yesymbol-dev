@@ -1,0 +1,23 @@
+YeSymbol catalog v0.12 -> catalog.txt migration
+===============================================
+
+Baseline unique symbols/sequences: 13,931
+Final unique symbols/sequences:    13,931
+Symbols lost:                      0
+
+Removed duplicates:
+- duplicate items inside the same group: 6
+- repeated references inside the same category: 146
+- duplicate symbol definitions: 0
+
+Preserved intentionally:
+- the same symbol may appear in different categories because those are different browsing paths;
+- 1,691 symbols that previously existed only in “全部符号” were moved to
+  “补充符号 -> 未分类补充”, so converting to the text source does not discard them;
+- “全部符号” is now generated automatically as a unique union and is no longer
+  repeated in catalog.txt.
+
+Deduplication rule inside one category:
+- named groups are preferred over unnamed raw rows;
+- among groups of the same kind, the earlier group wins;
+- item order is otherwise preserved.

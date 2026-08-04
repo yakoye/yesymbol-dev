@@ -1,0 +1,41 @@
+YeSymbol catalog category/order report (rc12)
+==============================================
+
+Input source
+------------
+- Based on the user's catalog(2).txt.
+- Unique symbols/sequences before organization: 13,951
+- Unique symbols/sequences after organization:  13,951
+- Symbols lost:  0
+- Symbols added: 0
+
+First-level category fix
+------------------------
+- Body category headings (# Category or #Category) are now authoritative.
+- The legacy @ui-categories header is ignored and no longer exported.
+- A category may contain symbol rows directly without an artificial ## _ heading.
+- A source line longer than 12 entries is wrapped automatically.
+- The new first-level category 字母序号 is generated and visible in body order.
+
+Curated ordered sequences
+--------------------------
+- Letter index series: 7 complete A-Z sets, 26 entries each (182 total)
+- Mahjong tiles: 44 assigned characters, Unicode code-point order
+- Domino tiles: 100 assigned characters, Unicode code-point order
+- Playing cards: 82 assigned characters, Unicode code-point order
+- Chess symbols: 84 assigned characters, Unicode code-point order
+- Regional flags: 258 sequences, region-code A-Z order
+- Other flag-like symbols: 17 entries, separated from regional flags
+
+Name completion
+---------------
+- Added Chinese/English annotations for 10 fullwidth digits.
+- Added Chinese/English annotations for 10 mathematical sans-serif bold digits.
+- Symbols with an empty or “未标注” Chinese name after generation: 0
+
+Deduplication
+-------------
+- Duplicate references inside the same group removed: 0
+- Duplicate references inside the same category removed: 0
+- Cross-category reuse remains allowed.
+- 全部符号 remains an automatically generated unique union.
