@@ -20,6 +20,11 @@ typedef struct YSCommonList {
     uint32_t next_serial;
 } YSCommonList;
 
+typedef struct YSSearchHistory {
+    WCHAR items[YS_MAX_SEARCH_HISTORY][YS_MAX_QUERY];
+    size_t count;
+} YSSearchHistory;
+
 void ys_storage_init_list(YSDynamicList *, size_t);
 void ys_storage_load_recent(YSDynamicList *);
 void ys_storage_load_custom(YSDynamicList *);
@@ -40,3 +45,8 @@ void ys_common_sort(YSCommonList *);
 
 BOOL ys_storage_load_bool(const WCHAR *value_name, BOOL default_value);
 void ys_storage_save_bool(const WCHAR *value_name, BOOL value);
+
+void ys_search_history_init(YSSearchHistory *history);
+void ys_storage_load_search_history(YSSearchHistory *history);
+void ys_storage_save_search_history(const YSSearchHistory *history);
+BOOL ys_search_history_add_front(YSSearchHistory *history, const WCHAR *query);

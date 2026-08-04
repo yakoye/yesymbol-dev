@@ -137,6 +137,19 @@ def normalize_cldr_key(text: str) -> str:
     return str(text).replace(_VARIATION_SELECTOR_16, "")
 
 
+def normalize_visible_variant_key(text: str) -> str:
+    """Collapse presentation selector and skin-tone-only variants.
+
+    Such records remain searchable and available to the Emoji context menu, but
+    they do not need a second visible catalog cell when their base sequence is
+    already placed.
+    """
+    return "".join(
+        char for char in str(text)
+        if char != _VARIATION_SELECTOR_16 and not (0x1F3FB <= ord(char) <= 0x1F3FF)
+    )
+
+
 def load_cldr_tts(path: Path = CLDR_CACHE) -> Dict[str, str]:
     if not path.exists():
         return {}
@@ -297,6 +310,47 @@ def normalize_catalog(data: MutableMapping[str, Any]) -> Tuple[Dict[str, Any], D
     stats["cldr_name_replacements"] = apply_cldr_tts(records)
     by_text: "OrderedDict[str, Dict[str, Any]]" = OrderedDict((r["text"], r) for r in records)
 
+    # Every ordinary built-in symbol must have a real catalog location so a
+    # search result can report its source and the context menu can jump there.
+    # Keep presentation/skin-tone variants hidden when their base sequence is
+    # already visible, but place otherwise orphaned non-Emoji records into a
+    # generated “补充符号 → 未分类补充” block.  This also makes “全部符号” a
+    # genuine union of every non-variant built-in record.
+    visible_texts = {
+        symbol
+        for category in categories
+        for group in category["groups"]
+        for symbol in group.get("items", [])
+    }
+    visible_variant_keys = {normalize_visible_variant_key(symbol) for symbol in visible_texts}
+    orphan_symbols = [
+        text for text, record in by_text.items()
+        if text not in visible_texts
+        and not bool(record.get("emoji", False))
+        and normalize_visible_variant_key(text) not in visible_variant_keys
+    ]
+    if orphan_symbols:
+        supplement = next((category for category in categories if category["name"] == "补充符号"), None)
+        if supplement is None:
+            supplement = {"name": "补充符号", "desc": "未归入其他分类的补充字符。", "groups": []}
+            categories.append(supplement)
+        next_row = max(
+            (int(group.get("row", 0) or 0) for group in supplement["groups"] if not group.get("spacer")),
+            default=0,
+        ) + 1
+        for row_offset, row_items in enumerate(chunks(orphan_symbols, MAX_COLUMNS)):
+            supplement["groups"].append(
+                {
+                    "title": "未分类补充" if row_offset == 0 else "",
+                    "items": list(row_items),
+                    "cols": len(row_items),
+                    "row": next_row + row_offset,
+                }
+            )
+        stats["orphan_symbols_placed"] = len(orphan_symbols)
+    else:
+        stats["orphan_symbols_placed"] = 0
+
     referenced_order: List[str] = []
     referenced_seen = set()
     for category in categories:
@@ -348,11 +402,11 @@ def normalize_catalog(data: MutableMapping[str, Any]) -> Tuple[Dict[str, Any], D
         # that the user added to the body.
         "ui_categories": ["常用符号"]
         + [name for name in UI_MAIN_CATEGORIES if any(c["name"] == name for c in categories)]
-        + ["其他字符"]
+        + ["其他符号"]
         + [name for name in UI_OTHER_CATEGORIES if any(c["name"] == name for c in categories)]
         + [GENERATED_CATEGORY_NAME, "自定义"],
         "ui_category_groups": {
-            "其他字符": [name for name in UI_OTHER_CATEGORIES if any(c["name"] == name for c in categories)]
+            "其他符号": [name for name in UI_OTHER_CATEGORIES if any(c["name"] == name for c in categories)]
         },
         "name_languages": list(data.get("name_languages", ["zh-CN", "en"])),
         "name_note": str(data.get("name_note", "")),
@@ -696,12 +750,14 @@ def write_report(path: Path, stats: MutableMapping[str, int], output: MutableMap
         f"missing definitions created: {stats.get('missing_symbol_definitions_created', 0)}",
         f"Chinese names replaced from pinned CLDR TTS cache: {stats.get('cldr_name_replacements', 0)}",
         f"default-common duplicates removed: {stats.get('default_common_duplicates', 0)}",
+        f"unreferenced non-Emoji records placed in generated supplement: {stats.get('orphan_symbols_placed', 0)}",
         "",
         "Deduplication boundary:",
         "- exact duplicates inside one group are removed;",
         "- repeated references inside one category are removed; named groups win over unnamed rows;",
         "- the same symbol may remain in different categories intentionally;",
-        "- unreferenced #@symbols records remain compiled/searchable but are not forced into 补充符号;",
+        "- unreferenced non-Emoji #@symbols records are placed in generated 补充符号/未分类补充 rows;",
+        "- Emoji presentation and skin-tone variants may remain hidden and inherit the base symbol location;",
         "- 全部符号 is regenerated as one unique union and is not maintained in catalog.txt.",
     ]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
@@ -727,7 +783,8 @@ def command_build(txt_path: Path, json_path: Path) -> int:
     print(
         f"built {json_path}: {len(output['symbols'])} unique symbols, "
         f"removed {stats['within_group_duplicates']} in-group and "
-        f"{stats['within_category_duplicates']} in-category duplicate references"
+        f"{stats['within_category_duplicates']} in-category duplicate references, "
+        f"placed {stats.get('orphan_symbols_placed', 0)} unreferenced non-Emoji records in generated supplement"
     )
     return 0
 
@@ -743,7 +800,8 @@ def command_check(txt_path: Path) -> int:
     print(
         f"catalog OK: {len(output['categories'])} categories, {len(output['symbols'])} unique symbols; "
         f"would remove {stats['within_group_duplicates']} in-group and "
-        f"{stats['within_category_duplicates']} in-category duplicate references"
+        f"{stats['within_category_duplicates']} in-category duplicate references; "
+        f"generated supplement would place {stats.get('orphan_symbols_placed', 0)} unreferenced non-Emoji records"
     )
     return 0
 

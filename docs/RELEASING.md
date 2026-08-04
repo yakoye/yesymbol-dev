@@ -14,7 +14,7 @@ RELEASE_NOTES.md
 候选版建议使用：
 
 ```text
-1.0.0-rc15
+1.0.0-rc16
 ```
 
 正式版建议使用：
@@ -82,7 +82,7 @@ Get-FileHash .\dist\yesymbol.exe -Algorithm SHA256 |
 建议把结果保存为：
 
 ```text
-yesymbol-v1.0.0-rc15.sha256
+yesymbol-v1.0.0-rc16.sha256
 ```
 
 ## 6. GitHub Release 内容
@@ -91,8 +91,8 @@ yesymbol-v1.0.0-rc15.sha256
 
 ```text
 yesymbol.exe                        用户运行文件
-yesymbol-v1.0.0-rc15-source.zip     源码包
-yesymbol-v1.0.0-rc15.sha256         校验值
+yesymbol-v1.0.0-rc16-source.zip     源码包
+yesymbol-v1.0.0-rc16.sha256         校验值
 ```
 
 Release 说明至少包含：

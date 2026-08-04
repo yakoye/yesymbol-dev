@@ -47,9 +47,9 @@ main = [
     'Emoji·旅行与物品', 'Emoji·符号与旗帜',
 ]
 other = ['日文字符', '韩文字符', '东亚字符', '大篆', '小篆', '俄文字符', '古埃及文字', '象形文字']
-expected_ui = ['常用符号'] + main + ['其他字符'] + other + ['全部符号', '自定义']
+expected_ui = ['常用符号'] + main + ['其他符号'] + other + ['全部符号', '自定义']
 assert D['ui_categories'] == expected_ui
-assert D['ui_category_groups'] == {'其他字符': other}
+assert D['ui_category_groups'] == {'其他符号': other}
 static_names = [category['name'] for category in D['categories']]
 for name in main + other + ['补充符号']:
     assert name in static_names
@@ -65,7 +65,8 @@ for seal in ['大篆', '小篆']:
 # Text catalog stays hand-editable and derives rows/columns automatically.
 converter = (R / 'tools/catalog_text.py').read_text(encoding='utf-8')
 for token in ['yesymbol-catalog-text/2', 'command_export', 'command_build', 'command_check',
-              'command_apply_cldr', 'command_dedupe', 'UI_MAIN_CATEGORIES', 'UI_OTHER_CATEGORIES']:
+              'command_apply_cldr', 'command_dedupe', 'UI_MAIN_CATEGORIES', 'UI_OTHER_CATEGORIES',
+              'normalize_visible_variant_key', 'orphan_symbols_placed']:
     assert token in converter
 result = subprocess.run(
     [sys.executable, str(R / 'tools/catalog_text.py'), 'check'], cwd=R,
@@ -123,6 +124,11 @@ assert logical_group('序号字母', '字母序号') == letter_expected
 circled_21_50 = logical_group('序号字母', '带圈数字 21–50')
 assert len(circled_21_50) == 30 and circled_21_50[-1] == '㊿'
 
+generated_unclassified = logical_group('补充符号', '未分类补充')
+assert len(generated_unclassified) == 655
+assert all(not by[value].get('emoji') for value in generated_unclassified)
+assert set(generated_unclassified).issubset(set(all_items))
+
 for title, key in {
     '麻将牌（Unicode 顺序）': 'mahjong',
     '多米诺骨牌（Unicode 顺序）': 'domino',
@@ -168,11 +174,27 @@ generator = (R / 'tools/generate_bilingual_data.py').read_text(encoding='utf-8')
 generated_c = (R / 'src/symbol_data.c').read_text(encoding='ascii')
 symbol_h = (R / 'include/symbol_data.h').read_text(encoding='utf-8')
 for token in ['symbol_hash', 'hash_table', 'write_text_resilient', 'os.replace',
-              'make_writable', 'PermissionError', 'unchanged; skipped rewrite']:
+              'make_writable', 'PermissionError', 'unchanged; skipped rewrite',
+              'origin_rows', 'origin_normalized_text', 'category_priorities']:
     assert token in generator
 assert 'ys_symbol_index_from_text' in symbol_h
+assert 'YSSymbolOriginRecord' in symbol_h and 'ys_symbol_origin' in symbol_h
 assert 'g_ys_symbol_hash_table' in generated_c
 assert 'int ys_symbol_index_from_text' in generated_c
+assert 'const YSSymbolOriginRecord g_ys_symbol_origins[]' in generated_c
+
+# TXT -> JSON -> C consistency and generated source-location records.
+import re
+origin_block = generated_c.split('const YSSymbolOriginRecord g_ys_symbol_origins[] = {', 1)[1].split('};', 1)[0]
+origin_rows = [tuple(map(int, match)) for match in re.findall(r'\{(\d+)u,(\d+)u,(\d+)u,(\d+)u,(\d+)u,(\d+)u\}', origin_block)]
+assert len(origin_rows) == len(D['symbols'])
+assert all(row[0] != 65535 and row[1] > 0 and row[2] > 0 for row in origin_rows)
+assert f'const size_t g_ys_symbol_count = {len(D["symbols"])}u;' in generated_c
+category_index = {category['name']: index for index, category in enumerate(D['categories'])}
+symbol_index = {item['text']: index for index, item in enumerate(D['symbols'])}
+assert origin_rows[symbol_index['😤']][:3] == (category_index['Emoji·表情与人物'], 30, 10)
+assert origin_rows[symbol_index['♉']][:3] == (category_index['特殊符号'], 10, 2)
+assert origin_rows[symbol_index['𓀀']][:3] == (category_index['古埃及文字'], 1, 1)
 
 # UI, hierarchy and performance paths.
 ui = (R / 'src/ui.c').read_text(encoding='utf-8')
@@ -182,7 +204,9 @@ for token in ['中文名称：%s', '英文名称：%s', 'ys_symbol_name_zh', 'ys
     assert token in ui
 assert 'state->description' not in ui and 'ID_DESCRIPTION' not in ui
 assert '全部内置符号的去重集合；可搜索、复制或右键添加到常用符号。' not in ui
-assert '#define YS_WINDOW_WIDTH 770' in cfg
+assert '#define YS_WINDOW_WIDTH 786' in cfg
+assert '#define YS_CATEGORY_WIDTH 162' in cfg
+assert '#define YS_CATEGORY_ITEM_HEIGHT 28' in cfg
 assert '#define YS_WINDOW_HEIGHT 650' in cfg
 assert '#define YS_RECENT_MAX_VISIBLE 14' in cfg
 assert 'YS_DESCRIPTION_HEIGHT' not in cfg
@@ -191,15 +215,16 @@ for token in [
     '最近使用 ▼', 'YESYMBOL_RECENT_CLASS', 'L"自动插入"', 'LBS_OWNERDRAWFIXED',
     'EM_SETCUEBANNER', 'ID_RECENT_CLEAR', 'ID_SEARCH_CLEAR',
     'ys_storage_save_bool(L"AutoInsert"', '手动添加自定义符号', 'SS_ETCHEDHORZ',
-    'L"其他字符：▼"', 'L"其他字符：▶"',
+    'L"其他符号⯆"', 'L"其他符号⯈"',
 ]:
     assert token in ui or token in cfg or token in yesymbol_h
 category_block = ui[ui.index('static void ys_add_category_items'):ui.index('static LRESULT CALLBACK ys_main_proc')]
-assert category_block.index('ys_add_category_mapping_item(state, L"常用符号"') < category_block.index('for (i = 0; i < YS_ARRAY_COUNT(main_categories)')
+assert category_block.index('ys_add_category_mapping_item(state, L"常用符号"') < category_block.index('for (i = 0; i < YS_ARRAY_COUNT(g_ys_main_category_names)')
 assert category_block.index('L"全部符号"') < category_block.index('L"自定义"')
 for name in main + other:
-    assert f'L"{name}"' in category_block
-assert 'L"补充符号"' not in category_block
+    assert f'L"{name}"' in ui
+category_items_block = ui[ui.index('static void ys_add_category_items'):ui.index('static int ys_find_category_ui_index')]
+assert 'L"补充符号"' not in category_items_block
 
 # Performance: no fixed paste delay; target focus restoration, delayed writes,
 # debounced search, deferred noncritical setup and visible-row virtualization.
@@ -222,7 +247,29 @@ assert 'ys_storage_save_recent' not in copy_block and 'ys_storage_save_common' n
 storage_h = (R / 'include/storage.h').read_text(encoding='utf-8')
 storage_c = (R / 'src/storage.c').read_text(encoding='utf-8')
 assert 'ys_storage_load_bool' in storage_h and 'ys_storage_save_bool' in storage_h
+assert 'YSSearchHistory' in storage_h and 'YS_MAX_SEARCH_HISTORY' in yesymbol_h
+assert '#define _WIN32_IE 0x0600' in yesymbol_h
+for token in ['SearchHistory', 'ys_storage_load_search_history', 'ys_storage_save_search_history',
+              'ys_search_history_add_front', 'REG_MULTI_SZ']:
+    assert token in storage_c or token in storage_h
 assert 'REG_DWORD' in storage_c and 'AutoInsert' in ui
+
+# Search-result metadata, original-location jump, history navigation and sidebar hover.
+for token in [
+    r'L"符号：%s\r\n中文名称：%s\r\n英文名称：%s\r\n分类：%s\r\n信息：%s\r\n编码：%s"',
+    'ys_symbol_origin_valid', 'ys_format_hit_information', 'ys_origin_category_name',
+    'ID_MENU_JUMP_ORIGIN', 'L"跳到所在位置"', 'ys_jump_to_symbol_origin',
+    'YS_TIMER_SEARCH_HISTORY', 'YS_SEARCH_HISTORY_COMMIT_MS', 'VK_UP', 'VK_DOWN',
+    'SetWindowSubclass', 'LB_ITEMFROMPOINT', 'category_hover_index', 'RGB(238, 244, 250)',
+    'active_category_mapping', 'YS_CATEGORY_MAP_OTHER_HEADER',
+]:
+    assert token in ui or token in yesymbol_h
+assert 'return L"搜索结果"' not in ui
+assert 'SelectObject(draw->hDC, state->group_font)' not in ui[ui.index('case WM_DRAWITEM'):ui.index('case WM_COMMAND')]
+assert 'state->other_expanded ? L"其他符号⯆" : L"其他符号⯈"' in ui
+header_command = ui[ui.index('if (mapping == YS_CATEGORY_MAP_OTHER_HEADER)'):ui.index('if (selection >= 0)', ui.index('if (mapping == YS_CATEGORY_MAP_OTHER_HEADER)'))]
+assert 'state->active_category_mapping = active_mapping' in header_command
+assert 'LB_SETCURSEL, header_index' in header_command
 
 # Build, tray, resources and about dialog remain intact.
 assert '单击复制；右键可加入或移出常用符号' not in ui
@@ -231,7 +278,7 @@ for token in ['Shell_NotifyIconW', 'YESYMBOL_TRAY_MESSAGE', 'ID_TRAY_EXIT', 'SW_
 assert 'WS_OVERLAPPEDWINDOW' not in ui and 'WS_MAXIMIZEBOX' not in ui
 cmake = (R / 'CMakeLists.txt').read_text(encoding='utf-8')
 assert '/MANIFEST:NO' in cmake and 'shell32' in cmake and 'src/about.c' in cmake
-assert '1.0.0-rc15' in yesymbol_h
+assert '1.0.0-rc16' in yesymbol_h
 build = (R / 'build.bat').read_text(encoding='ascii')
 for token in ['clean', 'data', 'cldr', 'run', 'all', 'call regenerate-data.cmd',
               'Reusing the existing CMake generator and platform', 'cmake -S . -B build -A x64']:
@@ -245,7 +292,7 @@ for token in ['TaskDialogIndirect', 'YESYMBOL_AUTHOR_EMAIL', 'YESYMBOL_DEVELOPME
     assert token in about
 for token in ['IDI_YESYMBOL', '关于 YeSymbol', 'ID_TRAY_ABOUT', 'ID_SYSTEM_ABOUT']:
     assert token in ui or token in resource
-assert 'FILEVERSION 1,0,0,15' in resource and 'PRODUCTVERSION 1,0,0,15' in resource
+assert 'FILEVERSION 1,0,0,16' in resource and 'PRODUCTVERSION 1,0,0,16' in resource
 
 # Pinned CLDR cache and audit.
 audit = (R / 'tools/audit_catalog.py').read_text(encoding='utf-8')
@@ -259,5 +306,75 @@ cldr_cache = json.loads((R / 'data-source/cldr-annotations-zh.tts.json').read_te
 assert cldr_cache['metadata']['commit'] == 'c9a5503bf238114a1993377b87841fb76031371d'
 assert cldr_cache['tts']['↤'] == '尾部带杠的向左箭头'
 assert module.normalize_cldr_key('☹️') == '☹'
+
+
+
+
+def assert_c_lexically_balanced(path: Path) -> None:
+    text = path.read_text(encoding='ascii' if path.name == 'symbol_data.c' else 'utf-8')
+    stack = []
+    state = 'normal'
+    index = 0
+    line = 1
+    pairs = {')': '(', ']': '[', '}': '{'}
+    while index < len(text):
+        char = text[index]
+        following = text[index + 1] if index + 1 < len(text) else ''
+        if char == '\n':
+            line += 1
+        if state == 'normal':
+            if char == '/' and following == '/':
+                state = 'line-comment'
+                index += 2
+                continue
+            if char == '/' and following == '*':
+                state = 'block-comment'
+                index += 2
+                continue
+            if char == '"':
+                state = 'string'
+                index += 1
+                continue
+            if char == "'":
+                state = 'character'
+                index += 1
+                continue
+            if char in '([{':
+                stack.append((char, line))
+            elif char in ')]}':
+                assert stack and stack[-1][0] == pairs[char], (path, line, char, stack[-3:])
+                stack.pop()
+        elif state == 'line-comment':
+            if char == '\n':
+                state = 'normal'
+        elif state == 'block-comment':
+            if char == '*' and following == '/':
+                state = 'normal'
+                index += 2
+                continue
+        elif state in ('string', 'character'):
+            if char == '\\':
+                index += 2
+                continue
+            if (state == 'string' and char == '"') or (state == 'character' and char == "'"):
+                state = 'normal'
+        index += 1
+    assert state not in ('string', 'character', 'block-comment'), (path, state)
+    assert not stack, (path, stack[-10:])
+
+
+for source_path in list((R / 'src').glob('*.c')) + list((R / 'include').glob('*.h')):
+    assert_c_lexically_balanced(source_path)
+
+# README covers the complete user/developer workflow requested for rc16.
+readme = (R / 'README.md').read_text(encoding='utf-8')
+for heading in ['## 项目介绍', '## 开发目的', '## 安装与使用', '## 编译与运行',
+                '## 修改 TXT 并生成 JSON', '## 开发与维护']:
+    assert heading in readme
+for token in ['catalog.txt', 'catalog.generated.json', r'src\symbol_data.c',
+              '运行时不会打开或解析JSON', r'.\build.bat run',
+              r'python tools\catalog_text.py build', r'python tests\static_check.py',
+              '#define YS_WINDOW_WIDTH 786', '#define YS_CATEGORY_WIDTH 162']:
+    assert token in readme
 
 print('static checks passed')

@@ -13,7 +13,7 @@ include\ui_config.h
 ## 2. 窗口大小
 
 ```c
-#define YS_WINDOW_WIDTH 770
+#define YS_WINDOW_WIDTH 786
 #define YS_WINDOW_HEIGHT 650
 ```
 
@@ -34,7 +34,7 @@ WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
 ## 3. 左侧分类宽度
 
 ```c
-#define YS_CATEGORY_WIDTH 142
+#define YS_CATEGORY_WIDTH 162
 ```
 
 增大后：
@@ -125,7 +125,7 @@ Segoe UI Emoji    Emoji
 左侧分类行高：
 
 ```c
-#define YS_CATEGORY_ITEM_HEIGHT 30
+#define YS_CATEGORY_ITEM_HEIGHT 28
 ```
 
 自定义分类顶部输入区域高度：
@@ -148,7 +148,7 @@ include\yesymbol.h
 
 ```c
 #define YESYMBOL_PRODUCT_NAME L"符号大全"
-#define YESYMBOL_VERSION L"1.0.0-rc15"
+#define YESYMBOL_VERSION L"1.0.0-rc16"
 ```
 
 窗口标题在 `src/ui.c` 的 `CreateWindowExW` 调用处设置。

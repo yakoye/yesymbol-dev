@@ -46,3 +46,90 @@ void ys_storage_save_bool(const WCHAR *value_name, BOOL value) {
         RegCloseKey(key);
     }
 }
+
+
+void ys_search_history_init(YSSearchHistory *history) {
+    if (history) ZeroMemory(history, sizeof(*history));
+}
+
+static void ys_search_history_copy(WCHAR *destination, const WCHAR *source) {
+    StringCchCopyW(destination, YS_MAX_QUERY, source ? source : L"");
+}
+
+BOOL ys_search_history_add_front(YSSearchHistory *history, const WCHAR *query) {
+    size_t index;
+    size_t found = (size_t)-1;
+    size_t last;
+    if (!history || !query || !query[0]) return FALSE;
+    for (index = 0; index < history->count; ++index) {
+        if (_wcsicmp(history->items[index], query) == 0) {
+            found = index;
+            break;
+        }
+    }
+    if (found == 0) return FALSE;
+    if (found != (size_t)-1) {
+        for (index = found; index > 0; --index) {
+            ys_search_history_copy(history->items[index], history->items[index - 1]);
+        }
+    } else {
+        last = history->count < YS_MAX_SEARCH_HISTORY ? history->count : YS_MAX_SEARCH_HISTORY - 1u;
+        for (index = last; index > 0; --index) {
+            ys_search_history_copy(history->items[index], history->items[index - 1]);
+        }
+        if (history->count < YS_MAX_SEARCH_HISTORY) ++history->count;
+    }
+    ys_search_history_copy(history->items[0], query);
+    return TRUE;
+}
+
+void ys_storage_load_search_history(YSSearchHistory *history) {
+    HKEY key;
+    DWORD type = 0;
+    DWORD bytes = 0;
+    WCHAR *buffer;
+    WCHAR *cursor;
+    if (!history) return;
+    ys_search_history_init(history);
+    if (RegOpenKeyExW(HKEY_CURRENT_USER, YS_REG_PATH, 0, KEY_QUERY_VALUE, &key) != ERROR_SUCCESS) return;
+    if (RegQueryValueExW(key, L"SearchHistory", NULL, &type, NULL, &bytes) != ERROR_SUCCESS ||
+        type != REG_MULTI_SZ || bytes < sizeof(WCHAR) * 2u) {
+        RegCloseKey(key);
+        return;
+    }
+    buffer = (WCHAR *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, bytes + sizeof(WCHAR) * 2u);
+    if (buffer && RegQueryValueExW(key, L"SearchHistory", NULL, &type, (BYTE *)buffer, &bytes) == ERROR_SUCCESS) {
+        for (cursor = buffer; *cursor && history->count < YS_MAX_SEARCH_HISTORY; cursor += wcslen(cursor) + 1u) {
+            if (*cursor) {
+                ys_search_history_copy(history->items[history->count], cursor);
+                ++history->count;
+            }
+        }
+    }
+    if (buffer) HeapFree(GetProcessHeap(), 0, buffer);
+    RegCloseKey(key);
+}
+
+void ys_storage_save_search_history(const YSSearchHistory *history) {
+    HKEY key;
+    DWORD disposition;
+    size_t index;
+    size_t total = 2u;
+    size_t offset = 0;
+    WCHAR *buffer;
+    if (!history) return;
+    for (index = 0; index < history->count; ++index) total += wcslen(history->items[index]) + 1u;
+    buffer = (WCHAR *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, total * sizeof(WCHAR));
+    if (!buffer) return;
+    for (index = 0; index < history->count; ++index) {
+        size_t length = wcslen(history->items[index]);
+        memcpy(buffer + offset, history->items[index], (length + 1u) * sizeof(WCHAR));
+        offset += length + 1u;
+    }
+    if (RegCreateKeyExW(HKEY_CURRENT_USER, YS_REG_PATH, 0, NULL, 0, KEY_SET_VALUE, NULL, &key, &disposition) == ERROR_SUCCESS) {
+        RegSetValueExW(key, L"SearchHistory", 0, REG_MULTI_SZ, (const BYTE *)buffer,
+                       (DWORD)(total * sizeof(WCHAR)));
+        RegCloseKey(key);
+    }
+    HeapFree(GetProcessHeap(), 0, buffer);
+}

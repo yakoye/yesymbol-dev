@@ -9,10 +9,12 @@ unreferenced definitions removed: 0
 missing definitions created: 0
 Chinese names replaced from pinned CLDR TTS cache: 1798
 default-common duplicates removed: 0
+unreferenced non-Emoji records placed in generated supplement: 655
 
 Deduplication boundary:
 - exact duplicates inside one group are removed;
 - repeated references inside one category are removed; named groups win over unnamed rows;
 - the same symbol may remain in different categories intentionally;
-- unreferenced #@symbols records remain compiled/searchable but are not forced into 补充符号;
+- unreferenced non-Emoji #@symbols records are placed in generated 补充符号/未分类补充 rows;
+- Emoji presentation and skin-tone variants may remain hidden and inherit the base symbol location;
 - 全部符号 is regenerated as one unique union and is not maintained in catalog.txt.

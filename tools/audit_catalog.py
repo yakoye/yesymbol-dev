@@ -157,8 +157,28 @@ def main() -> int:
     leaked = [title for title in residual_titles if title.startswith(bad_prefixes)]
     if leaked:
         errors.append(f"supplement still contains groups that should be classified above: {leaked[:8]!r}")
-    if "未分类补充" in residual_titles:
-        errors.append("未分类补充 must remain hidden in #@symbols, not visible in 补充符号")
+    # Build-generated orphan placement is allowed and required: every ordinary
+    # searchable symbol needs a real source row for tooltip metadata and
+    # “跳到所在位置”.  Only Emoji presentation/skin variants may remain hidden.
+    all_visible = {
+        item
+        for cat in data.get("categories", [])[1:]
+        for group in cat.get("groups", [])
+        for item in group.get("items", [])
+    }
+    def variant_key(text: str) -> str:
+        return "".join(
+            char for char in str(text)
+            if ord(char) != 0xFE0F and not (0x1F3FB <= ord(char) <= 0x1F3FF)
+        )
+    visible_keys = {variant_key(item) for item in all_visible}
+    unlocatable = [
+        record.get("text") for record in data.get("symbols", [])
+        if record.get("text") not in all_visible
+        and variant_key(record.get("text", "")) not in visible_keys
+    ]
+    if unlocatable:
+        errors.append(f"searchable symbols without a source location: {unlocatable[:8]!r} (total {len(unlocatable)})")
     misplaced = {"萨顿手语书写", "带圈表意文字补充", "杂项符号和象形文字", "装饰性印刷符号", "交通和地图符号", "补充符号和象形文字", "传统计算机符号"}
     leaked_exact = sorted(misplaced.intersection(residual_titles))
     if leaked_exact:
@@ -178,7 +198,7 @@ def main() -> int:
         "catalog audit passed: "
         f"{len(symbol_records)} symbol records, 259 regional flags + 3 subdivision flags, "
         "complete 21–50 circled numbers, complete card/tile series, "
-        f"{len(egyptian_items)} Egyptian characters"
+        f"{len(egyptian_items)} Egyptian characters, all searchable records locatable"
     )
     return 0
 

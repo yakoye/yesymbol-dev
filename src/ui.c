@@ -52,20 +52,35 @@
 #define YS_TIMER_FOREGROUND 1u
 #define YS_TIMER_SEARCH 2u
 #define YS_TIMER_STORAGE 3u
+#define YS_TIMER_SEARCH_HISTORY 4u
 #define YS_SEARCH_DEBOUNCE_MS 90u
 #define YS_STORAGE_FLUSH_MS 350u
+#define YS_SEARCH_HISTORY_COMMIT_MS 650u
 #define YS_FOREGROUND_POLL_MS 150u
 #define YS_STORAGE_DIRTY_RECENT 0x01u
 #define YS_STORAGE_DIRTY_COMMON 0x02u
 #define YS_STORAGE_DIRTY_CUSTOM 0x04u
+#define YS_STORAGE_DIRTY_SEARCH_HISTORY 0x08u
 #define YS_VIRTUAL_THRESHOLD 480u
 #define ID_MENU_ADD_COMMON 2101
 #define ID_MENU_REMOVE_COMMON 2102
 #define ID_MENU_REMOVE_RECENT 2103
 #define ID_MENU_REMOVE_CUSTOM 2104
+#define ID_MENU_JUMP_ORIGIN 2105
 #define ID_MENU_TONE_BASE 2300
 #define YS_MAX_TONE_OPTIONS 6
 
+static const WCHAR *g_ys_main_category_names[] = {
+    L"特殊符号", L"标点符号", L"序号字母", L"数学/单位", L"希腊/拉丁",
+    L"拼音/注音", L"中文字符", L"英文音标", L"制表符",
+    L"Emoji·表情与人物", L"Emoji·动物与自然", L"Emoji·食物与活动",
+    L"Emoji·旅行与物品", L"Emoji·符号与旗帜"
+};
+
+static const WCHAR *g_ys_other_category_names[] = {
+    L"日文字符", L"韩文字符", L"东亚字符", L"大篆", L"小篆",
+    L"俄文字符", L"古埃及文字", L"象形文字"
+};
 
 typedef struct YSViewSymbol {
     const WCHAR *text;
@@ -142,6 +157,7 @@ typedef struct YSAppState {
     YSDynamicList recent;
     YSCommonList common;
     YSDynamicList custom;
+    YSSearchHistory search_history;
     YSViewSymbol *views;
     size_t view_count;
     size_t view_capacity;
@@ -157,6 +173,7 @@ typedef struct YSAppState {
     int virtual_flat_top;
     int virtual_flat_columns;
     int selected_ui;
+    int active_category_mapping;
     int *category_map;
     size_t category_item_count;
     int custom_ui_index;
@@ -167,6 +184,8 @@ typedef struct YSAppState {
     int hover_virtual_group;
     int hover_virtual_item;
     int recent_hover_index;
+    int category_hover_index;
+    int search_history_nav;
     BOOL recent_expanded;
     BOOL other_expanded;
     BOOL suppress_search_change;
@@ -178,8 +197,16 @@ typedef struct YSAppState {
     int grid_buffer_width;
     int grid_buffer_height;
     WCHAR search_header[96];
+    WCHAR search_history_draft[YS_MAX_QUERY];
     WCHAR tooltip_text[1280];
 } YSAppState;
+
+static void ys_jump_to_symbol_origin(YSAppState *state, uint32_t symbol_index);
+static void ys_layout_controls(YSAppState *state);
+static LRESULT CALLBACK ys_search_subclass_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
+                                                UINT_PTR subclass_id, DWORD_PTR reference_data);
+static LRESULT CALLBACK ys_categories_subclass_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
+                                                    UINT_PTR subclass_id, DWORD_PTR reference_data);
 
 static BOOL ys_reserve(void **memory, size_t *capacity, size_t required, size_t item_size) {
     size_t next;
@@ -312,7 +339,32 @@ static BOOL ys_hit_view(const YSAppState *state, const YSHitInfo *hit, YSViewSym
     return TRUE;
 }
 
+static BOOL ys_symbol_origin_valid(uint32_t symbol_index) {
+    const YSSymbolOriginRecord *origin;
+    if (symbol_index >= g_ys_symbol_count) return FALSE;
+    origin = ys_symbol_origin(symbol_index);
+    return origin->category_index < g_ys_category_count &&
+           origin->group_index < g_ys_group_count &&
+           origin->row_number > 0 && origin->column_number > 0;
+}
+
+static const WCHAR *ys_origin_category_name(uint32_t symbol_index) {
+    const YSSymbolOriginRecord *origin;
+    if (!ys_symbol_origin_valid(symbol_index)) return NULL;
+    origin = ys_symbol_origin(symbol_index);
+    return ys_pool_string(g_ys_categories[origin->category_index].name_offset);
+}
+
+static BOOL ys_search_is_active(const YSAppState *state) {
+    return state && state->search && GetWindowTextLengthW(state->search) > 0;
+}
+
 static const WCHAR *ys_hit_category_name(const YSAppState *state, const YSHitInfo *hit, const YSViewSymbol *view) {
+    const WCHAR *origin_name;
+    if (ys_search_is_active(state) && view && view->symbol_index < g_ys_symbol_count) {
+        origin_name = ys_origin_category_name(view->symbol_index);
+        if (origin_name) return origin_name;
+    }
     if (hit && hit->category_index < g_ys_category_count) {
         return ys_pool_string(g_ys_categories[hit->category_index].name_offset);
     }
@@ -320,8 +372,42 @@ static const WCHAR *ys_hit_category_name(const YSAppState *state, const YSHitInf
         if (view->source == YS_SOURCE_RECENT) return L"最近使用";
         if (view->source == YS_SOURCE_COMMON) return L"常用符号";
         if (view->source == YS_SOURCE_CUSTOM) return L"自定义";
+        origin_name = ys_origin_category_name(view->symbol_index);
+        if (origin_name) return origin_name;
     }
-    return L"搜索结果";
+    return L"未分类";
+}
+
+static void ys_format_hit_information(const YSAppState *state, const YSHitInfo *hit,
+                                      const YSViewSymbol *view, WCHAR *output, size_t capacity) {
+    const YSSymbolOriginRecord *origin;
+    if (!output || !capacity) return;
+    output[0] = 0;
+    if (ys_search_is_active(state) && view && ys_symbol_origin_valid(view->symbol_index)) {
+        origin = ys_symbol_origin(view->symbol_index);
+        StringCchPrintfW(output, capacity, L"第 %u 行，第 %u 个",
+                         (unsigned)origin->row_number, (unsigned)origin->column_number);
+        return;
+    }
+    if (hit && hit->category_index < g_ys_category_count && hit->row_number && hit->column_number) {
+        StringCchPrintfW(output, capacity, L"第 %u 行，第 %u 个",
+                         (unsigned)hit->row_number, (unsigned)hit->column_number);
+        return;
+    }
+    if (view && view->source == YS_SOURCE_COMMON && view->source_index < state->common.count) {
+        StringCchPrintfW(output, capacity, L"已使用 %u 次",
+                         state->common.items[view->source_index].use_count);
+        return;
+    }
+    if (view && view->source == YS_SOURCE_RECENT) {
+        StringCchCopyW(output, capacity, L"最近使用记录");
+        return;
+    }
+    if (view && view->source == YS_SOURCE_CUSTOM) {
+        StringCchCopyW(output, capacity, L"用户自定义符号");
+        return;
+    }
+    StringCchCopyW(output, capacity, L"暂无位置信息");
 }
 
 static void ys_show_tooltip_hit(YSAppState *state, const YSHitInfo *hit) {
@@ -330,21 +416,15 @@ static void ys_show_tooltip_hit(YSAppState *state, const YSHitInfo *hit) {
     YSViewSymbol view;
     WCHAR codes[192];
     const WCHAR *category;
-    WCHAR position[96] = L"";
+    WCHAR position[128];
     if (!state || !state->tooltip || !ys_hit_view(state, hit, &view)) return;
     category = ys_hit_category_name(state, hit, &view);
-    if (hit->category_index < g_ys_category_count) {
-        StringCchPrintfW(position, YS_ARRAY_COUNT(position), L"第 %u 行，第 %u 个",
-                         (unsigned)hit->row_number, (unsigned)hit->column_number);
-    } else if (view.source == YS_SOURCE_COMMON && view.source_index < state->common.count) {
-        StringCchPrintfW(position, YS_ARRAY_COUNT(position), L"已使用 %u 次",
-                         state->common.items[view.source_index].use_count);
-    }
+    ys_format_hit_information(state, hit, &view, position, YS_ARRAY_COUNT(position));
     ys_format_codepoints(view.text, codes, YS_ARRAY_COUNT(codes));
     StringCchPrintfW(state->tooltip_text, YS_ARRAY_COUNT(state->tooltip_text),
-                     L"符号：%s\r\n中文名称：%s\r\n英文名称：%s\r\n分类：%s%s%s\r\n编码：%s",
+                     L"符号：%s\r\n中文名称：%s\r\n英文名称：%s\r\n分类：%s\r\n信息：%s\r\n编码：%s",
                      view.text, view.name_zh ? view.name_zh : L"", view.name_en ? view.name_en : L"",
-                     category, position[0] ? L"\r\n信息：" : L"", position, codes);
+                     category, position, codes);
     ZeroMemory(&info, sizeof(info));
     info.cbSize = sizeof(info);
     info.hwnd = state->grid;
@@ -357,11 +437,13 @@ static void ys_show_tooltip_hit(YSAppState *state, const YSHitInfo *hit) {
 }
 
 static const WCHAR *ys_category_name_for_view(const YSViewSymbol *view) {
+    const WCHAR *origin_name;
     if (!view) return L"";
     if (view->source == YS_SOURCE_RECENT) return L"最近使用";
     if (view->source == YS_SOURCE_COMMON) return L"常用符号";
     if (view->source == YS_SOURCE_CUSTOM) return L"自定义";
-    return L"搜索结果";
+    origin_name = ys_origin_category_name(view->symbol_index);
+    return origin_name ? origin_name : L"未分类";
 }
 
 static void ys_set_footer(YSAppState *state, const YSViewSymbol *view, const WCHAR *category, const WCHAR *prefix) {
@@ -532,11 +614,11 @@ static int ys_category_map_value(const YSAppState *state, int ui_index) {
 }
 
 static BOOL ys_selected_is_common(const YSAppState *state) {
-    return ys_category_map_value(state, state ? state->selected_ui : 0) == YS_CATEGORY_MAP_COMMON;
+    return state && state->active_category_mapping == YS_CATEGORY_MAP_COMMON;
 }
 
 static BOOL ys_selected_is_custom(const YSAppState *state) {
-    return ys_category_map_value(state, state ? state->selected_ui : 0) == YS_CATEGORY_MAP_CUSTOM;
+    return state && state->active_category_mapping == YS_CATEGORY_MAP_CUSTOM;
 }
 
 static int ys_data_category_from_ui(const YSAppState *state, int ui_index) {
@@ -759,7 +841,9 @@ static void ys_rebuild(YSAppState *state, BOOL reset_scroll) {
     } else if (ys_selected_is_custom(state)) {
         ys_build_dynamic(state, &state->custom, YS_SOURCE_CUSTOM, L"自定义符号", &y);
     } else {
-        data_index = ys_data_category_from_ui(state, state->selected_ui);
+        data_index = state->active_category_mapping >= 0 &&
+                     (size_t)state->active_category_mapping < g_ys_category_count
+                         ? state->active_category_mapping : -1;
         if (data_index >= 0) ys_build_data_category(state, data_index, &y);
     }
     state->content_height = max(y + 4, 1);
@@ -964,6 +1048,7 @@ static void ys_flush_storage(YSAppState *state) {
     if (flags & YS_STORAGE_DIRTY_RECENT) ys_storage_save_recent(&state->recent);
     if (flags & YS_STORAGE_DIRTY_COMMON) ys_storage_save_common(&state->common);
     if (flags & YS_STORAGE_DIRTY_CUSTOM) ys_storage_save_custom(&state->custom);
+    if (flags & YS_STORAGE_DIRTY_SEARCH_HISTORY) ys_storage_save_search_history(&state->search_history);
 }
 
 static void ys_schedule_storage(YSAppState *state, UINT flags) {
@@ -980,6 +1065,107 @@ static void ys_set_search_text(YSAppState *state, const WCHAR *text) {
     state->suppress_search_change = FALSE;
     ShowWindow(state->search_clear, text && text[0] ? SW_SHOW : SW_HIDE);
     KillTimer(state->hwnd, YS_TIMER_SEARCH);
+    KillTimer(state->hwnd, YS_TIMER_SEARCH_HISTORY);
+}
+
+static void ys_search_history_commit_text(YSAppState *state, const WCHAR *text) {
+    WCHAR query[YS_MAX_QUERY];
+    WCHAR *start;
+    WCHAR *end;
+    if (!state || !text) return;
+    StringCchCopyW(query, YS_ARRAY_COUNT(query), text);
+    start = query;
+    while (*start && iswspace(*start)) ++start;
+    end = start + wcslen(start);
+    while (end > start && iswspace(end[-1])) --end;
+    *end = 0;
+    if (!start[0]) return;
+    if (ys_search_history_add_front(&state->search_history, start)) {
+        ys_schedule_storage(state, YS_STORAGE_DIRTY_SEARCH_HISTORY);
+    }
+}
+
+static void ys_search_history_commit_current(YSAppState *state) {
+    WCHAR query[YS_MAX_QUERY];
+    if (!state || !state->search) return;
+    GetWindowTextW(state->search, query, YS_ARRAY_COUNT(query));
+    ys_search_history_commit_text(state, query);
+    state->search_history_nav = -1;
+    state->search_history_draft[0] = 0;
+    KillTimer(state->hwnd, YS_TIMER_SEARCH_HISTORY);
+}
+
+static void ys_search_history_navigate(YSAppState *state, int direction) {
+    WCHAR current[YS_MAX_QUERY];
+    if (!state || !state->search || !state->search_history.count) return;
+    if (direction < 0) {
+        if (state->search_history_nav < 0) {
+            GetWindowTextW(state->search, state->search_history_draft,
+                           YS_ARRAY_COUNT(state->search_history_draft));
+            state->search_history_nav = 0;
+            if (state->search_history.count > 1u &&
+                _wcsicmp(state->search_history.items[0], state->search_history_draft) == 0) {
+                state->search_history_nav = 1;
+            }
+        } else if ((size_t)(state->search_history_nav + 1) < state->search_history.count) {
+            ++state->search_history_nav;
+        }
+        ys_set_search_text(state, state->search_history.items[state->search_history_nav]);
+    } else {
+        if (state->search_history_nav < 0) return;
+        if (state->search_history_nav > 0) {
+            if (state->search_history_nav == 1 &&
+                _wcsicmp(state->search_history.items[0], state->search_history_draft) == 0) {
+                state->search_history_nav = -1;
+                StringCchCopyW(current, YS_ARRAY_COUNT(current), state->search_history_draft);
+                state->search_history_draft[0] = 0;
+                ys_set_search_text(state, current);
+            } else {
+                --state->search_history_nav;
+                ys_set_search_text(state, state->search_history.items[state->search_history_nav]);
+            }
+        } else {
+            state->search_history_nav = -1;
+            StringCchCopyW(current, YS_ARRAY_COUNT(current), state->search_history_draft);
+            state->search_history_draft[0] = 0;
+            ys_set_search_text(state, current);
+        }
+    }
+    ys_layout_controls(state);
+    ys_rebuild(state, TRUE);
+    SendMessageW(state->search, EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+}
+
+static LRESULT CALLBACK ys_search_subclass_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
+                                                UINT_PTR subclass_id, DWORD_PTR reference_data) {
+    YSAppState *state = (YSAppState *)reference_data;
+    (void)subclass_id;
+    if (message == WM_GETDLGCODE) {
+        return DefSubclassProc(hwnd, message, wparam, lparam) | DLGC_WANTARROWS;
+    }
+    if (message == WM_KEYDOWN && state) {
+        if (wparam == VK_UP) {
+            ys_search_history_navigate(state, -1);
+            return 0;
+        }
+        if (wparam == VK_DOWN) {
+            ys_search_history_navigate(state, 1);
+            return 0;
+        }
+        if (wparam == VK_RETURN) {
+            ys_search_history_commit_current(state);
+            ys_rebuild(state, TRUE);
+            return 0;
+        }
+        if (wparam == VK_ESCAPE) {
+            ys_set_search_text(state, L"");
+            ys_layout_controls(state);
+            ys_rebuild(state, TRUE);
+            return 0;
+        }
+    }
+    if (message == WM_NCDESTROY) RemoveWindowSubclass(hwnd, ys_search_subclass_proc, 1u);
+    return DefSubclassProc(hwnd, message, wparam, lparam);
 }
 
 static void ys_refresh_recent_strip(YSAppState *state) {
@@ -1022,6 +1208,7 @@ static void ys_copy_hit(YSAppState *state, const YSHitInfo *hit) {
     YSViewSymbol view;
     const WCHAR *category;
     if (!ys_hit_view(state, hit, &view)) return;
+    if (ys_search_is_active(state)) ys_search_history_commit_current(state);
     category = ys_hit_category_name(state, hit, &view);
     ys_copy_view(state, &view, category, L"已复制：");
 }
@@ -1169,6 +1356,7 @@ static void ys_add_custom_from_edit(YSAppState *state) {
     SetWindowTextW(state->custom_text, L"");
     SendMessageW(state->categories, LB_SETCURSEL, state->custom_ui_index, 0);
     state->selected_ui = state->custom_ui_index;
+    state->active_category_mapping = YS_CATEGORY_MAP_CUSTOM;
     ys_set_search_text(state, L"");
     ys_rebuild(state, TRUE);
 }
@@ -1178,6 +1366,7 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
     HMENU skin_menu = NULL;
     UINT command;
     int common_index;
+    int symbol_index;
     BOOL rebuild_main = FALSE;
     WCHAR symbol[YS_MAX_SEQUENCE];
     WCHAR tone_variants[YS_MAX_TONE_OPTIONS][YS_MAX_SEQUENCE];
@@ -1186,6 +1375,7 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
     if (!state || !text || !text[0]) return;
     StringCchCopyW(symbol, YS_ARRAY_COUNT(symbol), text);
     common_index = ys_common_find(&state->common, symbol);
+    symbol_index = ys_symbol_index_from_text(symbol);
     menu = CreatePopupMenu();
     if (!menu) return;
     tone_count = ys_collect_skin_variants(symbol, tone_variants, tone_labels, YS_MAX_TONE_OPTIONS);
@@ -1198,6 +1388,10 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
             AppendMenuW(menu, MF_SEPARATOR, 0, NULL);
         }
     }
+    if (symbol_index >= 0 && ys_symbol_origin_valid((uint32_t)symbol_index)) {
+        AppendMenuW(menu, MF_STRING, ID_MENU_JUMP_ORIGIN, L"跳到所在位置");
+        AppendMenuW(menu, MF_SEPARATOR, 0, NULL);
+    }
     AppendMenuW(menu, MF_STRING, common_index >= 0 ? ID_MENU_REMOVE_COMMON : ID_MENU_ADD_COMMON,
                 common_index >= 0 ? L"从常用符号删除" : L"添加到常用符号");
     if (source == YS_SOURCE_RECENT) AppendMenuW(menu, MF_STRING, ID_MENU_REMOVE_RECENT, L"从最近使用删除");
@@ -1207,6 +1401,11 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
     DestroyMenu(menu);
     if (command >= ID_MENU_TONE_BASE && command < ID_MENU_TONE_BASE + tone_count) {
         ys_copy_text_direct(state, tone_variants[command - ID_MENU_TONE_BASE], L"已复制肤色变体：");
+        return;
+    }
+    if (command == ID_MENU_JUMP_ORIGIN && symbol_index >= 0) {
+        ys_search_history_commit_current(state);
+        ys_jump_to_symbol_origin(state, (uint32_t)symbol_index);
         return;
     }
     if (command == ID_MENU_ADD_COMMON) {
@@ -1367,6 +1566,8 @@ static LRESULT CALLBACK ys_recent_proc(HWND hwnd, UINT message, WPARAM wparam, L
         if (state) {
             ys_hide_recent_tooltip(state);
             state->recent_hover_index = -1;
+        state->category_hover_index = -1;
+        state->search_history_nav = -1;
             InvalidateRect(hwnd, NULL, FALSE);
         }
         return 0;
@@ -1925,16 +2126,6 @@ static BOOL ys_add_named_category(YSAppState *state, const WCHAR *display_name, 
 }
 
 static void ys_add_category_items(YSAppState *state, int preferred_mapping) {
-    static const WCHAR *main_categories[] = {
-        L"特殊符号", L"标点符号", L"序号字母", L"数学/单位", L"希腊/拉丁",
-        L"拼音/注音", L"中文字符", L"英文音标", L"制表符",
-        L"Emoji·表情与人物", L"Emoji·动物与自然", L"Emoji·食物与活动",
-        L"Emoji·旅行与物品", L"Emoji·符号与旗帜"
-    };
-    static const WCHAR *other_categories[] = {
-        L"日文字符", L"韩文字符", L"东亚字符", L"大篆", L"小篆",
-        L"俄文字符", L"古埃及文字", L"象形文字"
-    };
     size_t i;
     int all_data_index;
     int selected_index = 0;
@@ -1951,17 +2142,19 @@ static void ys_add_category_items(YSAppState *state, int preferred_mapping) {
     ys_add_category_mapping_item(state, L"常用符号", YS_CATEGORY_MAP_COMMON);
     if (preferred_mapping == YS_CATEGORY_MAP_COMMON) selected_index = 0;
 
-    for (i = 0; i < YS_ARRAY_COUNT(main_categories); ++i) {
-        ys_add_named_category(state, main_categories[i], main_categories[i], &selected_index, preferred_mapping);
+    for (i = 0; i < YS_ARRAY_COUNT(g_ys_main_category_names); ++i) {
+        ys_add_named_category(state, g_ys_main_category_names[i], g_ys_main_category_names[i],
+                              &selected_index, preferred_mapping);
     }
 
-    ys_add_category_mapping_item(state, state->other_expanded ? L"其他字符：▼" : L"其他字符：▶",
+    ys_add_category_mapping_item(state, state->other_expanded ? L"其他符号⯆" : L"其他符号⯈",
                                  YS_CATEGORY_MAP_OTHER_HEADER);
     if (state->other_expanded) {
-        for (i = 0; i < YS_ARRAY_COUNT(other_categories); ++i) {
+        for (i = 0; i < YS_ARRAY_COUNT(g_ys_other_category_names); ++i) {
             WCHAR display_name[64];
-            StringCchPrintfW(display_name, YS_ARRAY_COUNT(display_name), L"    %s", other_categories[i]);
-            ys_add_named_category(state, display_name, other_categories[i], &selected_index, preferred_mapping);
+            StringCchPrintfW(display_name, YS_ARRAY_COUNT(display_name), L"    %s", g_ys_other_category_names[i]);
+            ys_add_named_category(state, display_name, g_ys_other_category_names[i],
+                                  &selected_index, preferred_mapping);
         }
     }
 
@@ -1983,6 +2176,182 @@ static void ys_add_category_items(YSAppState *state, int preferred_mapping) {
     SendMessageW(state->categories, LB_SETCURSEL, selected_index, 0);
 }
 
+static int ys_find_category_ui_index(const YSAppState *state, int mapping) {
+    size_t index;
+    if (!state || !state->category_map) return -1;
+    for (index = 0; index < state->category_item_count; ++index) {
+        if (state->category_map[index] == mapping) return (int)index;
+    }
+    return -1;
+}
+
+static BOOL ys_is_other_category_index(int data_index) {
+    const WCHAR *name;
+    size_t index;
+    if (data_index < 0 || (size_t)data_index >= g_ys_category_count) return FALSE;
+    name = ys_pool_string(g_ys_categories[data_index].name_offset);
+    for (index = 0; index < YS_ARRAY_COUNT(g_ys_other_category_names); ++index) {
+        if (wcscmp(name, g_ys_other_category_names[index]) == 0) return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL ys_find_symbol_location_in_category(int category_index, uint32_t symbol_index,
+                                                uint32_t *group_index, uint32_t *item_index,
+                                                uint16_t *row_number, uint16_t *column_number) {
+    const YSCategoryRecord *category;
+    uint32_t relative_group;
+    if (category_index < 0 || (size_t)category_index >= g_ys_category_count ||
+        symbol_index >= g_ys_symbol_count) return FALSE;
+    category = &g_ys_categories[category_index];
+    for (relative_group = 0; relative_group < category->group_count; ++relative_group) {
+        uint32_t absolute_group = category->first_group + relative_group;
+        const YSGroupRecord *group = &g_ys_groups[absolute_group];
+        uint32_t item;
+        if (group->flags & YS_GROUP_FLAG_SPACER) continue;
+        for (item = 0; item < group->item_count; ++item) {
+            if (g_ys_group_items[group->item_start + item] != symbol_index) continue;
+            if (group_index) *group_index = absolute_group;
+            if (item_index) *item_index = item;
+            if (row_number) *row_number = group->row_number;
+            if (column_number) *column_number = (uint16_t)(item + 1u);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+static void ys_scroll_to_symbol_location(YSAppState *state, uint32_t symbol_index,
+                                         int category_index, uint32_t group_index,
+                                         uint32_t item_index, uint16_t row_number,
+                                         uint16_t column_number) {
+    size_t index;
+    int target_y = 0;
+    BOOL found = FALSE;
+    state->hover_layout = -1;
+    state->hover_virtual_group = -1;
+    state->hover_virtual_item = -1;
+    if (state->virtual_data_mode) {
+        for (index = 0; index < state->virtual_group_count; ++index) {
+            const YSVirtualGroup *group = &state->virtual_groups[index];
+            if (group->group_index != group_index) continue;
+            target_y = group->symbols_top + (int)(item_index / max(1, group->columns)) * YS_CELL_H;
+            state->hover_virtual_group = (int)index;
+            state->hover_virtual_item = (int)item_index;
+            found = TRUE;
+            break;
+        }
+    } else {
+        for (index = 0; index < state->layout_count; ++index) {
+            YSLayoutItem *item = &state->layout[index];
+            if (item->type != YS_ITEM_SYMBOL || item->category_index != category_index ||
+                item->row_number != row_number || item->column_number != column_number ||
+                item->view_index >= state->view_count) continue;
+            target_y = item->rect.top;
+            state->hover_layout = (int)index;
+            found = TRUE;
+            break;
+        }
+    }
+    if (found) {
+        ys_grid_scroll(state, max(0, target_y - YS_CELL_H * 2));
+        InvalidateRect(state->grid, NULL, FALSE);
+    }
+}
+
+static void ys_jump_to_symbol_origin(YSAppState *state, uint32_t symbol_index) {
+    const YSSymbolOriginRecord *origin;
+    int target_category;
+    uint32_t target_group;
+    uint32_t target_item;
+    uint16_t target_row;
+    uint16_t target_column;
+    int ui_index;
+    const WCHAR *category_name;
+    YSViewSymbol view;
+    if (!state || !ys_symbol_origin_valid(symbol_index)) return;
+    origin = ys_symbol_origin(symbol_index);
+    target_category = origin->category_index;
+    target_group = origin->group_index;
+    target_item = origin->item_index;
+    target_row = origin->row_number;
+    target_column = origin->column_number;
+
+    /* 补充符号不在侧边栏。对于只存在于该分类的少量字符，跳到
+       “全部符号”中对应的真实位置，而悬浮信息仍显示原始分类。 */
+    if (wcscmp(ys_pool_string(g_ys_categories[target_category].name_offset), L"补充符号") == 0) {
+        int all_category = ys_find_data_category_by_name(L"全部符号");
+        if (all_category >= 0 &&
+            ys_find_symbol_location_in_category(all_category, symbol_index, &target_group, &target_item,
+                                                &target_row, &target_column)) {
+            target_category = all_category;
+        }
+    }
+
+    if (ys_is_other_category_index(target_category)) state->other_expanded = TRUE;
+    ys_add_category_items(state, target_category);
+    ui_index = ys_find_category_ui_index(state, target_category);
+    if (ui_index < 0) return;
+    state->selected_ui = ui_index;
+    state->active_category_mapping = target_category;
+    SendMessageW(state->categories, LB_SETCURSEL, ui_index, 0);
+    ys_set_search_text(state, L"");
+    ys_layout_controls(state);
+    ys_rebuild(state, TRUE);
+    ys_scroll_to_symbol_location(state, symbol_index, target_category, target_group,
+                                 target_item, target_row, target_column);
+
+    ZeroMemory(&view, sizeof(view));
+    view.text = ys_symbol_text(symbol_index);
+    view.name_zh = ys_symbol_name_zh(symbol_index);
+    view.name_en = ys_symbol_name_en(symbol_index);
+    view.flags = g_ys_symbols[symbol_index].flags;
+    view.symbol_index = symbol_index;
+    view.source = YS_SOURCE_DATA;
+    category_name = ys_pool_string(g_ys_categories[origin->category_index].name_offset);
+    ys_set_footer(state, &view, category_name, L"已定位：");
+    SetFocus(state->grid);
+}
+
+static void ys_invalidate_category_item(YSAppState *state, int item_index) {
+    RECT rect;
+    if (!state || !state->categories || item_index < 0) return;
+    if (SendMessageW(state->categories, LB_GETITEMRECT, item_index, (LPARAM)&rect) != LB_ERR) {
+        InvalidateRect(state->categories, &rect, FALSE);
+    }
+}
+
+static LRESULT CALLBACK ys_categories_subclass_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
+                                                    UINT_PTR subclass_id, DWORD_PTR reference_data) {
+    YSAppState *state = (YSAppState *)reference_data;
+    (void)subclass_id;
+    if (message == WM_MOUSEMOVE && state) {
+        DWORD hit = (DWORD)SendMessageW(hwnd, LB_ITEMFROMPOINT, 0, lparam);
+        int item_index = HIWORD(hit) ? -1 : (int)LOWORD(hit);
+        if (item_index != state->category_hover_index) {
+            int old_index = state->category_hover_index;
+            state->category_hover_index = item_index;
+            ys_invalidate_category_item(state, old_index);
+            ys_invalidate_category_item(state, item_index);
+        }
+        {
+            TRACKMOUSEEVENT tracking;
+            ZeroMemory(&tracking, sizeof(tracking));
+            tracking.cbSize = sizeof(tracking);
+            tracking.dwFlags = TME_LEAVE;
+            tracking.hwndTrack = hwnd;
+            TrackMouseEvent(&tracking);
+        }
+    } else if (message == WM_MOUSELEAVE && state) {
+        int old_index = state->category_hover_index;
+        state->category_hover_index = -1;
+        ys_invalidate_category_item(state, old_index);
+    } else if (message == WM_NCDESTROY) {
+        RemoveWindowSubclass(hwnd, ys_categories_subclass_proc, 1u);
+    }
+    return DefSubclassProc(hwnd, message, wparam, lparam);
+}
+
 static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
     YSAppState *state = (YSAppState *)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
     if (state && state->taskbar_created_message && message == state->taskbar_created_message) {
@@ -1999,12 +2368,15 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         state->instance = create->hInstance;
         state->hwnd = hwnd;
         state->selected_ui = 0;
+        state->active_category_mapping = YS_CATEGORY_MAP_COMMON;
         state->hover_layout = -1;
         state->hover_virtual_group = -1;
         state->hover_virtual_item = -1;
         state->recent_hover_index = -1;
+        state->category_hover_index = -1;
+        state->search_history_nav = -1;
         state->recent_expanded = TRUE;
-        state->other_expanded = TRUE;
+        state->other_expanded = FALSE;
         state->virtual_category_index = -1;
         ys_capture_external_target(state);
         state->taskbar_created_message = RegisterWindowMessageW(L"TaskbarCreated");
@@ -2029,6 +2401,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             state->storage_dirty_flags |= YS_STORAGE_DIRTY_COMMON;
         }
         ys_storage_load_custom(&state->custom);
+        ys_search_history_init(&state->search_history);
+        ys_storage_load_search_history(&state->search_history);
         auto_insert_enabled = ys_storage_load_bool(L"AutoInsert", FALSE);
 
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)state);
@@ -2085,6 +2459,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
                                       WS_CHILD | WS_VISIBLE | WS_TABSTOP | WS_VSCROLL,
                                       0, 0, 0, 0, hwnd, (HMENU)(INT_PTR)ID_GRID,
                                       create->hInstance, state);
+        SetWindowSubclass(state->search, ys_search_subclass_proc, 1u, (DWORD_PTR)state);
+        SetWindowSubclass(state->categories, ys_categories_subclass_proc, 1u, (DWORD_PTR)state);
 
         state->custom_label = CreateWindowW(L"STATIC", L"手动添加自定义符号",
                                              WS_CHILD, 0, 0, 0, 0, hwnd, NULL,
@@ -2121,6 +2497,7 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         ys_set_font(state->status, state->ui_font);
 
         ys_add_category_items(state, YS_CATEGORY_MAP_COMMON);
+        state->active_category_mapping = YS_CATEGORY_MAP_COMMON;
         ys_layout_controls(state);
         ys_rebuild(state, TRUE);
         PostMessageW(hwnd, YESYMBOL_DEFERRED_INIT_MESSAGE, 0, 0);
@@ -2156,16 +2533,25 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             int mapping;
             BOOL header;
             BOOL selected;
+            BOOL hovered;
             if (draw->itemID == (UINT)-1) return TRUE;
             mapping = ys_category_map_value(state, (int)draw->itemID);
             header = mapping == YS_CATEGORY_MAP_OTHER_HEADER;
-            selected = !header && (draw->itemState & ODS_SELECTED) != 0;
+            selected = (draw->itemState & ODS_SELECTED) != 0;
+            hovered = state->category_hover_index == (int)draw->itemID;
             SendMessageW(state->categories, LB_GETTEXT, draw->itemID, (LPARAM)text);
-            FillRect(draw->hDC, &rect, GetSysColorBrush(header ? COLOR_BTNFACE : (selected ? COLOR_HIGHLIGHT : COLOR_WINDOW)));
+            if (selected && !header) {
+                FillRect(draw->hDC, &rect, GetSysColorBrush(COLOR_HIGHLIGHT));
+            } else if (selected || hovered) {
+                SetDCBrushColor(draw->hDC, RGB(238, 244, 250));
+                FillRect(draw->hDC, &rect, (HBRUSH)GetStockObject(DC_BRUSH));
+            } else {
+                FillRect(draw->hDC, &rect, GetSysColorBrush(COLOR_WINDOW));
+            }
             SetBkMode(draw->hDC, TRANSPARENT);
-            SetTextColor(draw->hDC, GetSysColor(selected ? COLOR_HIGHLIGHTTEXT : COLOR_WINDOWTEXT));
-            SelectObject(draw->hDC, header ? state->group_font : state->ui_font);
-            rect.left += header ? 8 : 12;
+            SetTextColor(draw->hDC, GetSysColor(selected && !header ? COLOR_HIGHLIGHTTEXT : COLOR_WINDOWTEXT));
+            SelectObject(draw->hDC, state->ui_font);
+            rect.left += 12;
             rect.right -= 6;
             DrawTextW(draw->hDC, text, -1, &rect,
                       DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
@@ -2177,14 +2563,22 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         if (!state) break;
         if (LOWORD(wparam) == ID_SEARCH && HIWORD(wparam) == EN_CHANGE) {
             if (state->suppress_search_change) return 0;
+            state->search_history_nav = -1;
+            state->search_history_draft[0] = 0;
             ShowWindow(state->search_clear, GetWindowTextLengthW(state->search) ? SW_SHOW : SW_HIDE);
             ys_layout_controls(state);
             KillTimer(hwnd, YS_TIMER_SEARCH);
+            KillTimer(hwnd, YS_TIMER_SEARCH_HISTORY);
             SetTimer(hwnd, YS_TIMER_SEARCH, YS_SEARCH_DEBOUNCE_MS, NULL);
+            if (GetWindowTextLengthW(state->search)) {
+                SetTimer(hwnd, YS_TIMER_SEARCH_HISTORY, YS_SEARCH_HISTORY_COMMIT_MS, NULL);
+            }
             return 0;
         }
         if (LOWORD(wparam) == ID_SEARCH_CLEAR) {
+            ys_search_history_commit_current(state);
             ys_set_search_text(state, L"");
+            ys_layout_controls(state);
             ys_rebuild(state, TRUE);
             SetFocus(state->search);
             return 0;
@@ -2217,14 +2611,25 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             int selection = (int)SendMessageW(state->categories, LB_GETCURSEL, 0, 0);
             int mapping = ys_category_map_value(state, selection);
             if (mapping == YS_CATEGORY_MAP_OTHER_HEADER) {
-                int previous_mapping = ys_category_map_value(state, state->selected_ui);
+                int active_mapping = state->active_category_mapping;
+                int header_index;
                 state->other_expanded = !state->other_expanded;
-                ys_add_category_items(state, previous_mapping);
+                ys_add_category_items(state, active_mapping);
+                state->active_category_mapping = active_mapping;
+                header_index = ys_find_category_ui_index(state, YS_CATEGORY_MAP_OTHER_HEADER);
+                if (header_index >= 0) {
+                    state->selected_ui = header_index;
+                    SendMessageW(state->categories, LB_SETCURSEL, header_index, 0);
+                }
                 ys_layout_controls(state);
-                ys_rebuild(state, FALSE);
+                InvalidateRect(state->categories, NULL, FALSE);
                 return 0;
             }
-            if (selection >= 0) state->selected_ui = selection;
+            if (selection >= 0) {
+                state->selected_ui = selection;
+                state->active_category_mapping = mapping;
+            }
+            ys_search_history_commit_current(state);
             ys_set_search_text(state, L"");
             ys_layout_controls(state);
             ys_rebuild(state, TRUE);
@@ -2250,6 +2655,9 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             ys_rebuild(state, TRUE);
         } else if (wparam == YS_TIMER_STORAGE) {
             ys_flush_storage(state);
+        } else if (wparam == YS_TIMER_SEARCH_HISTORY) {
+            KillTimer(hwnd, YS_TIMER_SEARCH_HISTORY);
+            ys_search_history_commit_current(state);
         }
         return 0;
     case YESYMBOL_DEFERRED_INIT_MESSAGE:
@@ -2297,7 +2705,10 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             KillTimer(hwnd, YS_TIMER_FOREGROUND);
             KillTimer(hwnd, YS_TIMER_SEARCH);
             KillTimer(hwnd, YS_TIMER_STORAGE);
+            KillTimer(hwnd, YS_TIMER_SEARCH_HISTORY);
             ys_flush_storage(state);
+            if (state->search) RemoveWindowSubclass(state->search, ys_search_subclass_proc, 1u);
+            if (state->categories) RemoveWindowSubclass(state->categories, ys_categories_subclass_proc, 1u);
             ys_tray_remove(state);
             ys_hide_tooltip(state);
             ys_hide_recent_tooltip(state);

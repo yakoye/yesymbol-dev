@@ -8,12 +8,12 @@
  */
 
 /* 主窗口外框尺寸（像素） */
-#define YS_WINDOW_WIDTH 770
+#define YS_WINDOW_WIDTH 786
 #define YS_WINDOW_HEIGHT 650
 
 /* 左侧分类列表宽度 */
-#define YS_CATEGORY_WIDTH 142
-#define YS_CATEGORY_ITEM_HEIGHT 30
+#define YS_CATEGORY_WIDTH 162
+#define YS_CATEGORY_ITEM_HEIGHT 28
 
 /* 主符号区域每行最大符号数 */
 #define YS_MAX_COLUMNS 12

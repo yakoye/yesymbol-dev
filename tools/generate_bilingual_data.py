@@ -67,6 +67,65 @@ for ci, category in enumerate(cat['categories']):
 dinds = [idx[text] for text in cat['default_common'] if text in idx]
 
 
+def origin_normalized_text(text):
+    """Normalize presentation-only differences for source-location fallback."""
+    return ''.join(
+        ch for ch in text
+        if ord(ch) != 0xFE0F and not (0x1F3FB <= ord(ch) <= 0x1F3FF)
+    )
+
+
+# Pick one useful source location for every compiled symbol.  The generated
+# “全部符号” category is deliberately last in the preference order, otherwise
+# every search result would report that synthetic category instead of the
+# hand-maintained source category.  “补充符号” is used only when no regular
+# visible category contains the symbol.
+origin_rows = [None] * len(symbols)
+category_priorities = []
+for excluded in ({'全部符号', '补充符号'}, {'全部符号'}, set()):
+    for ci, category in enumerate(cat['categories']):
+        if category['name'] in excluded or ci in category_priorities:
+            continue
+        category_priorities.append(ci)
+
+for ci in category_priorities:
+    category = cat['categories'][ci]
+    first_group = crows[ci][2]
+    for relative_group_index, group in enumerate(category['groups']):
+        if group.get('spacer'):
+            continue
+        group_index = first_group + relative_group_index
+        row_number = int(group.get('row', 0) or 0)
+        for item_index, text in enumerate(group.get('items', [])):
+            symbol_index = idx[text]
+            if origin_rows[symbol_index] is None:
+                origin_rows[symbol_index] = (
+                    ci,
+                    row_number,
+                    item_index + 1,
+                    0,
+                    group_index,
+                    item_index,
+                )
+
+# Hidden skin-tone/presentation variants may not be referenced directly by a
+# category row.  Reuse the source position of their base variant when possible.
+normalized_origins = {}
+for symbol_index, row in enumerate(origin_rows):
+    if row is not None:
+        normalized_origins.setdefault(origin_normalized_text(symbols[symbol_index]['text']), row)
+for symbol_index, row in enumerate(origin_rows):
+    if row is None:
+        row = normalized_origins.get(origin_normalized_text(symbols[symbol_index]['text']))
+        if row is not None:
+            origin_rows[symbol_index] = row
+
+origin_rows = [
+    row if row is not None else (0xFFFF, 0, 0, 0, 0xFFFFFFFF, 0xFFFFFFFF)
+    for row in origin_rows
+]
+
+
 def symbol_hash(text):
     value = 2166136261
     for unit in units(text):
@@ -101,6 +160,7 @@ parts = [
     'const YSSymbolRecord g_ys_symbols[] = {\n' + format_array(srows, lambda row: '{%du,%du,%du,%du,%du}' % row, 2) + '\n};\n',
     'const YSGroupRecord g_ys_groups[] = {\n' + format_array(grows, lambda row: '{%du,%du,%du,%du,%du,%du,%du}' % row, 2) + '\n};\n',
     'const YSCategoryRecord g_ys_categories[] = {\n' + format_array(crows, lambda row: '{%du,%du,%du,%du,0u}' % row, 2) + '\n};\n',
+    'const YSSymbolOriginRecord g_ys_symbol_origins[] = {\n' + format_array(origin_rows, lambda row: '{%du,%du,%du,%du,%du,%du}' % row, 2) + '\n};\n',
     'const uint32_t g_ys_group_items[] = {\n' + format_array(irefs, lambda value: f'{value}u', 12) + '\n};\n',
     'const uint32_t g_ys_default_common_items[] = {\n' + format_array(dinds, lambda value: f'{value}u', 12) + '\n};\n',
     'static const uint32_t g_ys_symbol_hash_table[] = {\n' + format_array(hash_table, lambda value: f'{value}u', 16) + '\n};\n',
