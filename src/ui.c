@@ -2622,6 +2622,108 @@ static LRESULT CALLBACK ys_categories_subclass_proc(HWND hwnd, UINT message, WPA
     return DefSubclassProc(hwnd, message, wparam, lparam);
 }
 
+/* How many emoji symbols to warm synchronously (blocking WM_CREATE, before
+ * the window is shown) per "Emoji·" category. Large enough to cover more
+ * than one screenful (YS_MAX_COLUMNS=12 wide) so a first click needs no
+ * scrolling to feel warm; small enough that the one-time startup delay
+ * this adds stays well under what a user would notice as a slow launch. */
+#define YS_EMOJI_SYNC_PREWARM_PER_CATEGORY 60u
+
+static BOOL ys_category_name_starts_with(uint32_t category_index, const WCHAR *prefix) {
+    const WCHAR *name = ys_pool_string(g_ys_categories[category_index].name_offset);
+    return wcsncmp(name, prefix, wcslen(prefix)) == 0;
+}
+
+/* Kicks off background worker threads (see ys_emoji_renderer_warm_cache_async)
+ * that pre-create the DirectWrite text layout for every emoji symbol in the
+ * catalog, so opening an emoji-heavy category for the first time in a
+ * session is already served from cache instead of shaping ~3900 symbols on
+ * demand. texts[] holds pointers into g_ys_string_pool, which is static
+ * program-lifetime data, so it is safe for the background threads to read
+ * them at their own pace; the warm-up call takes ownership of the texts
+ * array itself and frees it when done (or immediately on failure here).
+ *
+ * Symbols are collected by walking categories in sidebar display order
+ * (skipping index 0, "全部符号", a synthetic aggregate of every other
+ * category -- see generate_bilingual_data.py) rather than by raw
+ * g_ys_symbols index order, which does not track display order.
+ *
+ * Reordering alone still depends on the background pass having had enough
+ * wall-clock time to reach a given category before the user opens it --
+ * for the biggest category ("Emoji·符号与旗帜", mostly flags, and also the
+ * last of the five "Emoji·" categories in display order) that was
+ * observed to still lose the race in practice. So before starting the
+ * background pass, this also synchronously warms a bounded first slice of
+ * every "Emoji·" category (see ys_emoji_renderer_warm_cache_sync), which
+ * guarantees those categories' first screenful is already cached the
+ * moment the window appears, independent of background thread timing. */
+static void ys_warm_emoji_layout_cache(YSAppState *state) {
+    const WCHAR **texts;
+    BYTE *seen;
+    size_t capacity = 0, count = 0;
+    uint32_t symbol_index, ci, gi, ii;
+    if (!state || !ys_emoji_renderer_is_available(state->emoji_renderer)) return;
+    for (symbol_index = 0; symbol_index < g_ys_symbol_count; ++symbol_index) {
+        if (g_ys_symbols[symbol_index].flags & YS_SYMBOL_FLAG_EMOJI) ++capacity;
+    }
+    if (!capacity) return;
+    texts = (const WCHAR **)HeapAlloc(GetProcessHeap(), 0, sizeof(WCHAR *) * capacity);
+    if (!texts) return;
+    seen = (BYTE *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, g_ys_symbol_count);
+    if (!seen) {
+        HeapFree(GetProcessHeap(), 0, texts);
+        return;
+    }
+
+    for (ci = 1; ci < g_ys_category_count; ++ci) {
+        const YSCategoryRecord *category;
+        const WCHAR *sync_texts[YS_EMOJI_SYNC_PREWARM_PER_CATEGORY];
+        size_t sync_count = 0;
+        if (!ys_category_name_starts_with(ci, L"Emoji")) continue;
+        category = &g_ys_categories[ci];
+        for (gi = 0; gi < category->group_count && sync_count < YS_EMOJI_SYNC_PREWARM_PER_CATEGORY; ++gi) {
+            const YSGroupRecord *group = &g_ys_groups[category->first_group + gi];
+            for (ii = 0; ii < group->item_count && sync_count < YS_EMOJI_SYNC_PREWARM_PER_CATEGORY; ++ii) {
+                symbol_index = g_ys_group_items[group->item_start + ii];
+                if (symbol_index >= g_ys_symbol_count || seen[symbol_index]) continue;
+                seen[symbol_index] = 1;
+                if (g_ys_symbols[symbol_index].flags & YS_SYMBOL_FLAG_EMOJI) {
+                    sync_texts[sync_count++] = ys_symbol_text(symbol_index);
+                }
+            }
+        }
+        if (sync_count) {
+            ys_emoji_renderer_warm_cache_sync(state->emoji_renderer, sync_texts, sync_count,
+                                              YS_CELL_W - 6, YS_CELL_H - 6);
+        }
+    }
+
+    /* Everything else -- the rest of each "Emoji·" category beyond the
+     * synchronous slice above, plus any other category's emoji symbols --
+     * goes to the background pass; `seen` already excludes what was just
+     * warmed synchronously. */
+    for (ci = 1; ci < g_ys_category_count && count < capacity; ++ci) {
+        const YSCategoryRecord *category = &g_ys_categories[ci];
+        for (gi = 0; gi < category->group_count; ++gi) {
+            const YSGroupRecord *group = &g_ys_groups[category->first_group + gi];
+            for (ii = 0; ii < group->item_count; ++ii) {
+                symbol_index = g_ys_group_items[group->item_start + ii];
+                if (symbol_index >= g_ys_symbol_count || seen[symbol_index]) continue;
+                seen[symbol_index] = 1;
+                if (g_ys_symbols[symbol_index].flags & YS_SYMBOL_FLAG_EMOJI) {
+                    texts[count++] = ys_symbol_text(symbol_index);
+                }
+            }
+        }
+    }
+    HeapFree(GetProcessHeap(), 0, seen);
+
+    if (!count || !ys_emoji_renderer_warm_cache_async(state->emoji_renderer, texts, count,
+                                                       YS_CELL_W - 6, YS_CELL_H - 6)) {
+        HeapFree(GetProcessHeap(), 0, texts);
+    }
+}
+
 static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
     YSAppState *state = (YSAppState *)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
     if (state && state->taskbar_created_message && message == state->taskbar_created_message) {
@@ -2663,6 +2765,7 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
                                         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                                         CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI Emoji");
         state->emoji_renderer = ys_emoji_renderer_create((float)(-YS_EMOJI_FONT_HEIGHT));
+        ys_warm_emoji_layout_cache(state);
 
         ys_storage_init_list(&state->recent, YS_MAX_RECENT);
         ys_common_init(&state->common);

@@ -4,7 +4,7 @@ categories (including generated 全部符号): 24
 unique symbol definitions: 16679
 symbol definition duplicates removed: 0
 duplicates removed inside the same group: 0
-duplicate references removed inside the same category: 0
+duplicate references removed inside the same category: 1
 unreferenced definitions removed: 0
 missing definitions created: 0
 Chinese names replaced from pinned CLDR TTS cache: 1798

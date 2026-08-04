@@ -41,11 +41,30 @@
  * don't re-shape) are refreshed per draw, so a symbol cached from a
  * differently-sized context (e.g. the recent-use strip vs. the main grid)
  * still lays out correctly. Capacity is a fixed power-of-two open-addressed
- * table; if it ever fills up the whole cache is dropped and rebuilt rather
- * than tracking per-entry recency, which keeps the eviction logic simple
- * and correct at the cost of an occasional one-time re-shape burst. */
-#define YS_EMOJI_LAYOUT_CACHE_CAPACITY 4096u
+ * table sized comfortably above the ~3900 actual emoji symbols in the
+ * catalog, so a full background warm-up (see
+ * ys_emoji_renderer_warm_cache_async below) does not fill it; if it ever
+ * does fill up anyway, the whole cache is dropped and rebuilt rather than
+ * tracking per-entry recency, which keeps the eviction logic simple and
+ * correct at the cost of an occasional one-time re-shape burst.
+ *
+ * The cache is shared between the UI thread (draws, via
+ * ys_emoji_renderer_draw) and an optional background warm-up thread, so all
+ * access to layout_cache/layout_cache_used must hold cache_lock. Only the
+ * UI thread's own insert path (in ys_emoji_renderer_draw) is allowed to
+ * evict/clear the cache: eviction Release()s every cached layout, and the
+ * UI thread may be mid-DrawTextLayout on a pointer it fetched outside the
+ * lock, so a release racing with that use would be a use-after-free. The
+ * background thread only ever inserts (skipping a symbol instead of
+ * evicting if the table is briefly full), which never touches an object
+ * anyone else might currently be using. */
+#define YS_EMOJI_LAYOUT_CACHE_CAPACITY 8192u
 #define YS_EMOJI_LAYOUT_CACHE_TEXT_CAPACITY 36u
+/* Warm-up is split across at most this many low-priority worker threads
+ * (see ys_emoji_renderer_warm_cache_async) so the whole background pass
+ * finishes sooner in wall-clock time, capped to avoid over-subscribing on
+ * very high-core-count machines for what is purely opportunistic work. */
+#define YS_EMOJI_WARMUP_MAX_THREADS 4u
 
 typedef struct YSEmojiLayoutCacheSlot {
     WCHAR text[YS_EMOJI_LAYOUT_CACHE_TEXT_CAPACITY];
@@ -60,6 +79,10 @@ struct YSEmojiRenderer {
     IDWriteTextFormat *text_format;
     YSEmojiLayoutCacheSlot *layout_cache;
     UINT32 layout_cache_used;
+    CRITICAL_SECTION cache_lock;
+    HANDLE warmup_threads[YS_EMOJI_WARMUP_MAX_THREADS];
+    UINT32 warmup_thread_count;
+    volatile LONG warmup_cancel;
     BOOL drawing;
     BOOL available;
 };
@@ -72,6 +95,10 @@ static UINT32 ys_emoji_text_hash(const WCHAR *text) {
     }
     return hash;
 }
+
+/* renderer->cache_lock must be held by the caller for all three functions
+ * below -- they do no locking of their own so callers can hold the lock
+ * across a find-then-maybe-insert sequence without deadlocking. */
 
 static void ys_emoji_layout_cache_clear(YSEmojiRenderer *renderer) {
     UINT32 i;
@@ -99,24 +126,21 @@ static IDWriteTextLayout *ys_emoji_layout_cache_find(YSEmojiRenderer *renderer, 
     return NULL;
 }
 
-static void ys_emoji_layout_cache_insert(YSEmojiRenderer *renderer, const WCHAR *text, IDWriteTextLayout *layout) {
+static BOOL ys_emoji_layout_cache_insert(YSEmojiRenderer *renderer, const WCHAR *text, IDWriteTextLayout *layout) {
     UINT32 mask = YS_EMOJI_LAYOUT_CACHE_CAPACITY - 1u;
     UINT32 slot = ys_emoji_text_hash(text) & mask;
     UINT32 start = slot;
-    if (!renderer->layout_cache) return;
+    if (!renderer->layout_cache) return FALSE;
     do {
         if (!renderer->layout_cache[slot].layout) {
             StringCchCopyW(renderer->layout_cache[slot].text, YS_EMOJI_LAYOUT_CACHE_TEXT_CAPACITY, text);
             renderer->layout_cache[slot].layout = layout;
             ++renderer->layout_cache_used;
-            return;
+            return TRUE;
         }
         slot = (slot + 1u) & mask;
     } while (slot != start);
-    /* Capacity is refreshed before every insert attempt (see
-     * ys_emoji_renderer_draw), so a full table here should not happen; if
-     * it somehow does, the caller still owns `layout` and will draw+release
-     * it once instead of caching it. */
+    return FALSE;
 }
 
 static void ys_emoji_renderer_release_target(YSEmojiRenderer *renderer) {
@@ -173,6 +197,9 @@ YSEmojiRenderer *ys_emoji_renderer_create(float font_size_pixels) {
     HRESULT result;
     renderer = (YSEmojiRenderer *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*renderer));
     if (!renderer) return NULL;
+    /* Initialized before anything else so ys_emoji_renderer_destroy can
+     * unconditionally delete it on any later failure path below. */
+    InitializeCriticalSection(&renderer->cache_lock);
 
     result = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
                                IID_ID2D1Factory, NULL,
@@ -218,12 +245,24 @@ failed:
 
 void ys_emoji_renderer_destroy(YSEmojiRenderer *renderer) {
     if (!renderer) return;
+    if (renderer->warmup_thread_count) {
+        UINT32 i;
+        /* Each worker's loop checks this every symbol, so all of them
+         * notice and exit promptly; wait for every one before touching
+         * anything they might still be reading (dwrite_factory,
+         * text_format, the cache). */
+        InterlockedExchange(&renderer->warmup_cancel, 1);
+        WaitForMultipleObjects(renderer->warmup_thread_count, renderer->warmup_threads, TRUE, INFINITE);
+        for (i = 0; i < renderer->warmup_thread_count; ++i) CloseHandle(renderer->warmup_threads[i]);
+        renderer->warmup_thread_count = 0;
+    }
     ys_emoji_renderer_release_target(renderer);
     ys_emoji_layout_cache_clear(renderer);
     if (renderer->layout_cache) HeapFree(GetProcessHeap(), 0, renderer->layout_cache);
     if (renderer->text_format) renderer->text_format->Release();
     if (renderer->dwrite_factory) renderer->dwrite_factory->Release();
     if (renderer->d2d_factory) renderer->d2d_factory->Release();
+    DeleteCriticalSection(&renderer->cache_lock);
     HeapFree(GetProcessHeap(), 0, renderer);
 }
 
@@ -283,26 +322,50 @@ BOOL ys_emoji_renderer_draw(YSEmojiRenderer *renderer, const WCHAR *text,
     height = draw_rect.bottom - draw_rect.top;
     if (width <= 0.0f || height <= 0.0f) return FALSE;
 
+    EnterCriticalSection(&renderer->cache_lock);
     layout = ys_emoji_layout_cache_find(renderer, text);
+    LeaveCriticalSection(&renderer->cache_lock);
+
     if (layout) {
         /* Cheap: only adjusts the layout box, does not re-run text
          * analysis/shaping, so a symbol cached from a different-sized
-         * context (e.g. the recent-use strip) still lays out correctly
-         * here. */
+         * context (e.g. the recent-use strip, or the background warm-up's
+         * default cell size) still lays out correctly here. */
         layout->SetMaxWidth(width);
         layout->SetMaxHeight(height);
     } else {
-        if (renderer->layout_cache_used >= (YS_EMOJI_LAYOUT_CACHE_CAPACITY * 3u) / 4u) {
-            ys_emoji_layout_cache_clear(renderer);
-        }
+        IDWriteTextLayout *existing;
+        /* CreateTextLayout runs without the lock held -- it can run
+         * concurrently with the warm-up thread doing the same for other
+         * symbols (DirectWrite's shared factory is documented safe for
+         * that), and it keeps this possibly-slow, first-time shaping work
+         * from blocking anyone else's cache access. */
         result = renderer->dwrite_factory->CreateTextLayout(text, (UINT32)wcslen(text),
                                                               renderer->text_format,
                                                               width, height, &layout);
         if (FAILED(result) || !layout) return FALSE;
-        if (renderer->layout_cache_used < YS_EMOJI_LAYOUT_CACHE_CAPACITY) {
-            ys_emoji_layout_cache_insert(renderer, text, layout);
+
+        EnterCriticalSection(&renderer->cache_lock);
+        existing = ys_emoji_layout_cache_find(renderer, text);
+        if (existing) {
+            /* The warm-up thread cached this same text while we were
+             * creating our own copy above: drop ours and use the shared
+             * entry instead of keeping two layouts for the same symbol. */
+            LeaveCriticalSection(&renderer->cache_lock);
+            layout->Release();
+            layout = existing;
+            layout->SetMaxWidth(width);
+            layout->SetMaxHeight(height);
         } else {
-            owned_layout = TRUE;
+            if (renderer->layout_cache_used >= (YS_EMOJI_LAYOUT_CACHE_CAPACITY * 3u) / 4u) {
+                ys_emoji_layout_cache_clear(renderer);
+            }
+            /* Insert failing here (table still full right after a clear)
+             * would mean layout_cache_used is far larger than the actual
+             * emoji vocabulary -- not expected, but stay correct: draw this
+             * one time and release it ourselves instead of leaking it. */
+            if (!ys_emoji_layout_cache_insert(renderer, text, layout)) owned_layout = TRUE;
+            LeaveCriticalSection(&renderer->cache_lock);
         }
     }
 
@@ -312,6 +375,171 @@ BOOL ys_emoji_renderer_draw(YSEmojiRenderer *renderer, const WCHAR *text,
     renderer->dc_target->DrawTextLayout(origin, layout, renderer->brush, options);
     if (owned_layout) layout->Release();
     return TRUE;
+}
+
+/* Shared by every worker thread spawned for one ys_emoji_renderer_warm_cache_async
+ * call. `texts` is caller-ordered (see ui.c: category display order, most
+ * likely to be opened first, comes first) and split into contiguous
+ * per-thread slices below -- each worker stays priority-ordered within its
+ * own slice, and running several slices concurrently finishes the whole
+ * pass sooner without disturbing that ordering. active_workers starts at
+ * the number of slices actually handed to a running thread; whichever
+ * worker (or, if every CreateThread call failed, the spawning call itself)
+ * decrements it to zero owns freeing `texts` and this job struct. */
+typedef struct YSEmojiWarmupJob {
+    YSEmojiRenderer *renderer;
+    const WCHAR **texts;
+    FLOAT cell_width;
+    FLOAT cell_height;
+    volatile LONG active_workers;
+} YSEmojiWarmupJob;
+
+typedef struct YSEmojiWarmupSlice {
+    YSEmojiWarmupJob *job;
+    size_t start;
+    size_t end;
+} YSEmojiWarmupSlice;
+
+static void ys_emoji_warmup_job_release(YSEmojiWarmupJob *job) {
+    if (InterlockedDecrement(&job->active_workers) == 0) {
+        HeapFree(GetProcessHeap(), 0, job->texts);
+        HeapFree(GetProcessHeap(), 0, job);
+    }
+}
+
+/* Ensures `text` has a cached layout, creating one via CreateTextLayout if
+ * needed. Used by both the synchronous and background warm-up paths, which
+ * only need the cache populated (unlike ys_emoji_renderer_draw, which also
+ * needs the layout pointer back to draw with immediately).
+ *
+ * allow_evict must only be TRUE for calls made from the UI thread: eviction
+ * Release()s every cached layout, and if a background worker triggered it
+ * while the UI thread was mid-DrawTextLayout on a pointer fetched outside
+ * the lock (see ys_emoji_renderer_draw), that would be a use-after-free.
+ * The UI-thread-only synchronous warm-up path is safe to evict from
+ * because it runs before the window is shown, i.e. before anything could
+ * possibly be mid-draw yet. */
+static void ys_emoji_renderer_ensure_cached(YSEmojiRenderer *renderer, const WCHAR *text,
+                                            FLOAT width, FLOAT height, BOOL allow_evict) {
+    IDWriteTextLayout *layout;
+    IDWriteTextLayout *existing;
+    HRESULT result;
+    if (!text || !text[0]) return;
+
+    EnterCriticalSection(&renderer->cache_lock);
+    existing = ys_emoji_layout_cache_find(renderer, text);
+    LeaveCriticalSection(&renderer->cache_lock);
+    if (existing) return;
+
+    result = renderer->dwrite_factory->CreateTextLayout(text, (UINT32)wcslen(text),
+                                                         renderer->text_format, width, height, &layout);
+    if (FAILED(result) || !layout) return;
+
+    EnterCriticalSection(&renderer->cache_lock);
+    existing = ys_emoji_layout_cache_find(renderer, text);
+    if (existing) {
+        LeaveCriticalSection(&renderer->cache_lock);
+        layout->Release();
+        return;
+    }
+    if (allow_evict && renderer->layout_cache_used >= (YS_EMOJI_LAYOUT_CACHE_CAPACITY * 3u) / 4u) {
+        ys_emoji_layout_cache_clear(renderer);
+    }
+    if (!ys_emoji_layout_cache_insert(renderer, text, layout)) layout->Release();
+    LeaveCriticalSection(&renderer->cache_lock);
+}
+
+static DWORD WINAPI ys_emoji_renderer_warmup_proc(LPVOID param) {
+    YSEmojiWarmupSlice *slice = (YSEmojiWarmupSlice *)param;
+    YSEmojiWarmupJob *job = slice->job;
+    YSEmojiRenderer *renderer = job->renderer;
+    size_t i;
+    for (i = slice->start; i < slice->end; ++i) {
+        if (renderer->warmup_cancel) break;
+        ys_emoji_renderer_ensure_cached(renderer, job->texts[i], job->cell_width, job->cell_height, FALSE);
+    }
+    HeapFree(GetProcessHeap(), 0, slice);
+    ys_emoji_warmup_job_release(job);
+    return 0;
+}
+
+void ys_emoji_renderer_warm_cache_sync(YSEmojiRenderer *renderer,
+                                       const WCHAR *const *texts, size_t text_count,
+                                       int cell_width, int cell_height) {
+    size_t i;
+    if (!ys_emoji_renderer_is_available(renderer) || !texts || cell_width <= 0 || cell_height <= 0) return;
+    for (i = 0; i < text_count; ++i) {
+        ys_emoji_renderer_ensure_cached(renderer, texts[i], (FLOAT)cell_width, (FLOAT)cell_height, TRUE);
+    }
+}
+
+BOOL ys_emoji_renderer_warm_cache_async(YSEmojiRenderer *renderer,
+                                        const WCHAR **texts, size_t text_count,
+                                        int cell_width, int cell_height) {
+    YSEmojiWarmupJob *job;
+    SYSTEM_INFO system_info;
+    UINT32 thread_count, i;
+    size_t per_thread, start;
+    if (!ys_emoji_renderer_is_available(renderer) || !texts || !text_count ||
+        cell_width <= 0 || cell_height <= 0 || renderer->warmup_thread_count) {
+        if (texts) HeapFree(GetProcessHeap(), 0, texts);
+        return FALSE;
+    }
+    job = (YSEmojiWarmupJob *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*job));
+    if (!job) {
+        HeapFree(GetProcessHeap(), 0, texts);
+        return FALSE;
+    }
+    job->renderer = renderer;
+    job->texts = texts;
+    job->cell_width = (FLOAT)cell_width;
+    job->cell_height = (FLOAT)cell_height;
+
+    GetSystemInfo(&system_info);
+    thread_count = system_info.dwNumberOfProcessors > 1u
+                       ? min(YS_EMOJI_WARMUP_MAX_THREADS, system_info.dwNumberOfProcessors - 1u)
+                       : 1u;
+    if ((size_t)thread_count > text_count) thread_count = (UINT32)text_count;
+    job->active_workers = (LONG)thread_count;
+
+    per_thread = text_count / thread_count;
+    start = 0;
+    for (i = 0; i < thread_count; ++i) {
+        YSEmojiWarmupSlice *slice;
+        size_t end = (i + 1u == thread_count) ? text_count : start + per_thread;
+        HANDLE thread;
+
+        slice = (YSEmojiWarmupSlice *)HeapAlloc(GetProcessHeap(), 0, sizeof(*slice));
+        if (!slice) {
+            ys_emoji_warmup_job_release(job);
+            start = end;
+            continue;
+        }
+        slice->job = job;
+        slice->start = start;
+        slice->end = end;
+
+        thread = CreateThread(NULL, 0, ys_emoji_renderer_warmup_proc, slice, 0, NULL);
+        if (!thread) {
+            HeapFree(GetProcessHeap(), 0, slice);
+            ys_emoji_warmup_job_release(job);
+            start = end;
+            continue;
+        }
+        /* Normal priority, not lowest: THREAD_PRIORITY_LOWEST can leave this
+         * thread starved for CPU time for a long while whenever anything
+         * else on the system is even mildly busy, which made warm-up
+         * effectively never finish in practice. This work is still bounded
+         * and short-lived (each iteration is a brief CreateTextLayout call
+         * plus a short lock), and one core is deliberately left unused (see
+         * thread_count below) for the UI thread, so running at normal
+         * priority should not cause noticeable UI jank while actually
+         * getting scheduled promptly. */
+        SetThreadPriority(thread, THREAD_PRIORITY_NORMAL);
+        renderer->warmup_threads[renderer->warmup_thread_count++] = thread;
+        start = end;
+    }
+    return renderer->warmup_thread_count > 0;
 }
 
 BOOL ys_emoji_renderer_end(YSEmojiRenderer *renderer) {

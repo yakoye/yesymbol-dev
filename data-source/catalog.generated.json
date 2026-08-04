@@ -2316,6 +2316,96 @@
             "⓲",
             "⓳",
             "⓴",
+            "➀",
+            "➁",
+            "➂",
+            "➃",
+            "➄",
+            "➅",
+            "➆",
+            "➇",
+            "➈",
+            "➉",
+            "➊",
+            "➋",
+            "➌",
+            "➍",
+            "➎",
+            "➏",
+            "➐",
+            "➑",
+            "➒",
+            "➓",
+            "⓵",
+            "⓶",
+            "⓷",
+            "⓸",
+            "⓹",
+            "⓺",
+            "⓻",
+            "⓼",
+            "⓽",
+            "⓾",
+            "⓪",
+            "⓿",
+            "０",
+            "１",
+            "２",
+            "３",
+            "４",
+            "５",
+            "６",
+            "７",
+            "８",
+            "９",
+            "𝟬",
+            "𝟭",
+            "𝟮",
+            "𝟯",
+            "𝟰",
+            "𝟱",
+            "𝟲",
+            "𝟳",
+            "𝟴",
+            "𝟵",
+            "㉑",
+            "㉒",
+            "㉓",
+            "㉔",
+            "㉕",
+            "㉖",
+            "㉗",
+            "㉘",
+            "㉙",
+            "㉚",
+            "㉛",
+            "㉜",
+            "㉝",
+            "㉞",
+            "㉟",
+            "㊱",
+            "㊲",
+            "㊳",
+            "㊴",
+            "㊵",
+            "㊶",
+            "㊷",
+            "㊸",
+            "㊹",
+            "㊺",
+            "㊻",
+            "㊼",
+            "㊽",
+            "㊾",
+            "㊿",
+            "㉈",
+            "㉉",
+            "㉊",
+            "㉋",
+            "㉌",
+            "㉍",
+            "㉎",
+            "㉏",
             "⑴",
             "⑵",
             "⑶",
@@ -2378,66 +2468,6 @@
             "ⅷ",
             "ⅸ",
             "ⅹ",
-            "➀",
-            "➁",
-            "➂",
-            "➃",
-            "➄",
-            "➅",
-            "➆",
-            "➇",
-            "➈",
-            "➉",
-            "➊",
-            "➋",
-            "➌",
-            "➍",
-            "➎",
-            "➏",
-            "➐",
-            "➑",
-            "➒",
-            "➓",
-            "⓵",
-            "⓶",
-            "⓷",
-            "⓸",
-            "⓹",
-            "⓺",
-            "⓻",
-            "⓼",
-            "⓽",
-            "⓾",
-            "⓪",
-            "⓿",
-            "㉈",
-            "㉉",
-            "㉊",
-            "㉋",
-            "㉌",
-            "㉍",
-            "㉎",
-            "㉏",
-            "０",
-            "１",
-            "２",
-            "３",
-            "４",
-            "５",
-            "６",
-            "７",
-            "８",
-            "９",
-            "𝟬",
-            "𝟭",
-            "𝟮",
-            "𝟯",
-            "𝟰",
-            "𝟱",
-            "𝟲",
-            "𝟳",
-            "𝟴",
-            "𝟵",
             "㈠",
             "㈡",
             "㈢",
@@ -2579,36 +2609,6 @@
             "𐄾",
             "𐄿",
             "𞴮",
-            "㉑",
-            "㉒",
-            "㉓",
-            "㉔",
-            "㉕",
-            "㉖",
-            "㉗",
-            "㉘",
-            "㉙",
-            "㉚",
-            "㉛",
-            "㉜",
-            "㉝",
-            "㉞",
-            "㉟",
-            "㊱",
-            "㊲",
-            "㊳",
-            "㊴",
-            "㊵",
-            "㊶",
-            "㊷",
-            "㊸",
-            "㊹",
-            "㊺",
-            "㊻",
-            "㊼",
-            "㊽",
-            "㊾",
-            "㊿",
             "Ⓐ",
             "Ⓑ",
             "Ⓒ",
@@ -15360,7 +15360,7 @@
         },
         {
           "title": "",
-          "cols": 11,
+          "cols": 12,
           "row": 12,
           "items": [
             "←",
@@ -19249,6 +19249,13 @@
         },
         {
           "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
           "cols": 10,
           "row": 3,
           "items": [
@@ -19290,8 +19297,217 @@
         },
         {
           "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
           "cols": 10,
           "row": 5,
+          "items": [
+            "➀",
+            "➁",
+            "➂",
+            "➃",
+            "➄",
+            "➅",
+            "➆",
+            "➇",
+            "➈",
+            "➉"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
+          "cols": 10,
+          "row": 6,
+          "items": [
+            "➊",
+            "➋",
+            "➌",
+            "➍",
+            "➎",
+            "➏",
+            "➐",
+            "➑",
+            "➒",
+            "➓"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 7,
+          "items": [
+            "⓵",
+            "⓶",
+            "⓷",
+            "⓸",
+            "⓹",
+            "⓺",
+            "⓻",
+            "⓼",
+            "⓽",
+            "⓾",
+            "⓪",
+            "⓿"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
+          "cols": 10,
+          "row": 8,
+          "items": [
+            "０",
+            "１",
+            "２",
+            "３",
+            "４",
+            "５",
+            "６",
+            "７",
+            "８",
+            "９"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
+          "cols": 10,
+          "row": 9,
+          "items": [
+            "𝟬",
+            "𝟭",
+            "𝟮",
+            "𝟯",
+            "𝟰",
+            "𝟱",
+            "𝟲",
+            "𝟳",
+            "𝟴",
+            "𝟵"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "带圈数字 21–50",
+          "cols": 12,
+          "row": 10,
+          "items": [
+            "㉑",
+            "㉒",
+            "㉓",
+            "㉔",
+            "㉕",
+            "㉖",
+            "㉗",
+            "㉘",
+            "㉙",
+            "㉚",
+            "㉛",
+            "㉜"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 11,
+          "items": [
+            "㉝",
+            "㉞",
+            "㉟",
+            "㊱",
+            "㊲",
+            "㊳",
+            "㊴",
+            "㊵",
+            "㊶",
+            "㊷",
+            "㊸",
+            "㊹"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 6,
+          "row": 12,
+          "items": [
+            "㊺",
+            "㊻",
+            "㊼",
+            "㊽",
+            "㊾",
+            "㊿"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
+          "cols": 8,
+          "row": 13,
+          "items": [
+            "㉈",
+            "㉉",
+            "㉊",
+            "㉋",
+            "㉌",
+            "㉍",
+            "㉎",
+            "㉏"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 0,
+          "row": 0,
+          "items": [],
+          "spacer": true
+        },
+        {
+          "title": "",
+          "cols": 10,
+          "row": 14,
           "items": [
             "⑴",
             "⑵",
@@ -19308,7 +19524,7 @@
         {
           "title": "",
           "cols": 10,
-          "row": 6,
+          "row": 15,
           "items": [
             "⑾",
             "⑿",
@@ -19332,7 +19548,7 @@
         {
           "title": "",
           "cols": 10,
-          "row": 7,
+          "row": 16,
           "items": [
             "⒈",
             "⒉",
@@ -19349,7 +19565,7 @@
         {
           "title": "",
           "cols": 10,
-          "row": 8,
+          "row": 17,
           "items": [
             "⒒",
             "⒓",
@@ -19373,7 +19589,7 @@
         {
           "title": "",
           "cols": 12,
-          "row": 9,
+          "row": 18,
           "items": [
             "Ⅰ",
             "Ⅱ",
@@ -19392,7 +19608,7 @@
         {
           "title": "",
           "cols": 10,
-          "row": 10,
+          "row": 19,
           "items": [
             "ⅰ",
             "ⅱ",
@@ -19414,111 +19630,9 @@
           "spacer": true
         },
         {
-          "title": "无衬线带圈数字",
-          "cols": 10,
-          "row": 11,
-          "items": [
-            "➀",
-            "➁",
-            "➂",
-            "➃",
-            "➄",
-            "➅",
-            "➆",
-            "➇",
-            "➈",
-            "➉"
-          ]
-        },
-        {
-          "title": "黑色无衬线带圈数字",
-          "cols": 10,
-          "row": 12,
-          "items": [
-            "➊",
-            "➋",
-            "➌",
-            "➍",
-            "➎",
-            "➏",
-            "➐",
-            "➑",
-            "➒",
-            "➓"
-          ]
-        },
-        {
-          "title": "双圈数字与零",
-          "cols": 12,
-          "row": 13,
-          "items": [
-            "⓵",
-            "⓶",
-            "⓷",
-            "⓸",
-            "⓹",
-            "⓺",
-            "⓻",
-            "⓼",
-            "⓽",
-            "⓾",
-            "⓪",
-            "⓿"
-          ]
-        },
-        {
-          "title": "",
-          "cols": 8,
-          "row": 14,
-          "items": [
-            "㉈",
-            "㉉",
-            "㉊",
-            "㉋",
-            "㉌",
-            "㉍",
-            "㉎",
-            "㉏"
-          ]
-        },
-        {
-          "title": "全形数字",
-          "cols": 10,
-          "row": 15,
-          "items": [
-            "０",
-            "１",
-            "２",
-            "３",
-            "４",
-            "５",
-            "６",
-            "７",
-            "８",
-            "９"
-          ]
-        },
-        {
-          "title": "粗体数字",
-          "cols": 10,
-          "row": 16,
-          "items": [
-            "𝟬",
-            "𝟭",
-            "𝟮",
-            "𝟯",
-            "𝟰",
-            "𝟱",
-            "𝟲",
-            "𝟳",
-            "𝟴",
-            "𝟵"
-          ]
-        },
-        {
           "title": "括号汉字",
           "cols": 10,
-          "row": 17,
+          "row": 20,
           "items": [
             "㈠",
             "㈡",
@@ -19535,7 +19649,7 @@
         {
           "title": "圆圈汉字",
           "cols": 10,
-          "row": 18,
+          "row": 21,
           "items": [
             "㊀",
             "㊁",
@@ -19552,7 +19666,7 @@
         {
           "title": "上标数字与符号",
           "cols": 10,
-          "row": 19,
+          "row": 22,
           "items": [
             "⁰",
             "¹",
@@ -19569,7 +19683,7 @@
         {
           "title": "",
           "cols": 6,
-          "row": 20,
+          "row": 23,
           "items": [
             "⁺",
             "⁻",
@@ -19582,7 +19696,7 @@
         {
           "title": "下标数字与符号",
           "cols": 10,
-          "row": 21,
+          "row": 24,
           "items": [
             "₀",
             "₁",
@@ -19599,7 +19713,7 @@
         {
           "title": "",
           "cols": 10,
-          "row": 22,
+          "row": 25,
           "items": [
             "₊",
             "₋",
@@ -19623,7 +19737,7 @@
         {
           "title": "罗马数字",
           "cols": 8,
-          "row": 23,
+          "row": 26,
           "items": [
             "Ⅼ",
             "Ⅽ",
@@ -19638,7 +19752,7 @@
         {
           "title": "",
           "cols": 8,
-          "row": 24,
+          "row": 27,
           "items": [
             "ⅾ",
             "ⅿ",
@@ -19653,7 +19767,7 @@
         {
           "title": "",
           "cols": 3,
-          "row": 25,
+          "row": 28,
           "items": [
             "ↆ",
             "ↇ",
@@ -19663,7 +19777,7 @@
         {
           "title": "数字形式",
           "cols": 2,
-          "row": 26,
+          "row": 29,
           "items": [
             "↊",
             "↋"
@@ -19672,7 +19786,7 @@
         {
           "title": "",
           "cols": 8,
-          "row": 27,
+          "row": 30,
           "items": [
             "🄪",
             "🄍",
@@ -19687,7 +19801,7 @@
         {
           "title": "",
           "cols": 12,
-          "row": 28,
+          "row": 31,
           "items": [
             "🅊",
             "🅋",
@@ -19706,7 +19820,7 @@
         {
           "title": "",
           "cols": 12,
-          "row": 29,
+          "row": 32,
           "items": [
             "🆊",
             "🆋",
@@ -19725,7 +19839,7 @@
         {
           "title": "",
           "cols": 12,
-          "row": 30,
+          "row": 33,
           "items": [
             "🆡",
             "🆢",
@@ -19744,7 +19858,7 @@
         {
           "title": "",
           "cols": 1,
-          "row": 31,
+          "row": 34,
           "items": [
             "🆭"
           ]
@@ -19752,7 +19866,7 @@
         {
           "title": "上标和下标",
           "cols": 8,
-          "row": 32,
+          "row": 35,
           "items": [
             "ₕ",
             "ₖ",
@@ -19767,7 +19881,7 @@
         {
           "title": "通用印度数字形式",
           "cols": 3,
-          "row": 33,
+          "row": 36,
           "items": [
             "꠶",
             "꠷",
@@ -19777,7 +19891,7 @@
         {
           "title": "爱琴数字",
           "cols": 9,
-          "row": 34,
+          "row": 37,
           "items": [
             "𐄷",
             "𐄸",
@@ -19800,7 +19914,7 @@
         {
           "title": "奥斯曼西亚克数字",
           "cols": 1,
-          "row": 35,
+          "row": 38,
           "items": [
             "𞴮"
           ]
@@ -19811,57 +19925,6 @@
           "row": 0,
           "items": [],
           "spacer": true
-        },
-        {
-          "title": "带圈数字 21–50",
-          "cols": 12,
-          "row": 36,
-          "items": [
-            "㉑",
-            "㉒",
-            "㉓",
-            "㉔",
-            "㉕",
-            "㉖",
-            "㉗",
-            "㉘",
-            "㉙",
-            "㉚",
-            "㉛",
-            "㉜"
-          ]
-        },
-        {
-          "title": "",
-          "cols": 12,
-          "row": 37,
-          "items": [
-            "㉝",
-            "㉞",
-            "㉟",
-            "㊱",
-            "㊲",
-            "㊳",
-            "㊴",
-            "㊵",
-            "㊶",
-            "㊷",
-            "㊸",
-            "㊹"
-          ]
-        },
-        {
-          "title": "",
-          "cols": 6,
-          "row": 38,
-          "items": [
-            "㊺",
-            "㊻",
-            "㊼",
-            "㊽",
-            "㊾",
-            "㊿"
-          ]
         },
         {
           "title": "字母序号",
@@ -57954,6 +58017,636 @@
       "name_zh": "黑底带圈数字二十"
     },
     {
+      "text": "➀",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT ONE",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT ONE",
+      "name_zh": "无衬线带圈数字一"
+    },
+    {
+      "text": "➁",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT TWO",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT TWO",
+      "name_zh": "无衬线带圈数字二"
+    },
+    {
+      "text": "➂",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT THREE",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT THREE",
+      "name_zh": "无衬线带圈数字三"
+    },
+    {
+      "text": "➃",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT FOUR",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT FOUR",
+      "name_zh": "无衬线带圈数字四"
+    },
+    {
+      "text": "➄",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT FIVE",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT FIVE",
+      "name_zh": "无衬线带圈数字五"
+    },
+    {
+      "text": "➅",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT SIX",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT SIX",
+      "name_zh": "无衬线带圈数字六"
+    },
+    {
+      "text": "➆",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT SEVEN",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT SEVEN",
+      "name_zh": "无衬线带圈数字七"
+    },
+    {
+      "text": "➇",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT EIGHT",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT EIGHT",
+      "name_zh": "无衬线带圈数字八"
+    },
+    {
+      "text": "➈",
+      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT NINE",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT NINE",
+      "name_zh": "无衬线带圈数字九"
+    },
+    {
+      "text": "➉",
+      "name": "DINGBAT CIRCLED SANS-SERIF NUMBER TEN",
+      "emoji": false,
+      "name_en": "DINGBAT CIRCLED SANS-SERIF NUMBER TEN",
+      "name_zh": "无衬线带圈数字十"
+    },
+    {
+      "text": "➊",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT ONE",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT ONE",
+      "name_zh": "黑底无衬线带圈数字一"
+    },
+    {
+      "text": "➋",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT TWO",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT TWO",
+      "name_zh": "黑底无衬线带圈数字二"
+    },
+    {
+      "text": "➌",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT THREE",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT THREE",
+      "name_zh": "黑底无衬线带圈数字三"
+    },
+    {
+      "text": "➍",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FOUR",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FOUR",
+      "name_zh": "黑底无衬线带圈数字四"
+    },
+    {
+      "text": "➎",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FIVE",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FIVE",
+      "name_zh": "黑底无衬线带圈数字五"
+    },
+    {
+      "text": "➏",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SIX",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SIX",
+      "name_zh": "黑底无衬线带圈数字六"
+    },
+    {
+      "text": "➐",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SEVEN",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SEVEN",
+      "name_zh": "黑底无衬线带圈数字七"
+    },
+    {
+      "text": "➑",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT EIGHT",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT EIGHT",
+      "name_zh": "黑底无衬线带圈数字八"
+    },
+    {
+      "text": "➒",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT NINE",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT NINE",
+      "name_zh": "黑底无衬线带圈数字九"
+    },
+    {
+      "text": "➓",
+      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF NUMBER TEN",
+      "emoji": false,
+      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF NUMBER TEN",
+      "name_zh": "黑底无衬线带圈数字十"
+    },
+    {
+      "text": "⓵",
+      "name": "DOUBLE CIRCLED DIGIT ONE",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT ONE",
+      "name_zh": "双圈数字一"
+    },
+    {
+      "text": "⓶",
+      "name": "DOUBLE CIRCLED DIGIT TWO",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT TWO",
+      "name_zh": "双圈数字二"
+    },
+    {
+      "text": "⓷",
+      "name": "DOUBLE CIRCLED DIGIT THREE",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT THREE",
+      "name_zh": "双圈数字三"
+    },
+    {
+      "text": "⓸",
+      "name": "DOUBLE CIRCLED DIGIT FOUR",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT FOUR",
+      "name_zh": "双圈数字四"
+    },
+    {
+      "text": "⓹",
+      "name": "DOUBLE CIRCLED DIGIT FIVE",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT FIVE",
+      "name_zh": "双圈数字五"
+    },
+    {
+      "text": "⓺",
+      "name": "DOUBLE CIRCLED DIGIT SIX",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT SIX",
+      "name_zh": "双圈数字六"
+    },
+    {
+      "text": "⓻",
+      "name": "DOUBLE CIRCLED DIGIT SEVEN",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT SEVEN",
+      "name_zh": "双圈数字七"
+    },
+    {
+      "text": "⓼",
+      "name": "DOUBLE CIRCLED DIGIT EIGHT",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT EIGHT",
+      "name_zh": "双圈数字八"
+    },
+    {
+      "text": "⓽",
+      "name": "DOUBLE CIRCLED DIGIT NINE",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED DIGIT NINE",
+      "name_zh": "双圈数字九"
+    },
+    {
+      "text": "⓾",
+      "name": "DOUBLE CIRCLED NUMBER TEN",
+      "emoji": false,
+      "name_en": "DOUBLE CIRCLED NUMBER TEN",
+      "name_zh": "双圈数字十"
+    },
+    {
+      "text": "⓪",
+      "name": "CIRCLED DIGIT ZERO",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT ZERO",
+      "name_zh": "带圈数字零"
+    },
+    {
+      "text": "⓿",
+      "name": "NEGATIVE CIRCLED DIGIT ZERO",
+      "emoji": false,
+      "name_en": "NEGATIVE CIRCLED DIGIT ZERO",
+      "name_zh": "黑底带圈数字零"
+    },
+    {
+      "text": "０",
+      "name": "FULLWIDTH DIGIT ZERO",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT ZERO",
+      "name_zh": "全角数字零"
+    },
+    {
+      "text": "１",
+      "name": "FULLWIDTH DIGIT ONE",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT ONE",
+      "name_zh": "全角数字一"
+    },
+    {
+      "text": "２",
+      "name": "FULLWIDTH DIGIT TWO",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT TWO",
+      "name_zh": "全角数字二"
+    },
+    {
+      "text": "３",
+      "name": "FULLWIDTH DIGIT THREE",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT THREE",
+      "name_zh": "全角数字三"
+    },
+    {
+      "text": "４",
+      "name": "FULLWIDTH DIGIT FOUR",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT FOUR",
+      "name_zh": "全角数字四"
+    },
+    {
+      "text": "５",
+      "name": "FULLWIDTH DIGIT FIVE",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT FIVE",
+      "name_zh": "全角数字五"
+    },
+    {
+      "text": "６",
+      "name": "FULLWIDTH DIGIT SIX",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT SIX",
+      "name_zh": "全角数字六"
+    },
+    {
+      "text": "７",
+      "name": "FULLWIDTH DIGIT SEVEN",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT SEVEN",
+      "name_zh": "全角数字七"
+    },
+    {
+      "text": "８",
+      "name": "FULLWIDTH DIGIT EIGHT",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT EIGHT",
+      "name_zh": "全角数字八"
+    },
+    {
+      "text": "９",
+      "name": "FULLWIDTH DIGIT NINE",
+      "emoji": false,
+      "name_en": "FULLWIDTH DIGIT NINE",
+      "name_zh": "全角数字九"
+    },
+    {
+      "text": "𝟬",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT ZERO",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT ZERO",
+      "name_zh": "无衬线粗体数字零"
+    },
+    {
+      "text": "𝟭",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT ONE",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT ONE",
+      "name_zh": "无衬线粗体数字一"
+    },
+    {
+      "text": "𝟮",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT TWO",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT TWO",
+      "name_zh": "无衬线粗体数字二"
+    },
+    {
+      "text": "𝟯",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT THREE",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT THREE",
+      "name_zh": "无衬线粗体数字三"
+    },
+    {
+      "text": "𝟰",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT FOUR",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT FOUR",
+      "name_zh": "无衬线粗体数字四"
+    },
+    {
+      "text": "𝟱",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT FIVE",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT FIVE",
+      "name_zh": "无衬线粗体数字五"
+    },
+    {
+      "text": "𝟲",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT SIX",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT SIX",
+      "name_zh": "无衬线粗体数字六"
+    },
+    {
+      "text": "𝟳",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT SEVEN",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT SEVEN",
+      "name_zh": "无衬线粗体数字七"
+    },
+    {
+      "text": "𝟴",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT EIGHT",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT EIGHT",
+      "name_zh": "无衬线粗体数字八"
+    },
+    {
+      "text": "𝟵",
+      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT NINE",
+      "emoji": false,
+      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT NINE",
+      "name_zh": "无衬线粗体数字九"
+    },
+    {
+      "text": "㉑",
+      "name": "CIRCLED NUMBER TWENTY ONE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY ONE",
+      "name_zh": "带圈数字二十一"
+    },
+    {
+      "text": "㉒",
+      "name": "CIRCLED NUMBER TWENTY TWO",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY TWO",
+      "name_zh": "带圈数字二十二"
+    },
+    {
+      "text": "㉓",
+      "name": "CIRCLED NUMBER TWENTY THREE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY THREE",
+      "name_zh": "带圈数字二十三"
+    },
+    {
+      "text": "㉔",
+      "name": "CIRCLED NUMBER TWENTY FOUR",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY FOUR",
+      "name_zh": "带圈数字二十四"
+    },
+    {
+      "text": "㉕",
+      "name": "CIRCLED NUMBER TWENTY FIVE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY FIVE",
+      "name_zh": "带圈数字二十五"
+    },
+    {
+      "text": "㉖",
+      "name": "CIRCLED NUMBER TWENTY SIX",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY SIX",
+      "name_zh": "带圈数字二十六"
+    },
+    {
+      "text": "㉗",
+      "name": "CIRCLED NUMBER TWENTY SEVEN",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY SEVEN",
+      "name_zh": "带圈数字二十七"
+    },
+    {
+      "text": "㉘",
+      "name": "CIRCLED NUMBER TWENTY EIGHT",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY EIGHT",
+      "name_zh": "带圈数字二十八"
+    },
+    {
+      "text": "㉙",
+      "name": "CIRCLED NUMBER TWENTY NINE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY NINE",
+      "name_zh": "带圈数字二十九"
+    },
+    {
+      "text": "㉚",
+      "name": "CIRCLED NUMBER THIRTY",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY",
+      "name_zh": "带圈数字三十"
+    },
+    {
+      "text": "㉛",
+      "name": "CIRCLED NUMBER THIRTY ONE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY ONE",
+      "name_zh": "带圈数字三十一"
+    },
+    {
+      "text": "㉜",
+      "name": "CIRCLED NUMBER THIRTY TWO",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY TWO",
+      "name_zh": "带圈数字三十二"
+    },
+    {
+      "text": "㉝",
+      "name": "CIRCLED NUMBER THIRTY THREE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY THREE",
+      "name_zh": "带圈数字三十三"
+    },
+    {
+      "text": "㉞",
+      "name": "CIRCLED NUMBER THIRTY FOUR",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY FOUR",
+      "name_zh": "带圈数字三十四"
+    },
+    {
+      "text": "㉟",
+      "name": "CIRCLED NUMBER THIRTY FIVE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY FIVE",
+      "name_zh": "带圈数字三十五"
+    },
+    {
+      "text": "㊱",
+      "name": "CIRCLED NUMBER THIRTY SIX",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY SIX",
+      "name_zh": "带圈数字三十六"
+    },
+    {
+      "text": "㊲",
+      "name": "CIRCLED NUMBER THIRTY SEVEN",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY SEVEN",
+      "name_zh": "带圈数字三十七"
+    },
+    {
+      "text": "㊳",
+      "name": "CIRCLED NUMBER THIRTY EIGHT",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY EIGHT",
+      "name_zh": "带圈数字三十八"
+    },
+    {
+      "text": "㊴",
+      "name": "CIRCLED NUMBER THIRTY NINE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY NINE",
+      "name_zh": "带圈数字三十九"
+    },
+    {
+      "text": "㊵",
+      "name": "CIRCLED NUMBER FORTY",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY",
+      "name_zh": "带圈数字四十"
+    },
+    {
+      "text": "㊶",
+      "name": "CIRCLED NUMBER FORTY ONE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY ONE",
+      "name_zh": "带圈数字四十一"
+    },
+    {
+      "text": "㊷",
+      "name": "CIRCLED NUMBER FORTY TWO",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY TWO",
+      "name_zh": "带圈数字四十二"
+    },
+    {
+      "text": "㊸",
+      "name": "CIRCLED NUMBER FORTY THREE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY THREE",
+      "name_zh": "带圈数字四十三"
+    },
+    {
+      "text": "㊹",
+      "name": "CIRCLED NUMBER FORTY FOUR",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY FOUR",
+      "name_zh": "带圈数字四十四"
+    },
+    {
+      "text": "㊺",
+      "name": "CIRCLED NUMBER FORTY FIVE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY FIVE",
+      "name_zh": "带圈数字四十五"
+    },
+    {
+      "text": "㊻",
+      "name": "CIRCLED NUMBER FORTY SIX",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY SIX",
+      "name_zh": "带圈数字四十六"
+    },
+    {
+      "text": "㊼",
+      "name": "CIRCLED NUMBER FORTY SEVEN",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY SEVEN",
+      "name_zh": "带圈数字四十七"
+    },
+    {
+      "text": "㊽",
+      "name": "CIRCLED NUMBER FORTY EIGHT",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY EIGHT",
+      "name_zh": "带圈数字四十八"
+    },
+    {
+      "text": "㊾",
+      "name": "CIRCLED NUMBER FORTY NINE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY NINE",
+      "name_zh": "带圈数字四十九"
+    },
+    {
+      "text": "㊿",
+      "name": "CIRCLED NUMBER FIFTY",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FIFTY",
+      "name_zh": "带圈数字五十"
+    },
+    {
+      "text": "㉈",
+      "name": "CIRCLED NUMBER TEN ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TEN ON BLACK SQUARE",
+      "name_zh": "带圈数字十上实心方块"
+    },
+    {
+      "text": "㉉",
+      "name": "CIRCLED NUMBER TWENTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWENTY ON BLACK SQUARE",
+      "name_zh": "带圈数字二十上实心方块"
+    },
+    {
+      "text": "㉊",
+      "name": "CIRCLED NUMBER THIRTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER THIRTY ON BLACK SQUARE",
+      "name_zh": "带圈或带括号东亚字符 ㉊"
+    },
+    {
+      "text": "㉋",
+      "name": "CIRCLED NUMBER FORTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FORTY ON BLACK SQUARE",
+      "name_zh": "带圈或带括号东亚字符 ㉋"
+    },
+    {
+      "text": "㉌",
+      "name": "CIRCLED NUMBER FIFTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER FIFTY ON BLACK SQUARE",
+      "name_zh": "带圈或带括号东亚字符 ㉌"
+    },
+    {
+      "text": "㉍",
+      "name": "CIRCLED NUMBER SIXTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER SIXTY ON BLACK SQUARE",
+      "name_zh": "带圈或带括号东亚字符 ㉍"
+    },
+    {
+      "text": "㉎",
+      "name": "CIRCLED NUMBER SEVENTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER SEVENTY ON BLACK SQUARE",
+      "name_zh": "带圈或带括号东亚字符 ㉎"
+    },
+    {
+      "text": "㉏",
+      "name": "CIRCLED NUMBER EIGHTY ON BLACK SQUARE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER EIGHTY ON BLACK SQUARE",
+      "name_zh": "带圈或带括号东亚字符 ㉏"
+    },
+    {
       "text": "⑴",
       "name": "PARENTHESIZED DIGIT ONE",
       "emoji": false,
@@ -58386,426 +59079,6 @@
       "emoji": false,
       "name_en": "SMALL ROMAN NUMERAL TEN",
       "name_zh": "小写罗马数字十"
-    },
-    {
-      "text": "➀",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT ONE",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT ONE",
-      "name_zh": "无衬线带圈数字一"
-    },
-    {
-      "text": "➁",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT TWO",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT TWO",
-      "name_zh": "无衬线带圈数字二"
-    },
-    {
-      "text": "➂",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT THREE",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT THREE",
-      "name_zh": "无衬线带圈数字三"
-    },
-    {
-      "text": "➃",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT FOUR",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT FOUR",
-      "name_zh": "无衬线带圈数字四"
-    },
-    {
-      "text": "➄",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT FIVE",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT FIVE",
-      "name_zh": "无衬线带圈数字五"
-    },
-    {
-      "text": "➅",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT SIX",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT SIX",
-      "name_zh": "无衬线带圈数字六"
-    },
-    {
-      "text": "➆",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT SEVEN",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT SEVEN",
-      "name_zh": "无衬线带圈数字七"
-    },
-    {
-      "text": "➇",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT EIGHT",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT EIGHT",
-      "name_zh": "无衬线带圈数字八"
-    },
-    {
-      "text": "➈",
-      "name": "DINGBAT CIRCLED SANS-SERIF DIGIT NINE",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF DIGIT NINE",
-      "name_zh": "无衬线带圈数字九"
-    },
-    {
-      "text": "➉",
-      "name": "DINGBAT CIRCLED SANS-SERIF NUMBER TEN",
-      "emoji": false,
-      "name_en": "DINGBAT CIRCLED SANS-SERIF NUMBER TEN",
-      "name_zh": "无衬线带圈数字十"
-    },
-    {
-      "text": "➊",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT ONE",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT ONE",
-      "name_zh": "黑底无衬线带圈数字一"
-    },
-    {
-      "text": "➋",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT TWO",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT TWO",
-      "name_zh": "黑底无衬线带圈数字二"
-    },
-    {
-      "text": "➌",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT THREE",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT THREE",
-      "name_zh": "黑底无衬线带圈数字三"
-    },
-    {
-      "text": "➍",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FOUR",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FOUR",
-      "name_zh": "黑底无衬线带圈数字四"
-    },
-    {
-      "text": "➎",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FIVE",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT FIVE",
-      "name_zh": "黑底无衬线带圈数字五"
-    },
-    {
-      "text": "➏",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SIX",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SIX",
-      "name_zh": "黑底无衬线带圈数字六"
-    },
-    {
-      "text": "➐",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SEVEN",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT SEVEN",
-      "name_zh": "黑底无衬线带圈数字七"
-    },
-    {
-      "text": "➑",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT EIGHT",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT EIGHT",
-      "name_zh": "黑底无衬线带圈数字八"
-    },
-    {
-      "text": "➒",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT NINE",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF DIGIT NINE",
-      "name_zh": "黑底无衬线带圈数字九"
-    },
-    {
-      "text": "➓",
-      "name": "DINGBAT NEGATIVE CIRCLED SANS-SERIF NUMBER TEN",
-      "emoji": false,
-      "name_en": "DINGBAT NEGATIVE CIRCLED SANS-SERIF NUMBER TEN",
-      "name_zh": "黑底无衬线带圈数字十"
-    },
-    {
-      "text": "⓵",
-      "name": "DOUBLE CIRCLED DIGIT ONE",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT ONE",
-      "name_zh": "双圈数字一"
-    },
-    {
-      "text": "⓶",
-      "name": "DOUBLE CIRCLED DIGIT TWO",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT TWO",
-      "name_zh": "双圈数字二"
-    },
-    {
-      "text": "⓷",
-      "name": "DOUBLE CIRCLED DIGIT THREE",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT THREE",
-      "name_zh": "双圈数字三"
-    },
-    {
-      "text": "⓸",
-      "name": "DOUBLE CIRCLED DIGIT FOUR",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT FOUR",
-      "name_zh": "双圈数字四"
-    },
-    {
-      "text": "⓹",
-      "name": "DOUBLE CIRCLED DIGIT FIVE",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT FIVE",
-      "name_zh": "双圈数字五"
-    },
-    {
-      "text": "⓺",
-      "name": "DOUBLE CIRCLED DIGIT SIX",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT SIX",
-      "name_zh": "双圈数字六"
-    },
-    {
-      "text": "⓻",
-      "name": "DOUBLE CIRCLED DIGIT SEVEN",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT SEVEN",
-      "name_zh": "双圈数字七"
-    },
-    {
-      "text": "⓼",
-      "name": "DOUBLE CIRCLED DIGIT EIGHT",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT EIGHT",
-      "name_zh": "双圈数字八"
-    },
-    {
-      "text": "⓽",
-      "name": "DOUBLE CIRCLED DIGIT NINE",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED DIGIT NINE",
-      "name_zh": "双圈数字九"
-    },
-    {
-      "text": "⓾",
-      "name": "DOUBLE CIRCLED NUMBER TEN",
-      "emoji": false,
-      "name_en": "DOUBLE CIRCLED NUMBER TEN",
-      "name_zh": "双圈数字十"
-    },
-    {
-      "text": "⓪",
-      "name": "CIRCLED DIGIT ZERO",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT ZERO",
-      "name_zh": "带圈数字零"
-    },
-    {
-      "text": "⓿",
-      "name": "NEGATIVE CIRCLED DIGIT ZERO",
-      "emoji": false,
-      "name_en": "NEGATIVE CIRCLED DIGIT ZERO",
-      "name_zh": "黑底带圈数字零"
-    },
-    {
-      "text": "㉈",
-      "name": "CIRCLED NUMBER TEN ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TEN ON BLACK SQUARE",
-      "name_zh": "带圈数字十上实心方块"
-    },
-    {
-      "text": "㉉",
-      "name": "CIRCLED NUMBER TWENTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY ON BLACK SQUARE",
-      "name_zh": "带圈数字二十上实心方块"
-    },
-    {
-      "text": "㉊",
-      "name": "CIRCLED NUMBER THIRTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY ON BLACK SQUARE",
-      "name_zh": "带圈或带括号东亚字符 ㉊"
-    },
-    {
-      "text": "㉋",
-      "name": "CIRCLED NUMBER FORTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY ON BLACK SQUARE",
-      "name_zh": "带圈或带括号东亚字符 ㉋"
-    },
-    {
-      "text": "㉌",
-      "name": "CIRCLED NUMBER FIFTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FIFTY ON BLACK SQUARE",
-      "name_zh": "带圈或带括号东亚字符 ㉌"
-    },
-    {
-      "text": "㉍",
-      "name": "CIRCLED NUMBER SIXTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER SIXTY ON BLACK SQUARE",
-      "name_zh": "带圈或带括号东亚字符 ㉍"
-    },
-    {
-      "text": "㉎",
-      "name": "CIRCLED NUMBER SEVENTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER SEVENTY ON BLACK SQUARE",
-      "name_zh": "带圈或带括号东亚字符 ㉎"
-    },
-    {
-      "text": "㉏",
-      "name": "CIRCLED NUMBER EIGHTY ON BLACK SQUARE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER EIGHTY ON BLACK SQUARE",
-      "name_zh": "带圈或带括号东亚字符 ㉏"
-    },
-    {
-      "text": "０",
-      "name": "FULLWIDTH DIGIT ZERO",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT ZERO",
-      "name_zh": "全角数字零"
-    },
-    {
-      "text": "１",
-      "name": "FULLWIDTH DIGIT ONE",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT ONE",
-      "name_zh": "全角数字一"
-    },
-    {
-      "text": "２",
-      "name": "FULLWIDTH DIGIT TWO",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT TWO",
-      "name_zh": "全角数字二"
-    },
-    {
-      "text": "３",
-      "name": "FULLWIDTH DIGIT THREE",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT THREE",
-      "name_zh": "全角数字三"
-    },
-    {
-      "text": "４",
-      "name": "FULLWIDTH DIGIT FOUR",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT FOUR",
-      "name_zh": "全角数字四"
-    },
-    {
-      "text": "５",
-      "name": "FULLWIDTH DIGIT FIVE",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT FIVE",
-      "name_zh": "全角数字五"
-    },
-    {
-      "text": "６",
-      "name": "FULLWIDTH DIGIT SIX",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT SIX",
-      "name_zh": "全角数字六"
-    },
-    {
-      "text": "７",
-      "name": "FULLWIDTH DIGIT SEVEN",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT SEVEN",
-      "name_zh": "全角数字七"
-    },
-    {
-      "text": "８",
-      "name": "FULLWIDTH DIGIT EIGHT",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT EIGHT",
-      "name_zh": "全角数字八"
-    },
-    {
-      "text": "９",
-      "name": "FULLWIDTH DIGIT NINE",
-      "emoji": false,
-      "name_en": "FULLWIDTH DIGIT NINE",
-      "name_zh": "全角数字九"
-    },
-    {
-      "text": "𝟬",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT ZERO",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT ZERO",
-      "name_zh": "无衬线粗体数字零"
-    },
-    {
-      "text": "𝟭",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT ONE",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT ONE",
-      "name_zh": "无衬线粗体数字一"
-    },
-    {
-      "text": "𝟮",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT TWO",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT TWO",
-      "name_zh": "无衬线粗体数字二"
-    },
-    {
-      "text": "𝟯",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT THREE",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT THREE",
-      "name_zh": "无衬线粗体数字三"
-    },
-    {
-      "text": "𝟰",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT FOUR",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT FOUR",
-      "name_zh": "无衬线粗体数字四"
-    },
-    {
-      "text": "𝟱",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT FIVE",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT FIVE",
-      "name_zh": "无衬线粗体数字五"
-    },
-    {
-      "text": "𝟲",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT SIX",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT SIX",
-      "name_zh": "无衬线粗体数字六"
-    },
-    {
-      "text": "𝟳",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT SEVEN",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT SEVEN",
-      "name_zh": "无衬线粗体数字七"
-    },
-    {
-      "text": "𝟴",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT EIGHT",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT EIGHT",
-      "name_zh": "无衬线粗体数字八"
-    },
-    {
-      "text": "𝟵",
-      "name": "MATHEMATICAL SANS-SERIF BOLD DIGIT NINE",
-      "emoji": false,
-      "name_en": "MATHEMATICAL SANS-SERIF BOLD DIGIT NINE",
-      "name_zh": "无衬线粗体数字九"
     },
     {
       "text": "㈠",
@@ -59793,216 +60066,6 @@
       "emoji": false,
       "name_en": "OTTOMAN SIYAQ MARRATAN",
       "name_zh": "OttomanSiyaqMarratan"
-    },
-    {
-      "text": "㉑",
-      "name": "CIRCLED NUMBER TWENTY ONE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY ONE",
-      "name_zh": "带圈数字二十一"
-    },
-    {
-      "text": "㉒",
-      "name": "CIRCLED NUMBER TWENTY TWO",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY TWO",
-      "name_zh": "带圈数字二十二"
-    },
-    {
-      "text": "㉓",
-      "name": "CIRCLED NUMBER TWENTY THREE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY THREE",
-      "name_zh": "带圈数字二十三"
-    },
-    {
-      "text": "㉔",
-      "name": "CIRCLED NUMBER TWENTY FOUR",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY FOUR",
-      "name_zh": "带圈数字二十四"
-    },
-    {
-      "text": "㉕",
-      "name": "CIRCLED NUMBER TWENTY FIVE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY FIVE",
-      "name_zh": "带圈数字二十五"
-    },
-    {
-      "text": "㉖",
-      "name": "CIRCLED NUMBER TWENTY SIX",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY SIX",
-      "name_zh": "带圈数字二十六"
-    },
-    {
-      "text": "㉗",
-      "name": "CIRCLED NUMBER TWENTY SEVEN",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY SEVEN",
-      "name_zh": "带圈数字二十七"
-    },
-    {
-      "text": "㉘",
-      "name": "CIRCLED NUMBER TWENTY EIGHT",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY EIGHT",
-      "name_zh": "带圈数字二十八"
-    },
-    {
-      "text": "㉙",
-      "name": "CIRCLED NUMBER TWENTY NINE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWENTY NINE",
-      "name_zh": "带圈数字二十九"
-    },
-    {
-      "text": "㉚",
-      "name": "CIRCLED NUMBER THIRTY",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY",
-      "name_zh": "带圈数字三十"
-    },
-    {
-      "text": "㉛",
-      "name": "CIRCLED NUMBER THIRTY ONE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY ONE",
-      "name_zh": "带圈数字三十一"
-    },
-    {
-      "text": "㉜",
-      "name": "CIRCLED NUMBER THIRTY TWO",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY TWO",
-      "name_zh": "带圈数字三十二"
-    },
-    {
-      "text": "㉝",
-      "name": "CIRCLED NUMBER THIRTY THREE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY THREE",
-      "name_zh": "带圈数字三十三"
-    },
-    {
-      "text": "㉞",
-      "name": "CIRCLED NUMBER THIRTY FOUR",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY FOUR",
-      "name_zh": "带圈数字三十四"
-    },
-    {
-      "text": "㉟",
-      "name": "CIRCLED NUMBER THIRTY FIVE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY FIVE",
-      "name_zh": "带圈数字三十五"
-    },
-    {
-      "text": "㊱",
-      "name": "CIRCLED NUMBER THIRTY SIX",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY SIX",
-      "name_zh": "带圈数字三十六"
-    },
-    {
-      "text": "㊲",
-      "name": "CIRCLED NUMBER THIRTY SEVEN",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY SEVEN",
-      "name_zh": "带圈数字三十七"
-    },
-    {
-      "text": "㊳",
-      "name": "CIRCLED NUMBER THIRTY EIGHT",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY EIGHT",
-      "name_zh": "带圈数字三十八"
-    },
-    {
-      "text": "㊴",
-      "name": "CIRCLED NUMBER THIRTY NINE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER THIRTY NINE",
-      "name_zh": "带圈数字三十九"
-    },
-    {
-      "text": "㊵",
-      "name": "CIRCLED NUMBER FORTY",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY",
-      "name_zh": "带圈数字四十"
-    },
-    {
-      "text": "㊶",
-      "name": "CIRCLED NUMBER FORTY ONE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY ONE",
-      "name_zh": "带圈数字四十一"
-    },
-    {
-      "text": "㊷",
-      "name": "CIRCLED NUMBER FORTY TWO",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY TWO",
-      "name_zh": "带圈数字四十二"
-    },
-    {
-      "text": "㊸",
-      "name": "CIRCLED NUMBER FORTY THREE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY THREE",
-      "name_zh": "带圈数字四十三"
-    },
-    {
-      "text": "㊹",
-      "name": "CIRCLED NUMBER FORTY FOUR",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY FOUR",
-      "name_zh": "带圈数字四十四"
-    },
-    {
-      "text": "㊺",
-      "name": "CIRCLED NUMBER FORTY FIVE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY FIVE",
-      "name_zh": "带圈数字四十五"
-    },
-    {
-      "text": "㊻",
-      "name": "CIRCLED NUMBER FORTY SIX",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY SIX",
-      "name_zh": "带圈数字四十六"
-    },
-    {
-      "text": "㊼",
-      "name": "CIRCLED NUMBER FORTY SEVEN",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY SEVEN",
-      "name_zh": "带圈数字四十七"
-    },
-    {
-      "text": "㊽",
-      "name": "CIRCLED NUMBER FORTY EIGHT",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY EIGHT",
-      "name_zh": "带圈数字四十八"
-    },
-    {
-      "text": "㊾",
-      "name": "CIRCLED NUMBER FORTY NINE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FORTY NINE",
-      "name_zh": "带圈数字四十九"
-    },
-    {
-      "text": "㊿",
-      "name": "CIRCLED NUMBER FIFTY",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER FIFTY",
-      "name_zh": "带圈数字五十"
     },
     {
       "text": "Ⓐ",

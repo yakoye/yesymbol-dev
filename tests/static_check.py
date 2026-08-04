@@ -283,7 +283,7 @@ assert 'src/emoji_renderer.c' in cmake and 'd2d1' in cmake and 'dwrite' in cmake
 assert 'LANGUAGES C CXX RC' in cmake
 assert 'set_source_files_properties(src/emoji_renderer.c PROPERTIES LANGUAGE CXX)' in cmake
 assert '$<$<COMPILE_LANGUAGE:CXX>:/GR->' in cmake
-assert '1.0.3-rc1' in yesymbol_h
+assert '1.0.3' in yesymbol_h
 build = (R / 'build.bat').read_text(encoding='ascii')
 for token in ['clean', 'data', 'cldr', 'run', 'all', 'call regenerate-data.cmd',
               'Reusing the existing CMake generator and platform', 'cmake -S . -B build -A x64']:
@@ -400,7 +400,7 @@ def assert_c_lexically_balanced(path: Path) -> None:
 for source_path in list((R / 'src').glob('*.c')) + list((R / 'include').glob('*.h')):
     assert_c_lexically_balanced(source_path)
 
-# README covers the complete user/developer workflow and v1.0.3-rc1 behavior.
+# README covers the complete user/developer workflow and v1.0.3 behavior.
 readme = (R / 'README.md').read_text(encoding='utf-8')
 for heading in ['## 项目介绍', '## 开发目的', '## 功能特点', '## 快速开始',
                 '### 直接运行', '### 从源码编译运行', '#### 编译环境要求',
