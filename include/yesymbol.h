@@ -13,10 +13,10 @@
 #include <stdint.h>
 
 #define YESYMBOL_PRODUCT_NAME L"符号大全"
-#define YESYMBOL_VERSION L"1.0.0-rc16"
-#define YESYMBOL_WINDOW_CLASS L"YeTools.YeSymbol.Window.v14"
-#define YESYMBOL_GRID_CLASS L"YeTools.YeSymbol.Grid.v14"
-#define YESYMBOL_RECENT_CLASS L"YeTools.YeSymbol.Recent.v3"
+#define YESYMBOL_VERSION L"1.0.3-rc1"
+#define YESYMBOL_WINDOW_CLASS L"YeTools.YeSymbol.Window.v16"
+#define YESYMBOL_GRID_CLASS L"YeTools.YeSymbol.Grid.v16"
+#define YESYMBOL_RECENT_CLASS L"YeTools.YeSymbol.Recent.v5"
 #define YESYMBOL_ACTIVATE_MESSAGE (WM_APP + 41)
 #define YESYMBOL_TRAY_MESSAGE (WM_APP + 42)
 #define YESYMBOL_DEFERRED_INIT_MESSAGE (WM_APP + 43)

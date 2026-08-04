@@ -4,6 +4,7 @@
 #include "clipboard.h"
 #include "storage.h"
 #include "symbol_data.h"
+#include "emoji_renderer.h"
 #include "ui_config.h"
 #include <commctrl.h>
 #include <windowsx.h>
@@ -11,6 +12,7 @@
 #include <shlwapi.h>
 #include <shellapi.h>
 #include <wchar.h>
+#include <stdlib.h>
 #include <wctype.h>
 
 #define ID_SEARCH 1001
@@ -61,6 +63,7 @@
 #define YS_STORAGE_DIRTY_COMMON 0x02u
 #define YS_STORAGE_DIRTY_CUSTOM 0x04u
 #define YS_STORAGE_DIRTY_SEARCH_HISTORY 0x08u
+#define YS_STORAGE_DIRTY_USAGE 0x10u
 #define YS_VIRTUAL_THRESHOLD 480u
 #define ID_MENU_ADD_COMMON 2101
 #define ID_MENU_REMOVE_COMMON 2102
@@ -69,6 +72,7 @@
 #define ID_MENU_JUMP_ORIGIN 2105
 #define ID_MENU_TONE_BASE 2300
 #define YS_MAX_TONE_OPTIONS 6
+#define YS_MAX_VISIBLE_EMOJI_DRAWS 512u
 
 static const WCHAR *g_ys_main_category_names[] = {
     L"特殊符号", L"标点符号", L"序号字母", L"数学/单位", L"希腊/拉丁",
@@ -124,6 +128,17 @@ typedef struct YSHitInfo {
     uint16_t column_number;
 } YSHitInfo;
 
+typedef struct YSEmojiDrawItem {
+    WCHAR text[YS_MAX_SEQUENCE + 4];
+    RECT rect;
+    COLORREF fallback_color;
+} YSEmojiDrawItem;
+
+typedef struct YSEmojiDrawBatch {
+    YSEmojiDrawItem items[YS_MAX_VISIBLE_EMOJI_DRAWS];
+    size_t count;
+} YSEmojiDrawBatch;
+
 typedef struct YSAppState {
     HINSTANCE instance;
     HWND hwnd;
@@ -154,8 +169,10 @@ typedef struct YSAppState {
     HFONT group_font;
     HFONT symbol_font;
     HFONT emoji_font;
+    YSEmojiRenderer *emoji_renderer;
     YSDynamicList recent;
     YSCommonList common;
+    YSUsageList usage;
     YSDynamicList custom;
     YSSearchHistory search_history;
     YSViewSymbol *views;
@@ -190,6 +207,10 @@ typedef struct YSAppState {
     BOOL other_expanded;
     BOOL suppress_search_change;
     BOOL pending_common_rebuild;
+    int common_drag_source;
+    int common_drag_target;
+    POINT common_drag_start;
+    BOOL common_dragging;
     UINT storage_dirty_flags;
     HDC grid_memory_dc;
     HBITMAP grid_bitmap;
@@ -534,6 +555,34 @@ static void ys_layout_symbol_range(YSAppState *state, size_t first_view, size_t 
     *y += rows * YS_CELL_H + YS_GROUP_GAP;
 }
 
+static void ys_layout_symbol_range_fit_columns(YSAppState *state, size_t first_view, size_t count,
+                                               int requested_columns, int *y,
+                                               uint16_t category_index, uint16_t row_number) {
+    int columns = max(1, min(YS_MAX_COLUMNS, requested_columns));
+    int available_width = max(columns, ys_grid_width(state) - 8);
+    int cell_width = max(24, available_width / columns);
+    size_t i;
+    int rows;
+    for (i = 0; i < count; ++i) {
+        int row = (int)(i / (size_t)columns);
+        int column = (int)(i % (size_t)columns);
+        YSLayoutItem item;
+        ZeroMemory(&item, sizeof(item));
+        item.type = YS_ITEM_SYMBOL;
+        item.view_index = (uint32_t)(first_view + i);
+        item.category_index = category_index;
+        item.row_number = row_number;
+        item.column_number = (uint16_t)(i + 1u);
+        item.rect.left = 4 + column * cell_width;
+        item.rect.top = *y + row * YS_CELL_H;
+        item.rect.right = (column == columns - 1) ? ys_grid_width(state) - 4 : item.rect.left + cell_width - 2;
+        item.rect.bottom = item.rect.top + YS_CELL_H - 2;
+        ys_append_layout(state, &item);
+    }
+    rows = count ? (int)((count + (size_t)columns - 1u) / (size_t)columns) : 0;
+    *y += rows * YS_CELL_H + YS_GROUP_GAP;
+}
+
 static void ys_reset_virtual_layout(YSAppState *state) {
     if (!state) return;
     state->virtual_group_count = 0;
@@ -703,7 +752,19 @@ static void ys_build_data_category(YSAppState *state, int data_index, int *y) {
 
 static int ys_find_symbol_index(const WCHAR *text) { return ys_symbol_index_from_text(text); }
 static void ys_names_for_text(const WCHAR *text, const WCHAR **name_zh, const WCHAR **name_en, uint32_t *flags, uint32_t *index) { int i=ys_find_symbol_index(text); if(i>=0){if(name_zh)*name_zh=ys_symbol_name_zh((uint32_t)i);if(name_en)*name_en=ys_symbol_name_en((uint32_t)i);if(flags)*flags=g_ys_symbols[i].flags;if(index)*index=(uint32_t)i;return;}if(name_zh)*name_zh=L"用户自定义符号";if(name_en)*name_en=L"User symbol";if(flags)*flags=ys_text_looks_emoji(text)?YS_SYMBOL_FLAG_EMOJI:0;if(index)*index=UINT32_MAX;}
-static void ys_build_common(YSAppState *state,int *y){size_t i,first=state->view_count;for(i=0;i<state->common.count;i++){uint32_t f,si;const WCHAR *zh,*en;ys_names_for_text(state->common.items[i].text,&zh,&en,&f,&si);ys_append_view(state,state->common.items[i].text,zh,en,f,si,YS_SOURCE_COMMON,(uint16_t)i);}ys_layout_group_begin(state,L"常用符号（按使用次数排序）",y);ys_layout_symbol_range(state,first,state->view_count-first,0,y,UINT16_MAX,0);}
+static void ys_build_common(YSAppState *state, int *y) {
+    size_t index;
+    size_t first = state->view_count;
+    for (index = 0; index < state->common.count; ++index) {
+        uint32_t flags, symbol_index;
+        const WCHAR *name_zh, *name_en;
+        ys_names_for_text(state->common.items[index].text, &name_zh, &name_en, &flags, &symbol_index);
+        ys_append_view(state, state->common.items[index].text, name_zh, name_en, flags, symbol_index,
+                       YS_SOURCE_COMMON, (uint16_t)index);
+    }
+    ys_layout_group_begin(state, L"常用符号（拖动排序，右键删除）", y);
+    ys_layout_symbol_range_fit_columns(state, first, state->view_count - first, 12, y, UINT16_MAX, 0);
+}
 
 static void ys_build_dynamic(YSAppState *state, YSDynamicList *list, uint16_t source, const WCHAR *title, int *y) {
     size_t i, first_view = state->view_count;
@@ -1001,13 +1062,28 @@ static void ys_capture_external_target(YSAppState *state) {
     state->last_external_thread = thread_id;
 }
 
-static BOOL ys_send_paste(YSAppState *state) {
-    INPUT inputs[4];
+/* Types `text` into the previously-focused external window as synthetic
+ * Unicode keystrokes (KEYEVENTF_UNICODE), instead of copying to the
+ * clipboard and sending Ctrl+V. This avoids depending on the target
+ * accepting paste, and avoids the clipboard entirely for this path (the
+ * click itself still separately copies to the clipboard via
+ * ys_clipboard_set, so manual paste elsewhere keeps working). Each UTF-16
+ * code unit is sent as its own key down/up pair; for characters outside
+ * the BMP (most emoji, flag sequences) that means sending the high and low
+ * surrogate as two consecutive events, which is exactly how Windows text
+ * controls expect to reassemble a supplementary-plane character from
+ * injected input. */
+static BOOL ys_send_auto_insert(YSAppState *state, const WCHAR *text) {
+    INPUT inputs[YS_MAX_SEQUENCE * 2u];
     HWND root, focus;
     DWORD target_thread, current_thread;
     BOOL attached = FALSE;
+    size_t length, i;
     int attempt;
-    if (!state) return FALSE;
+    UINT sent;
+    if (!state || !text || !text[0]) return FALSE;
+    length = wcslen(text);
+    if (length > YS_ARRAY_COUNT(inputs) / 2u) return FALSE;
     root = state->last_external_root;
     focus = state->last_external_focus;
     if (!root || !IsWindow(root)) return FALSE;
@@ -1028,15 +1104,18 @@ static BOOL ys_send_paste(YSAppState *state) {
         SwitchToThread();
     }
     if (focus && IsWindow(focus)) SetFocus(focus);
-    ZeroMemory(inputs, sizeof(inputs));
-    inputs[0].type = inputs[1].type = inputs[2].type = inputs[3].type = INPUT_KEYBOARD;
-    inputs[0].ki.wVk = VK_CONTROL;
-    inputs[1].ki.wVk = 'V';
-    inputs[2].ki.wVk = 'V'; inputs[2].ki.dwFlags = KEYEVENTF_KEYUP;
-    inputs[3].ki.wVk = VK_CONTROL; inputs[3].ki.dwFlags = KEYEVENTF_KEYUP;
-    attempt = (int)SendInput(4, inputs, sizeof(INPUT));
+    ZeroMemory(inputs, sizeof(inputs[0]) * length * 2u);
+    for (i = 0; i < length; ++i) {
+        inputs[i * 2u].type = INPUT_KEYBOARD;
+        inputs[i * 2u].ki.wScan = text[i];
+        inputs[i * 2u].ki.dwFlags = KEYEVENTF_UNICODE;
+        inputs[i * 2u + 1u].type = INPUT_KEYBOARD;
+        inputs[i * 2u + 1u].ki.wScan = text[i];
+        inputs[i * 2u + 1u].ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+    }
+    sent = SendInput((UINT)(length * 2u), inputs, sizeof(INPUT));
     if (attached) AttachThreadInput(current_thread, target_thread, FALSE);
-    return attempt == 4;
+    return sent == (UINT)(length * 2u);
 }
 
 static void ys_flush_storage(YSAppState *state) {
@@ -1049,6 +1128,7 @@ static void ys_flush_storage(YSAppState *state) {
     if (flags & YS_STORAGE_DIRTY_COMMON) ys_storage_save_common(&state->common);
     if (flags & YS_STORAGE_DIRTY_CUSTOM) ys_storage_save_custom(&state->custom);
     if (flags & YS_STORAGE_DIRTY_SEARCH_HISTORY) ys_storage_save_search_history(&state->search_history);
+    if (flags & YS_STORAGE_DIRTY_USAGE) ys_storage_save_usage(&state->usage);
 }
 
 static void ys_schedule_storage(YSAppState *state, UINT flags) {
@@ -1172,6 +1252,31 @@ static void ys_refresh_recent_strip(YSAppState *state) {
     if (state && state->recent_grid) InvalidateRect(state->recent_grid, NULL, TRUE);
 }
 
+static void ys_request_common_rebuild(YSAppState *state) {
+    if (!state) return;
+    if (!GetWindowTextLengthW(state->search) && ys_selected_is_common(state)) {
+        state->pending_common_rebuild = TRUE;
+        PostMessageW(state->hwnd, YESYMBOL_DEFERRED_REFRESH_MESSAGE, 0, 0);
+    }
+}
+
+static BOOL ys_record_symbol_use(YSAppState *state, const WCHAR *text) {
+    uint32_t use_count;
+    if (!state || !text || !text[0]) return FALSE;
+    if (ys_common_increment(&state->common, text)) {
+        ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON);
+        return FALSE;
+    }
+    use_count = ys_usage_increment(&state->usage, text);
+    ys_schedule_storage(state, YS_STORAGE_DIRTY_USAGE);
+    if (use_count < YS_COMMON_AUTO_ADD_THRESHOLD) return FALSE;
+    if (!ys_common_add(&state->common, text, use_count)) return FALSE;
+    ys_usage_remove(&state->usage, text);
+    ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON | YS_STORAGE_DIRTY_USAGE);
+    ys_request_common_rebuild(state);
+    return TRUE;
+}
+
 static void ys_copy_view(YSAppState *state, const YSViewSymbol *source_view, const WCHAR *category, const WCHAR *prefix) {
     YSViewSymbol view;
     WCHAR copied[YS_MAX_SEQUENCE];
@@ -1187,20 +1292,16 @@ static void ys_copy_view(YSAppState *state, const YSViewSymbol *source_view, con
     ys_set_footer(state, &view, category ? category : ys_category_name_for_view(&view), prefix ? prefix : L"已复制：");
 
     /* Auto insert is the latency-sensitive path.  Restore the previous target
-       and send Ctrl+V before sorting lists or writing the registry. */
-    if (Button_GetCheck(state->auto_insert) == BST_CHECKED) ys_send_paste(state);
+       and type the symbol directly before sorting lists or writing the registry. */
+    if (Button_GetCheck(state->auto_insert) == BST_CHECKED) ys_send_auto_insert(state, copied);
 
     recent_changed = ys_list_add_front_unique(&state->recent, copied);
     if (recent_changed) {
         ys_schedule_storage(state, YS_STORAGE_DIRTY_RECENT);
         ys_refresh_recent_strip(state);
     }
-    if (ys_common_increment(&state->common, copied)) {
-        ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON);
-        if (!GetWindowTextLengthW(state->search) && ys_selected_is_common(state)) {
-            state->pending_common_rebuild = TRUE;
-            PostMessageW(state->hwnd, YESYMBOL_DEFERRED_REFRESH_MESSAGE, 0, 0);
-        }
+    if (ys_record_symbol_use(state, copied)) {
+        SetWindowTextW(state->status, L"该符号已达到常用阈值，并追加到常用符号末尾。");
     }
 }
 
@@ -1367,6 +1468,7 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
     UINT command;
     int common_index;
     int symbol_index;
+    uint32_t previous_use_count;
     BOOL rebuild_main = FALSE;
     WCHAR symbol[YS_MAX_SEQUENCE];
     WCHAR tone_variants[YS_MAX_TONE_OPTIONS][YS_MAX_SEQUENCE];
@@ -1409,16 +1511,20 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
         return;
     }
     if (command == ID_MENU_ADD_COMMON) {
-        if (ys_common_add(&state->common, symbol, 0)) {
-            ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON);
-            SetWindowTextW(state->status, L"已添加到常用符号。");
+        previous_use_count = ys_usage_get(&state->usage, symbol);
+        if (ys_common_add(&state->common, symbol, previous_use_count)) {
+            ys_usage_remove(&state->usage, symbol);
+            ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON | YS_STORAGE_DIRTY_USAGE);
+            SetWindowTextW(state->status, L"已追加到常用符号末尾。");
             rebuild_main = ys_selected_is_common(state) || GetWindowTextLengthW(state->search) > 0;
         }
     } else if (command == ID_MENU_REMOVE_COMMON) {
         common_index = ys_common_find(&state->common, symbol);
         if (common_index >= 0 && ys_common_remove(&state->common, (size_t)common_index)) {
-            ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON);
-            SetWindowTextW(state->status, L"已从常用符号删除。");
+            /* 删除后重新从零累计，避免下一次点击立即自动加回。 */
+            ys_usage_remove(&state->usage, symbol);
+            ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON | YS_STORAGE_DIRTY_USAGE);
+            SetWindowTextW(state->status, L"已从常用符号删除；自动加入计数已重置。");
             rebuild_main = ys_selected_is_common(state) || GetWindowTextLengthW(state->search) > 0;
         }
     } else if (command == ID_MENU_REMOVE_RECENT && source_index < state->recent.count) {
@@ -1474,12 +1580,16 @@ static BOOL ys_recent_view(YSAppState *state, size_t index, YSViewSymbol *view) 
     return TRUE;
 }
 
-static RECT ys_recent_item_rect(size_t index) {
+static RECT ys_recent_item_rect(const YSAppState *state, size_t index) {
+    RECT client = {0, 0, 1, YS_RECENT_ROW_HEIGHT};
     RECT rect;
-    rect.left = 2 + (int)index * YS_RECENT_CELL_WIDTH;
+    int width;
+    if (state && state->recent_grid) GetClientRect(state->recent_grid, &client);
+    width = max(1, client.right - client.left);
+    rect.left = (int)(((size_t)width * index) / YS_RECENT_MAX_VISIBLE) + 1;
     rect.top = 2;
-    rect.right = rect.left + YS_RECENT_CELL_WIDTH - 2;
-    rect.bottom = YS_RECENT_ROW_HEIGHT - 2;
+    rect.right = (int)(((size_t)width * (index + 1u)) / YS_RECENT_MAX_VISIBLE) - 1;
+    rect.bottom = max(rect.top + 1, client.bottom - 2);
     return rect;
 }
 
@@ -1489,7 +1599,7 @@ static int ys_recent_hit_test(YSAppState *state, int x, int y) {
     point.x = x;
     point.y = y;
     for (i = 0; i < count; ++i) {
-        RECT rect = ys_recent_item_rect(i);
+        RECT rect = ys_recent_item_rect(state, i);
         if (PtInRect(&rect, point)) return (int)i;
     }
     return -1;
@@ -1524,6 +1634,52 @@ static void ys_show_recent_tooltip(YSAppState *state, int index) {
     GetCursorPos(&point);
     SendMessageW(state->recent_tooltip, TTM_TRACKPOSITION, 0, MAKELPARAM(point.x + 14, point.y + 18));
     SendMessageW(state->recent_tooltip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&info);
+}
+
+static BOOL ys_emoji_batch_add(YSEmojiDrawBatch *batch, const WCHAR *text,
+                               const RECT *rect, COLORREF fallback_color) {
+    YSEmojiDrawItem *item;
+    if (!batch || !text || !text[0] || !rect || batch->count >= YS_MAX_VISIBLE_EMOJI_DRAWS) return FALSE;
+    item = &batch->items[batch->count++];
+    StringCchCopyW(item->text, YS_ARRAY_COUNT(item->text), text);
+    item->rect = *rect;
+    item->fallback_color = fallback_color;
+    return TRUE;
+}
+
+static void ys_draw_emoji_batch_gdi_fallback(YSAppState *state, HDC dc, const YSEmojiDrawBatch *batch) {
+    size_t index;
+    if (!state || !dc || !batch) return;
+    SelectObject(dc, state->emoji_font);
+    SetBkMode(dc, TRANSPARENT);
+    for (index = 0; index < batch->count; ++index) {
+        RECT rect = batch->items[index].rect;
+        SetTextColor(dc, batch->items[index].fallback_color);
+        DrawTextW(dc, batch->items[index].text, -1, &rect,
+                  DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+    }
+}
+
+static void ys_render_emoji_batch(YSAppState *state, HDC dc, const RECT *bounds,
+                                  const YSEmojiDrawBatch *batch) {
+    size_t index;
+    BOOL rendered = FALSE;
+    if (!state || !dc || !bounds || !batch || !batch->count) return;
+    if (ys_emoji_renderer_is_available(state->emoji_renderer) &&
+        ys_emoji_renderer_begin(state->emoji_renderer, dc, bounds)) {
+        rendered = TRUE;
+        for (index = 0; index < batch->count; ++index) {
+            if (!ys_emoji_renderer_draw(state->emoji_renderer,
+                                        batch->items[index].text,
+                                        &batch->items[index].rect,
+                                        batch->items[index].fallback_color)) {
+                rendered = FALSE;
+                break;
+            }
+        }
+        if (!ys_emoji_renderer_end(state->emoji_renderer)) rendered = FALSE;
+    }
+    if (!rendered) ys_draw_emoji_batch_gdi_fallback(state, dc, batch);
 }
 
 static LRESULT CALLBACK ys_recent_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
@@ -1595,7 +1751,9 @@ static LRESULT CALLBACK ys_recent_proc(HWND hwnd, UINT message, WPARAM wparam, L
             RECT client;
             HDC memory_dc;
             HBITMAP bitmap, old_bitmap;
+            YSEmojiDrawBatch emoji_batch;
             size_t i, count = ys_recent_visible_count(state);
+            ZeroMemory(&emoji_batch, sizeof(emoji_batch));
             GetClientRect(hwnd, &client);
             memory_dc = CreateCompatibleDC(dc);
             bitmap = CreateCompatibleBitmap(dc, max(1, client.right), max(1, client.bottom));
@@ -1611,7 +1769,7 @@ static LRESULT CALLBACK ys_recent_proc(HWND hwnd, UINT message, WPARAM wparam, L
             }
             for (i = 0; i < count; ++i) {
                 YSViewSymbol view;
-                RECT rect = ys_recent_item_rect(i);
+                RECT rect = ys_recent_item_rect(state, i);
                 RECT inner = rect;
                 BOOL hot = ((int)i == state->recent_hover_index);
                 if (!ys_recent_view(state, i, &view)) continue;
@@ -1627,10 +1785,19 @@ static LRESULT CALLBACK ys_recent_proc(HWND hwnd, UINT message, WPARAM wparam, L
                 {
                     WCHAR display_buffer[YS_MAX_SEQUENCE + 4];
                     const WCHAR *display = ys_display_text(view.text, display_buffer, YS_ARRAY_COUNT(display_buffer));
-                    SelectObject(memory_dc, (view.flags & YS_SYMBOL_FLAG_EMOJI) ? state->emoji_font : state->symbol_font);
-                    DrawTextW(memory_dc, display, -1, &inner, DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+                    COLORREF text_color = GetSysColor(hot ? COLOR_HIGHLIGHTTEXT : COLOR_WINDOWTEXT);
+                    if ((view.flags & YS_SYMBOL_FLAG_EMOJI) &&
+                        ys_emoji_renderer_is_available(state->emoji_renderer) &&
+                        ys_emoji_batch_add(&emoji_batch, display, &inner, text_color)) {
+                        /* Color Emoji is rendered in one DirectWrite/Direct2D pass below. */
+                    } else {
+                        SelectObject(memory_dc, (view.flags & YS_SYMBOL_FLAG_EMOJI) ? state->emoji_font : state->symbol_font);
+                        DrawTextW(memory_dc, display, -1, &inner,
+                                  DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
+                    }
                 }
             }
+            ys_render_emoji_batch(state, memory_dc, &client, &emoji_batch);
             BitBlt(dc, 0, 0, client.right, client.bottom, memory_dc, 0, 0, SRCCOPY);
             SelectObject(memory_dc, old_bitmap);
             DeleteObject(bitmap);
@@ -1678,27 +1845,35 @@ static void ys_draw_grid_header(YSAppState *state, HDC dc, const WCHAR *text, RE
               DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 }
 
-static void ys_draw_grid_symbol(YSAppState *state, HDC dc, const YSViewSymbol *view, RECT draw, BOOL hot) {
+static void ys_draw_grid_symbol(YSAppState *state, HDC dc, const YSViewSymbol *view,
+                                RECT draw, BOOL hot, YSEmojiDrawBatch *emoji_batch) {
     RECT inner = draw;
     WCHAR display_buffer[YS_MAX_SEQUENCE + 4];
     const WCHAR *display;
+    COLORREF text_color;
     if (!view) return;
     if (hot) {
         FillRect(dc, &draw, GetSysColorBrush(COLOR_HIGHLIGHT));
-        SetTextColor(dc, GetSysColor(COLOR_HIGHLIGHTTEXT));
+        text_color = GetSysColor(COLOR_HIGHLIGHTTEXT);
     } else {
         FillRect(dc, &draw, GetSysColorBrush(COLOR_WINDOW));
-        SetTextColor(dc, GetSysColor(COLOR_WINDOWTEXT));
+        text_color = GetSysColor(COLOR_WINDOWTEXT);
     }
+    SetTextColor(dc, text_color);
     DrawEdge(dc, &draw, hot ? EDGE_SUNKEN : EDGE_RAISED, BF_RECT);
     InflateRect(&inner, -2, -2);
     display = ys_display_text(view->text, display_buffer, YS_ARRAY_COUNT(display_buffer));
+    if ((view->flags & YS_SYMBOL_FLAG_EMOJI) &&
+        ys_emoji_renderer_is_available(state->emoji_renderer) &&
+        ys_emoji_batch_add(emoji_batch, display, &inner, text_color)) {
+        return;
+    }
     SelectObject(dc, (view->flags & YS_SYMBOL_FLAG_EMOJI) ? state->emoji_font : state->symbol_font);
     DrawTextW(dc, display, -1, &inner,
               DT_CENTER | DT_VCENTER | DT_SINGLELINE | DT_END_ELLIPSIS | DT_NOPREFIX);
 }
 
-static void ys_paint_normal_layout(YSAppState *state, HDC dc, const RECT *client) {
+static void ys_paint_normal_layout(YSAppState *state, HDC dc, const RECT *client, YSEmojiDrawBatch *emoji_batch) {
     size_t i;
     for (i = 0; i < state->layout_count; ++i) {
         YSLayoutItem *item = &state->layout[i];
@@ -1708,13 +1883,16 @@ static void ys_paint_normal_layout(YSAppState *state, HDC dc, const RECT *client
         if (item->type == YS_ITEM_HEADER) {
             ys_draw_grid_header(state, dc, item->header, draw);
         } else if (item->view_index < state->view_count) {
-            BOOL hot = ((int)i == state->hover_layout && state->hover_virtual_item < 0);
-            ys_draw_grid_symbol(state, dc, &state->views[item->view_index], draw, hot);
+            const YSViewSymbol *view = &state->views[item->view_index];
+            BOOL hot = ((int)i == state->hover_layout && state->hover_virtual_item < 0) ||
+                       (state->common_dragging && view->source == YS_SOURCE_COMMON &&
+                        (int)view->source_index == state->common_drag_target);
+            ys_draw_grid_symbol(state, dc, view, draw, hot, emoji_batch);
         }
     }
 }
 
-static void ys_paint_virtual_data(YSAppState *state, HDC dc, const RECT *client) {
+static void ys_paint_virtual_data(YSAppState *state, HDC dc, const RECT *client, YSEmojiDrawBatch *emoji_batch) {
     size_t gi;
     int visible_top = state->scroll_y;
     int visible_bottom = state->scroll_y + client->bottom;
@@ -1755,13 +1933,13 @@ static void ys_paint_virtual_data(YSAppState *state, HDC dc, const RECT *client)
                 draw.bottom = draw.top + YS_CELL_H - 2;
                 hot = state->hover_layout < 0 && state->hover_virtual_group == (int)gi &&
                       state->hover_virtual_item == (int)item_index;
-                ys_draw_grid_symbol(state, dc, &view, draw, hot);
+                ys_draw_grid_symbol(state, dc, &view, draw, hot, emoji_batch);
             }
         }
     }
 }
 
-static void ys_paint_virtual_flat(YSAppState *state, HDC dc, const RECT *client) {
+static void ys_paint_virtual_flat(YSAppState *state, HDC dc, const RECT *client, YSEmojiDrawBatch *emoji_batch) {
     int visible_top = state->scroll_y;
     int visible_bottom = state->scroll_y + client->bottom;
     int first_row, last_row, row;
@@ -1784,9 +1962,22 @@ static void ys_paint_virtual_flat(YSAppState *state, HDC dc, const RECT *client)
             draw.bottom = draw.top + YS_CELL_H - 2;
             hot = state->hover_layout < 0 && state->hover_virtual_group < 0 &&
                   state->hover_virtual_item == (int)view_index;
-            ys_draw_grid_symbol(state, dc, &state->views[view_index], draw, hot);
+            ys_draw_grid_symbol(state, dc, &state->views[view_index], draw, hot, emoji_batch);
         }
     }
+}
+
+static int ys_common_index_from_hit(YSAppState *state, const YSHitInfo *hit) {
+    YSViewSymbol view;
+    if (!state || !hit || !ys_hit_view(state, hit, &view) || view.source != YS_SOURCE_COMMON) return -1;
+    return view.source_index < state->common.count ? (int)view.source_index : -1;
+}
+
+static void ys_common_drag_reset(YSAppState *state) {
+    if (!state) return;
+    state->common_drag_source = -1;
+    state->common_drag_target = -1;
+    state->common_dragging = FALSE;
 }
 
 static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
@@ -1829,14 +2020,68 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         }
         return 0;
     case WM_MOUSEWHEEL:
-        if (state) ys_grid_scroll(state, state->scroll_y -
-                                  (GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA) * 3 * YS_CELL_H);
+        if (state) {
+            int target = state->scroll_y -
+                         (GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA) * 3 * YS_CELL_H;
+            MSG queued;
+            /* A single physical wheel spin can post several WM_MOUSEWHEEL
+             * messages before this thread gets back to the queue. Each one
+             * used to trigger its own full-grid repaint, which is expensive
+             * on emoji-heavy pages (every visible cell's Direct2D draw call
+             * runs again per repaint). Folding any wheel messages already
+             * queued for this window into one target position turns a fast
+             * scroll burst into a single repaint instead of one per notch,
+             * without changing the feel of a single, deliberate notch. */
+            while (PeekMessageW(&queued, hwnd, WM_MOUSEWHEEL, WM_MOUSEWHEEL, PM_REMOVE)) {
+                target -= (GET_WHEEL_DELTA_WPARAM(queued.wParam) / WHEEL_DELTA) * 3 * YS_CELL_H;
+            }
+            ys_grid_scroll(state, target);
+        }
         return 0;
+    case WM_LBUTTONDOWN:
+        if (state && ys_selected_is_common(state) && GetWindowTextLengthW(state->search) == 0) {
+            YSHitInfo hit;
+            int common_index;
+            if (ys_hit_test_info(state, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), &hit) &&
+                (common_index = ys_common_index_from_hit(state, &hit)) >= 0) {
+                state->common_drag_source = common_index;
+                state->common_drag_target = common_index;
+                state->common_drag_start.x = GET_X_LPARAM(lparam);
+                state->common_drag_start.y = GET_Y_LPARAM(lparam);
+                state->common_dragging = FALSE;
+                SetCapture(hwnd);
+                SetFocus(hwnd);
+                return 0;
+            }
+        }
+        break;
     case WM_MOUSEMOVE:
         if (state) {
-            YSHitInfo hit;
-            YSViewSymbol view;
-            ys_hit_test_info(state, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), &hit);
+            if (state->common_drag_source >= 0 && GetCapture() == hwnd && (wparam & MK_LBUTTON)) {
+                int x = GET_X_LPARAM(lparam);
+                int y = GET_Y_LPARAM(lparam);
+                if (!state->common_dragging &&
+                    (abs(x - state->common_drag_start.x) >= GetSystemMetrics(SM_CXDRAG) ||
+                     abs(y - state->common_drag_start.y) >= GetSystemMetrics(SM_CYDRAG))) {
+                    state->common_dragging = TRUE;
+                    ys_hide_tooltip(state);
+                }
+                if (state->common_dragging) {
+                    YSHitInfo drag_hit;
+                    int target = -1;
+                    if (ys_hit_test_info(state, x, y, &drag_hit)) target = ys_common_index_from_hit(state, &drag_hit);
+                    if (target >= 0 && target != state->common_drag_target) {
+                        state->common_drag_target = target;
+                        InvalidateRect(hwnd, NULL, FALSE);
+                    }
+                    SetCursor(LoadCursorW(NULL, IDC_SIZEALL));
+                    return 0;
+                }
+            }
+            {
+                YSHitInfo hit;
+                YSViewSymbol view;
+                ys_hit_test_info(state, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), &hit);
             if (!ys_hit_is_current_hover(state, &hit)) {
                 ys_set_hover_hit(state, &hit);
                 InvalidateRect(hwnd, NULL, FALSE);
@@ -1855,6 +2100,7 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
                 tracking.hwndTrack = hwnd;
                 TrackMouseEvent(&tracking);
             }
+            }
         }
         return 0;
     case WM_MOUSELEAVE:
@@ -1867,7 +2113,28 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
     case WM_LBUTTONUP:
         if (state) {
             YSHitInfo hit;
+            if (state->common_drag_source >= 0) {
+                int source = state->common_drag_source;
+                int target = state->common_drag_target;
+                BOOL dragged = state->common_dragging;
+                ys_common_drag_reset(state);
+                if (GetCapture() == hwnd) ReleaseCapture();
+                if (dragged) {
+                    if (target >= 0 && ys_common_move(&state->common, (size_t)source, (size_t)target)) {
+                        ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON);
+                        SetWindowTextW(state->status, L"常用符号顺序已调整并保存。");
+                        ys_rebuild(state, FALSE);
+                    }
+                    return 0;
+                }
+            }
             if (ys_hit_test_info(state, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam), &hit)) ys_copy_hit(state, &hit);
+        }
+        return 0;
+    case WM_CAPTURECHANGED:
+        if (state && (HWND)lparam != hwnd) {
+            ys_common_drag_reset(state);
+            InvalidateRect(hwnd, NULL, FALSE);
         }
         return 0;
     case WM_RBUTTONUP:
@@ -1885,14 +2152,17 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             HDC dc = BeginPaint(hwnd, &paint);
             RECT client;
             HDC memory_dc;
+            YSEmojiDrawBatch emoji_batch;
+            ZeroMemory(&emoji_batch, sizeof(emoji_batch));
             GetClientRect(hwnd, &client);
             memory_dc = ys_prepare_grid_backbuffer(state, dc, client.right, client.bottom);
             if (memory_dc) {
                 FillRect(memory_dc, &client, GetSysColorBrush(COLOR_WINDOW));
                 SetBkMode(memory_dc, TRANSPARENT);
-                ys_paint_normal_layout(state, memory_dc, &client);
-                if (state->virtual_data_mode) ys_paint_virtual_data(state, memory_dc, &client);
-                if (state->virtual_flat_mode) ys_paint_virtual_flat(state, memory_dc, &client);
+                ys_paint_normal_layout(state, memory_dc, &client, &emoji_batch);
+                if (state->virtual_data_mode) ys_paint_virtual_data(state, memory_dc, &client, &emoji_batch);
+                if (state->virtual_flat_mode) ys_paint_virtual_flat(state, memory_dc, &client, &emoji_batch);
+                ys_render_emoji_batch(state, memory_dc, &client, &emoji_batch);
                 BitBlt(dc, 0, 0, client.right, client.bottom, memory_dc, 0, 0, SRCCOPY);
             } else {
                 FillRect(dc, &client, GetSysColorBrush(COLOR_WINDOW));
@@ -2375,6 +2645,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         state->recent_hover_index = -1;
         state->category_hover_index = -1;
         state->search_history_nav = -1;
+        state->common_drag_source = -1;
+        state->common_drag_target = -1;
         state->recent_expanded = TRUE;
         state->other_expanded = FALSE;
         state->virtual_category_index = -1;
@@ -2390,9 +2662,11 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         state->emoji_font = CreateFontW(YS_EMOJI_FONT_HEIGHT, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
                                         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                                         CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI Emoji");
+        state->emoji_renderer = ys_emoji_renderer_create((float)(-YS_EMOJI_FONT_HEIGHT));
 
         ys_storage_init_list(&state->recent, YS_MAX_RECENT);
         ys_common_init(&state->common);
+        ys_usage_init(&state->usage);
         ys_storage_init_list(&state->custom, YS_MAX_CUSTOM);
         ys_storage_load_recent(&state->recent);
         if (!ys_storage_load_common(&state->common)) {
@@ -2400,6 +2674,7 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             for (i = 0; i < g_ys_default_common_count; ++i) ys_common_add(&state->common, ys_symbol_text(g_ys_default_common_items[i]), 0);
             state->storage_dirty_flags |= YS_STORAGE_DIRTY_COMMON;
         }
+        ys_storage_load_usage(&state->usage);
         ys_storage_load_custom(&state->custom);
         ys_search_history_init(&state->search_history);
         ys_storage_load_search_history(&state->search_history);
@@ -2723,6 +2998,7 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
                 if (state->grid_bitmap) DeleteObject(state->grid_bitmap);
                 DeleteDC(state->grid_memory_dc);
             }
+            ys_emoji_renderer_destroy(state->emoji_renderer);
             if (state->group_font) DeleteObject(state->group_font);
             if (state->symbol_font) DeleteObject(state->symbol_font);
             if (state->emoji_font) DeleteObject(state->emoji_font);

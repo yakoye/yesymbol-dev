@@ -208,7 +208,8 @@ assert '#define YS_WINDOW_WIDTH 786' in cfg
 assert '#define YS_CATEGORY_WIDTH 162' in cfg
 assert '#define YS_CATEGORY_ITEM_HEIGHT 28' in cfg
 assert '#define YS_WINDOW_HEIGHT 650' in cfg
-assert '#define YS_RECENT_MAX_VISIBLE 14' in cfg
+assert '#define YS_RECENT_MAX_VISIBLE 17' in cfg
+assert '#define YS_COMMON_AUTO_ADD_THRESHOLD 5u' in cfg
 assert 'YS_DESCRIPTION_HEIGHT' not in cfg
 
 for token in [
@@ -278,7 +279,11 @@ for token in ['Shell_NotifyIconW', 'YESYMBOL_TRAY_MESSAGE', 'ID_TRAY_EXIT', 'SW_
 assert 'WS_OVERLAPPEDWINDOW' not in ui and 'WS_MAXIMIZEBOX' not in ui
 cmake = (R / 'CMakeLists.txt').read_text(encoding='utf-8')
 assert '/MANIFEST:NO' in cmake and 'shell32' in cmake and 'src/about.c' in cmake
-assert '1.0.0-rc16' in yesymbol_h
+assert 'src/emoji_renderer.c' in cmake and 'd2d1' in cmake and 'dwrite' in cmake
+assert 'LANGUAGES C CXX RC' in cmake
+assert 'set_source_files_properties(src/emoji_renderer.c PROPERTIES LANGUAGE CXX)' in cmake
+assert '$<$<COMPILE_LANGUAGE:CXX>:/GR->' in cmake
+assert '1.0.3-rc1' in yesymbol_h
 build = (R / 'build.bat').read_text(encoding='ascii')
 for token in ['clean', 'data', 'cldr', 'run', 'all', 'call regenerate-data.cmd',
               'Reusing the existing CMake generator and platform', 'cmake -S . -B build -A x64']:
@@ -288,11 +293,40 @@ assert not (R / 'build-clean.bat').exists() and not (R / 'autorun.bat').exists()
 about = (R / 'src/about.c').read_text(encoding='utf-8')
 resource = (R / 'src/resource.rc').read_text(encoding='utf-8')
 assert (R / 'assets/yesymbol.ico').exists() and (R / 'assets/yesymbol-512.png').exists()
-for token in ['TaskDialogIndirect', 'YESYMBOL_AUTHOR_EMAIL', 'YESYMBOL_DEVELOPMENT_PURPOSE', 'mailto:']:
+for token in ['TaskDialogIndirect', 'YESYMBOL_AUTHOR_EMAIL', 'YESYMBOL_DEVELOPMENT_PURPOSE', 'mailto:', 'github：', 'YESYMBOL_GITHUB_URL']:
     assert token in about
+about_config = (R / 'include/about_config.h').read_text(encoding='utf-8')
+assert 'https://github.com/yakoye/yesymbol-dev' in about_config and 'YESYMBOL_GITHUB_LABEL L"yesymbol-dev"' in about_config
 for token in ['IDI_YESYMBOL', '关于 YeSymbol', 'ID_TRAY_ABOUT', 'ID_SYSTEM_ABOUT']:
     assert token in ui or token in resource
-assert 'FILEVERSION 1,0,0,16' in resource and 'PRODUCTVERSION 1,0,0,16' in resource
+assert 'FILEVERSION 1,0,3,0' in resource and 'PRODUCTVERSION 1,0,3,0' in resource
+
+# DirectWrite/Direct2D color Emoji and fixed 12-column common layout.
+emoji_renderer = (R / 'src/emoji_renderer.c').read_text(encoding='utf-8')
+emoji_header = (R / 'include/emoji_renderer.h').read_text(encoding='utf-8')
+assert '#define CINTERFACE' in emoji_renderer and '#define COBJMACROS' in emoji_renderer
+assert 'extern "C"' in emoji_header
+for token in ['D2D1CreateFactory', 'DWriteCreateFactory', 'Segoe UI Emoji',
+              'D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT', 'ID2D1DCRenderTarget_DrawText',
+              'ys_emoji_renderer_begin', 'ys_emoji_renderer_end']:
+    assert token in emoji_renderer or token in emoji_header
+assert 'YSEmojiDrawBatch' in ui and 'ys_render_emoji_batch' in ui
+assert 'ys_layout_symbol_range_fit_columns(state, first, state->view_count - first, 12' in ui
+
+# v1.0.2: fixed common order, auto-add threshold, persistent usage counts and drag sorting.
+for token in [
+    'YS_STORAGE_DIRTY_USAGE', 'YS_COMMON_AUTO_ADD_THRESHOLD', 'ys_record_symbol_use',
+    'ys_usage_increment', 'ys_usage_get', 'ys_storage_load_usage', 'ys_storage_save_usage',
+    'ys_common_move', 'common_drag_source', 'common_drag_target', 'SetCapture(hwnd)',
+    'IDC_SIZEALL', 'L"常用符号（拖动排序，右键删除）"',
+    'L"该符号已达到常用阈值，并追加到常用符号末尾。"',
+]:
+    assert token in ui or token in storage_h or token in storage_c or token in cfg
+assert 'ys_common_sort' not in storage_h and 'ys_common_sort' not in storage_c
+assert 'CommonV2' in storage_c and 'UsageV1' in storage_c
+assert 'ys_load_common_value(key, L"CommonV1", 1u, list)' in storage_c
+assert 'ys_recent_item_rect(const YSAppState *state, size_t index)' in ui
+assert 'YS_RECENT_CELL_WIDTH' not in cfg
 
 # Pinned CLDR cache and audit.
 audit = (R / 'tools/audit_catalog.py').read_text(encoding='utf-8')
@@ -366,15 +400,25 @@ def assert_c_lexically_balanced(path: Path) -> None:
 for source_path in list((R / 'src').glob('*.c')) + list((R / 'include').glob('*.h')):
     assert_c_lexically_balanced(source_path)
 
-# README covers the complete user/developer workflow requested for rc16.
+# README covers the complete user/developer workflow and v1.0.3-rc1 behavior.
 readme = (R / 'README.md').read_text(encoding='utf-8')
-for heading in ['## 项目介绍', '## 开发目的', '## 安装与使用', '## 编译与运行',
-                '## 修改 TXT 并生成 JSON', '## 开发与维护']:
+for heading in ['## 项目介绍', '## 开发目的', '## 功能特点', '## 快速开始',
+                '### 直接运行', '### 从源码编译运行', '#### 编译环境要求',
+                '#### 一键清理、编译并运行', '## 使用方法', '### 复制符号',
+                '### 搜索', '### 最近使用、常用和自定义', '## 高级功能',
+                '### 1. 界面参数调整', '### 2. 数据维护（可以增加、删除、重排符号）',
+                '#### 2.1 刷新官方 CLDR 中文短名称并把适合替换的名称写回 catalog.txt',
+                '#### 2.2 人工修改 `data-source\\catalog.txt`', '## 技术说明',
+                '## 已知限制', '## 许可证']:
     assert heading in readme
 for token in ['catalog.txt', 'catalog.generated.json', r'src\symbol_data.c',
               '运行时不会打开或解析JSON', r'.\build.bat run',
               r'python tools\catalog_text.py build', r'python tests\static_check.py',
-              '#define YS_WINDOW_WIDTH 786', '#define YS_CATEGORY_WIDTH 162']:
+              '#define YS_WINDOW_WIDTH 786', '#define YS_CATEGORY_WIDTH 162',
+              'DirectWrite + Direct2D', 'D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT',
+              '常用符号固定每行显示 12 个', '最多显示 17 个符号', '拖动',
+              'YS_COMMON_AUTO_ADD_THRESHOLD 5u', 'CommonV2', 'UsageV1',
+              'https://github.com/yakoye/yesymbol-dev']:
     assert token in readme
 
 print('static checks passed')

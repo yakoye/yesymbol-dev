@@ -115,8 +115,7 @@ Segoe UI Emoji    Emoji
 顶部最近使用区域：
 
 ```c
-#define YS_RECENT_MAX_VISIBLE 14
-#define YS_RECENT_CELL_WIDTH 42
+#define YS_RECENT_MAX_VISIBLE 17
 #define YS_RECENT_ROW_HEIGHT 44
 #define YS_RECENT_TOGGLE_WIDTH 92
 #define YS_RECENT_CLEAR_WIDTH 34
@@ -148,7 +147,7 @@ include\yesymbol.h
 
 ```c
 #define YESYMBOL_PRODUCT_NAME L"符号大全"
-#define YESYMBOL_VERSION L"1.0.0-rc16"
+#define YESYMBOL_VERSION L"1.0.3-rc1"
 ```
 
 窗口标题在 `src/ui.c` 的 `CreateWindowExW` 调用处设置。
@@ -235,3 +234,12 @@ assets\yesymbol.ico
 ```
 
 图标同时用于 EXE、窗口标题栏、任务栏和系统托盘。替换图标后执行 `build.bat run` 完整重编译。
+
+
+## 常用符号自动加入阈值
+
+```c
+#define YS_COMMON_AUTO_ADD_THRESHOLD 5u
+```
+
+达到该使用次数的非常用符号会追加到常用符号末尾。常用符号顺序不会按次数自动重排。

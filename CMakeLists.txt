@@ -1,18 +1,26 @@
 cmake_minimum_required(VERSION 3.20)
-project(yesymbol VERSION 1.0.0 LANGUAGES C RC)
+project(yesymbol VERSION 1.0.3 LANGUAGES C CXX RC)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(yesymbol WIN32
     src/main.c
     src/ui.c
+    src/emoji_renderer.c
     src/about.c
     src/clipboard.c
     src/storage.c
     src/symbol_data.c
     src/resource.rc
 )
+
+# Windows SDK 10.0.26100 dwrite.h contains C++-only declarations/macros.
+# Compile only the isolated DirectWrite bridge as C++ while the application,
+# UI, storage, clipboard and generated symbol database remain C11.
+set_source_files_properties(src/emoji_renderer.c PROPERTIES LANGUAGE CXX)
 
 target_include_directories(yesymbol PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -22,6 +30,8 @@ target_include_directories(yesymbol PRIVATE
 target_link_libraries(yesymbol PRIVATE
     user32
     gdi32
+    d2d1
+    dwrite
     advapi32
     comctl32
     shlwapi
@@ -29,7 +39,8 @@ target_link_libraries(yesymbol PRIVATE
 )
 
 if(MSVC)
-    target_compile_options(yesymbol PRIVATE /O2 /utf-8 /W4 /wd4100 /wd4244 /wd4267)
+    target_compile_options(yesymbol PRIVATE /O2 /utf-8 /W4 /wd4100 /wd4244 /wd4267
+        $<$<COMPILE_LANGUAGE:CXX>:/GR->)
     set_property(TARGET yesymbol PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     # resource.rc explicitly embeds manifest resource ID 1.
     target_link_options(yesymbol PRIVATE "/MANIFEST:NO")

@@ -4,211 +4,145 @@
   <img src="assets/yesymbol-512.png" width="104" height="104" alt="YeSymbol icon">
 </p>
 
-> 面向 Windows 的原生 Unicode 符号选择器，用于快速搜索、浏览、收藏、复制和插入符号与 Emoji。
+> 面向 Windows 10/11 的原生 Unicode 符号与彩色 Emoji 选择器。
 
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-0078D4)
-![Language](https://img.shields.io/badge/language-C11-00599C)
-![UI](https://img.shields.io/badge/UI-Win32%20API-5C2D91)
+![Language](https://img.shields.io/badge/language-C11%20%2B%20DirectWrite%20bridge-00599C)
+![UI](https://img.shields.io/badge/UI-Win32%20%2B%20DirectWrite-5C2D91)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.0.0--rc16-orange)
+![Version](https://img.shields.io/badge/version-1.0.3--rc1-orange)
+
+仓库：<https://github.com/yakoye/yesymbol-dev>
 
 ## 项目介绍
 
-YeSymbol 使用纯 C 和 Win32 API 开发，不依赖 .NET、Qt、Electron 或 Python 运行时。发布产物是一个便携的 `yesymbol.exe`，无需安装，也不需要随程序携带 JSON、字体或其他数据文件。
+YeSymbol 是一个以 C11 为主体、使用 Win32 API、DirectWrite 和 Direct2D 开发的 Windows 符号工具。它用于快速浏览、搜索、收藏、复制和插入 Unicode 符号与 Emoji。
 
-当前内置 **16,679 个去重符号或 Unicode 序列**，包括常用符号、标点、数字与字母序号、数学符号、单位、音标、东亚字符、历史文字、Emoji、国家与地区旗帜等。每条内置记录包含：
+程序发布后只有一个便携的 `yesymbol.exe`：
 
-```text
-符号文本
-中文名称
-英文名称
-Unicode 编码
-原始分类
-原始分类中的行号和位置
-```
+- 无需安装；
+- 不依赖 .NET、Qt、Electron；
+- 不需要安装特定输入法；
+- 运行时不需要 Python；
+- 运行时不读取 TXT 或 JSON；
+- 不携带或分发字体文件。
 
-主要功能：
-
-- 中文、英文、符号本身、分类名和 `U+编码` 搜索；
-- 搜索框使用 `↑`、`↓` 回显最近搜索记录；
-- 搜索结果悬浮显示原始分类、原始行号和该行中的位置；
-- 搜索结果右键可选择“跳到所在位置”；
-- 顶部固定显示最近使用的14个符号；
-- 常用符号按使用次数排序；
-- 支持自定义符号、Emoji肤色变体、旗帜和ZWJ组合序列；
-- 可选“自动插入”，复制后恢复此前窗口并发送 `Ctrl+V`；
-- 关闭窗口后隐藏到系统托盘；
-- 运行时完全离线，个人记录保存在当前用户注册表。
+当前目录内置约 16,679 个去重符号或 Unicode 序列，覆盖标点、编号字母、数学、单位、拼音、音标、东亚字符、历史文字、Emoji、国家和地区旗帜等内容。
 
 ## 开发目的
 
-Windows 自带的 `Win + .` 面板启动和搜索速度不稳定，符号内容也与输入法绑定；不同输入法的符号面板在分类、搜索和专业字符覆盖方面差异很大。YeSymbol 的目标是提供一个：
+Windows 自带的 `Win + .` 面板以及输入法附带的符号面板，可能存在启动速度、分类方式、内容覆盖和输入法依赖方面的限制。
 
-- 启动快、浏览快、复制快的原生工具；
-- 不依赖输入法、账号、网络和大型运行时的独立工具；
-- 可由普通文本持续维护符号目录的开放工具；
-- 能覆盖专业符号、语言字符、古文字和完整 Unicode 序列的长期目录。
+YeSymbol 的开发目标是：
 
-项目坚持“单 EXE、纯 C、数据构建期固化、运行时不解析 JSON”的方向。
+- 提供一个独立、轻量、启动迅速的符号工具；
+- 让常用符号、专业字符和 Emoji 可以统一搜索；
+- 使用普通 TXT 文件维护符号数据，降低人工整理成本；
+- 保持单 EXE 发布，不把 JSON 解析放到运行时；
+- 使用 DirectWrite 和 Direct2D 正确呈现 Windows 彩色 Emoji 字体；
+- 让符号目录可以持续增加、删除、分组和重排。
 
-## 界面与分类
+## 功能特点
 
-```text
-┌──────────────────────────────────────────────────────────┐
-│ 最近使用▼ [搜索符号、名称或Unicode...       ×] ☑自动插入 ☑置顶 │
-│ [最近使用符号，最多14个]                            [🗑] │
-├────────────────┬─────────────────────────────────────────┤
-│ 常用符号       │                                         │
-│ 特殊符号       │              当前分类符号               │
-│ 标点符号       │                                         │
-│ 序号字母       │                                         │
-│ ……             │                                         │
-│ 其他符号⯈     │                                         │
-│ 全部符号       │                                         │
-│ 自定义         │                                         │
-├────────────────┴─────────────────────────────────────────┤
-│                         ✔ 勾号 U+2714 CHECK MARK 特殊符号 │
-└──────────────────────────────────────────────────────────┘
-```
+- 中文名称、英文名称、符号文本、分类名称和 Unicode 编码搜索；
+- 搜索结果显示原始分类、行号和所在位置；
+- 搜索结果右键可“跳到所在位置”；
+- 搜索框使用 `↑`、`↓` 回显历史搜索；
+- 顶部显示最近使用，最多一行 17 个，并按可用宽度自动铺满；
+- 常用符号固定每行显示 12 个，顺序由用户维护，不再按次数自动重排；
+- 支持自定义符号和完整 Unicode 序列；
+- 支持 Emoji 肤色、ZWJ 组合和区域指示符序列；
+- 使用 DirectWrite + Direct2D 彩色字体绘制 Emoji；
+- DirectWrite 初始化失败时自动退回 GDI 单色绘制，不影响复制；
+- 可选“自动插入”，并记住用户设置；
+- 支持窗口置顶和系统托盘；
+- 大分类使用虚拟布局，只绘制当前可见区域；
+- 符号查找使用构建期生成的哈希索引；
+- 用户数据保存在当前用户注册表，不写入程序目录；常用符号采用固定顺序模型，并支持旧版数据迁移。
 
-左侧顺序：
-
-```text
-常用符号
-特殊符号
-标点符号
-序号字母
-数学/单位
-希腊/拉丁
-拼音/注音
-中文字符
-英文音标
-制表符
-Emoji·表情与人物
-Emoji·动物与自然
-Emoji·食物与活动
-Emoji·旅行与物品
-Emoji·符号与旗帜
-其他符号⯈
-    日文字符
-    韩文字符
-    东亚字符
-    大篆
-    小篆
-    俄文字符
-    古埃及文字
-    象形文字
-全部符号
-自定义
-```
-
-“其他符号”只负责展开或折叠子分类。点击后，选择状态停留在“其他符号”上，不会跳回“常用符号”。“补充符号”仍作为内部数据分类参与搜索和“全部符号”生成，但不单独占用侧边栏入口。
-
-## 安装与使用
+## 快速开始
 
 ### 直接运行
 
-1. 下载 `yesymbol.exe`；
-2. 将它放到任意目录；
+1. 获取 `yesymbol.exe`；
+2. 放到任意可写或只读目录；
 3. 双击运行。
 
-程序无需安装。需要开机启动时，可自行给 `yesymbol.exe` 创建快捷方式并放入 Windows 启动目录。
-
-关闭主窗口时程序进入系统托盘：
+关闭主窗口时，程序默认隐藏到系统托盘。真正退出需要：
 
 ```text
-双击托盘图标              恢复窗口
-托盘右键 → 打开符号大全   恢复窗口
-托盘右键 → 关于 YeSymbol  查看版本信息
-托盘右键 → 退出           真正结束程序
+托盘图标右键 → 退出
 ```
 
-### 查找和复制
-
-- 单击符号：复制到剪贴板；
-- 勾选“自动插入”：复制后尝试回到此前的输入位置并执行粘贴；
-- 右键符号：加入/移出常用、删除最近记录、切换肤色或跳到原始位置；
-- 悬浮符号：查看中英文名称、原始分类、行号、位置和Unicode编码。
-
-搜索示例：
+“关于 YeSymbol”中包含可点击仓库链接：
 
 ```text
-→             搜索符号本身
-箭头          搜索中文名称
-arrow         搜索英文名称
-2192          搜索十六进制编码
-U+2192        搜索Unicode编码
-金牛座        搜索中文名
-Taurus        搜索英文名
+github：yesymbol-dev
 ```
 
-输入过的非空搜索会记入历史。搜索框获得焦点后：
+### 从源码编译运行
 
-```text
-↑  上一条搜索
-↓  下一条搜索或回到当前草稿
-Esc 清空搜索
-Enter 确认搜索并记入历史
-```
-
-用户数据位于：
-
-```text
-HKEY_CURRENT_USER\Software\YeTools\YeSymbol
-```
-
-包括最近使用、常用符号及次数、自定义符号、搜索历史和自动插入设置。删除全部用户数据前先退出程序，再运行：
-
-```powershell
-reg delete "HKCU\Software\YeTools\YeSymbol" /f
-```
-
-## 编译与运行
-
-### 环境要求
+#### 编译环境要求
 
 - Windows 10 或 Windows 11；
-- Visual Studio 2022/2026 或 Visual Studio Build Tools；
-- “使用 C++ 的桌面开发”工作负载；
-- Windows SDK；
-- CMake 3.20或更高版本；
-- Python 3.10或更高版本，仅用于构建期生成数据。
+- Visual Studio 2022、Visual Studio 2026 或对应 Build Tools；
+- Visual Studio 的“使用 C++ 的桌面开发”工作负载；
+- Windows 10/11 SDK；
+- CMake 3.20 或更高版本；
+- Python 3.10 或更高版本，仅用于构建期数据生成。
+
+程序使用以下 Windows 系统组件：
+
+```text
+Win32 API
+GDI
+DirectWrite
+Direct2D
+Common Controls
+Shell API
+```
 
 Python不是 `yesymbol.exe` 的运行依赖。
 
-### 构建命令
+#### 一键清理、编译并运行
 
 在项目根目录打开 PowerShell：
-
-```powershell
-.\build.bat
-```
-
-生成：
-
-```text
-dist\yesymbol.exe
-```
-
-统一命令：
-
-```powershell
-.\build.bat          # 增量编译Release
-.\build.bat build    # 与上面相同
-.\build.bat clean    # 删除build和dist
-.\build.bat data     # TXT → JSON → C，不编译EXE
-.\build.bat cldr     # 刷新固定版本的CLDR中文名称并重新生成数据
-.\build.bat all      # 生成数据、清理、完整编译
-.\build.bat run      # 结束旧进程、生成数据、清理、编译并运行
-```
-
-开发时推荐：
 
 ```powershell
 .\build.bat run
 ```
 
-数据解析、目录审计或C数据生成失败时，脚本会立即停止，不会继续启动旧程序。
+该命令依次执行：
+
+```text
+结束正在运行的 yesymbol.exe
+→ catalog.txt 生成 catalog.generated.json
+→ 审计数据
+→ JSON 生成 src\symbol_data.c
+→ 清理 build 和 dist
+→ CMake 配置
+→ Release 编译
+→ 运行 dist\yesymbol.exe
+```
+
+其他命令：
+
+```powershell
+.\build.bat          # 增量 Release 编译
+.\build.bat build    # 增量 Release 编译
+.\build.bat clean    # 删除 build 和 dist
+.\build.bat data     # TXT → JSON → C，不编译 EXE
+.\build.bat cldr     # 刷新固定版本 CLDR 中文名称并重新生成数据
+.\build.bat all      # 生成数据、清理并完整编译
+.\build.bat run      # 清理、生成、编译并运行
+.\build.bat help     # 查看帮助
+```
+
+编译结果：
+
+```text
+dist\yesymbol.exe
+```
 
 CMake 中必须保留：
 
@@ -216,124 +150,115 @@ CMake 中必须保留：
 /MANIFEST:NO
 ```
 
-`src/resource.rc` 已经手工嵌入 manifest；再次让链接器生成 manifest 会引发 `CVT1100` 或 `LNK1123`。
+`src/resource.rc` 已手工嵌入 manifest。重复生成 manifest 可能导致 `CVT1100` 或 `LNK1123`。
 
-## 修改 TXT 并生成 JSON
+## 使用方法
 
-### 数据流
+### 复制符号
 
-人工只维护：
+- 单击符号：复制到剪贴板；
+- 勾选“自动插入”：复制后恢复此前窗口并发送 `Ctrl+V`；
+- 鼠标悬浮：查看中英文名称、分类、位置信息和编码；
+- 右键符号：加入常用、移出常用、删除记录、切换肤色或跳转原位置。
 
-```text
-data-source\catalog.txt
-```
-
-完整生成关系：
-
-```text
-catalog.txt
-    ↓ tools\catalog_text.py build
-catalog.generated.json
-    ↓ tools\generate_bilingual_data.py
-src\symbol_data.c
-    ↓ MSVC/CMake
-yesymbol.exe
-```
-
-这里的“JSON让C识别加载”发生在**构建阶段**：Python生成器读取JSON并生成静态C数组。程序运行时不会打开或解析JSON，因此不会影响启动和浏览速度，也不会破坏单EXE发布方式。
-
-不要手工维护以下生成文件：
+底部信息栏显示：
 
 ```text
-data-source\catalog.generated.json
-src\symbol_data.c
+符号  中文名称  Unicode编码  英文名称  分类
 ```
 
-### TXT格式
+### 搜索
 
-分类、分组和符号行：
+搜索框支持：
 
 ```text
-# 序号字母
-@desc 数字、分数、编号和装饰字母。
-
-## 黑底带圈数字
-❶,❷,❸,❹,❺,❻,❼,❽,❾,❿
-⓫,⓬,⓭,⓮,⓯,⓰,⓱,⓲,⓳,⓴
+→             符号本身
+箭头          中文名称
+arrow         英文名称
+U+2192        Unicode编码
+2192          十六进制编码
+Emoji·动物    分类名称
 ```
 
-普通符号直接用逗号分隔，不写 `@cols`、`@row`，也不需要双引号。转换工具自动计算每行列数和行号；一行超过12项会自动换行。
-
-只有内容本身包含逗号、空格或需要表达空白字符时才使用引号，例如：
+快捷键：
 
 ```text
-","," ","　",a,b,👨‍💻
+↑      更早的搜索记录
+↓      更新的搜索记录，最后恢复当前草稿
+Enter  确认并保存当前搜索
+Esc    清空搜索
 ```
 
-名称记录：
+搜索结果悬浮信息格式：
 
 ```text
-#@symbols
-@symbol ♉|金牛座|TAURUS|false
-@symbol 😀|嘿嘿|GRINNING FACE|emoji
+符号：
+中文名称：
+英文名称：
+分类：
+信息：第 N 行，第 M 个
+编码：
 ```
 
-四个字段依次为：符号、中文名称、英文名称、是否优先使用Emoji字体。
+右键选择“跳到所在位置”，程序会清空搜索、展开需要的分类并滚动到原始符号。
 
-### 检查与生成
+### 最近使用、常用和自定义
 
-只检查TXT格式和重复项：
+#### 最近使用
+
+顶部最近使用区域最多显示 17 个符号。17个槽位会按当前可用宽度平均分配，使整行铺满；垃圾桶按钮可以清空记录。
+
+#### 常用符号
+
+常用符号位于左侧第一项：
+
+- 每行固定显示 12 个；
+- 常用符号顺序固定，不会因使用次数变化而重新排序；
+- 在“常用符号”页面按住符号拖动，可以调整顺序；
+- 右键任意符号可以加入常用或从常用删除；
+- 非常用符号累计使用达到 5 次后，会自动追加到常用符号末尾；
+- 手工加入、自动加入、拖动后的顺序和删除结果都会持久化保存。
+
+#### 自定义
+
+选择左侧“自定义”，在右侧输入自定义符号或完整 Unicode 序列并添加。
+
+用户数据位于：
+
+```text
+HKEY_CURRENT_USER\Software\YeTools\YeSymbol
+```
+
+包括：
+
+```text
+最近使用
+常用符号固定顺序、使用次数和用户修改结果
+非常用符号的自动加入计数
+自定义符号
+搜索历史
+自动插入设置
+```
+
+其中常用符号使用 `CommonV2` 保存固定顺序，非当前常用符号的累计次数使用 `UsageV1` 保存。旧版 `CommonV1` 会在首次启动时自动迁移，已有常用符号不会丢失。
+
+自动加入阈值可在 `include\ui_config.h` 中修改：
+
+```c
+#define YS_COMMON_AUTO_ADD_THRESHOLD 5u
+```
+
+清空全部用户数据前先退出程序，然后执行：
 
 ```powershell
-python tools\catalog_text.py check
+reg delete "HKCU\Software\YeTools\YeSymbol" /f
 ```
 
-TXT生成JSON：
+## 高级功能
 
-```powershell
-python tools\catalog_text.py build
-```
+### 1. 界面参数调整
 
-执行完整数据链路：
-
-```powershell
-.\regenerate-data.cmd
-```
-
-它依次执行：
-
-```text
-检查固定CLDR中文缓存
-→ catalog.txt生成catalog.generated.json
-→ 审计数量、顺序和完整性
-→ catalog.generated.json生成src\symbol_data.c
-```
-
-反向将JSON导出为TXT：
-
-```powershell
-python tools\catalog_text.py export
-```
-
-`export` 会覆盖 `catalog.txt`，只用于旧数据迁移或恢复，不应在已经人工修改TXT后随意执行。
-
-## 开发与维护
-
-### 目录结构
-
-```text
-include\                 公共头文件和界面参数
-src\                     Win32程序、存储、资源和生成的符号数据
-data-source\             人工目录、生成JSON、CLDR缓存和审计清单
-tools\                   TXT/JSON/C转换及数据检查工具
-tests\                   静态回归检查
-docs\                    编译、使用、数据维护和发布文档
-assets\                  图标和README图片
-```
-
-### 界面参数
-
-集中在：
+界面尺寸集中在：
 
 ```text
 include\ui_config.h
@@ -344,53 +269,278 @@ include\ui_config.h
 ```c
 #define YS_WINDOW_WIDTH 786
 #define YS_WINDOW_HEIGHT 650
+
 #define YS_CATEGORY_WIDTH 162
 #define YS_CATEGORY_ITEM_HEIGHT 28
+
 #define YS_MAX_COLUMNS 12
-#define YS_RECENT_MAX_VISIBLE 14
+#define YS_RECENT_MAX_VISIBLE 17
+#define YS_COMMON_AUTO_ADD_THRESHOLD 5u
 ```
 
-### 修改代码后的检查
+修改后重新执行：
 
 ```powershell
-python tools\catalog_text.py check
-python tools\audit_catalog.py
-python tests\static_check.py
 .\build.bat run
 ```
 
-提交前至少验证：
+窗口使用固定尺寸，不允许拖拽缩放。
 
-- 软件可以快速启动且只运行一个实例；
-- 搜索、上下键历史、悬浮说明和右键定位正常；
-- 普通分类与大分类都能滚动、悬浮、复制；
-- 自动插入在记事本、浏览器输入框和Office类程序中可用；
-- 常用、最近、自定义和搜索历史重启后仍能恢复；
-- 修改 `catalog.txt` 后能完整生成JSON和C数据；
-- 同组、同分类没有重复，符号数量和完整系列没有回退。
+### 2. 数据维护（可以增加、删除、重排符号）
 
-### 版本规则
-
-发现问题后先发布候选版本：
+人工主数据文件：
 
 ```text
-1.0.0-rc16
-1.0.0-rc17
-……
+data-source\catalog.txt
 ```
 
-只有候选版本通过实际Windows验收后，才发布对应的 `final`，避免未验证修改直接作为正式版。
+数据生成链路：
 
-更多资料：
+```text
+catalog.txt
+→ catalog.generated.json
+→ src\symbol_data.c
+→ yesymbol.exe
+```
 
-- [编译说明](docs/BUILDING.md)
-- [使用说明](docs/USAGE.md)
-- [目录文本格式](docs/CATALOG_TEXT_FORMAT.md)
-- [数据维护](docs/DATA_MAINTENANCE.md)
-- [界面定制](docs/CUSTOMIZATION.md)
-- [贡献指南](CONTRIBUTING.md)
-- [版本说明](RELEASE_NOTES.md)
+`catalog.generated.json` 是构建中间文件，不建议直接长期维护。运行时不会打开或解析JSON。
 
-## 许可证与第三方数据
+#### 2.1 刷新官方 CLDR 中文短名称并把适合替换的名称写回 catalog.txt
 
-项目源代码采用 [MIT License](LICENSE)。Unicode CLDR名称数据的来源和许可说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+执行：
+
+```powershell
+.\build.bat cldr
+```
+
+该流程会：
+
+```text
+下载固定提交的 Unicode CLDR zh.xml
+→ 校验固定 Git Blob SHA
+→ 提取 type="tts" 中文短名称
+→ 更新本地缓存
+→ 将适合替换的中文名称写回 catalog.txt
+→ 重新生成 JSON 和 C 数据
+```
+
+当前固定数据源：
+
+```text
+仓库：unicode-org/cldr
+提交：c9a5503bf238114a1993377b87841fb76031371d
+文件：common/annotations/zh.xml
+```
+
+CLDR缓存位于：
+
+```text
+data-source\cldr-annotations-zh.tts.json
+```
+
+普通 `build.bat run` 可以离线使用已经缓存的数据。
+
+#### 2.2 人工修改 `data-source\catalog.txt`
+
+##### 修改 TXT
+
+分类：
+
+```text
+# 特殊符号
+```
+
+分组：
+
+```text
+## 箭头
+```
+
+符号行使用逗号分隔：
+
+```text
+←,↑,→,↓,↔,↕
+```
+
+通常不需要双引号。以下情况需要引号：
+
+```text
+" "       半角空格
+"　"      全角空格
+","       逗号本身
+"a,b"     内容内部包含逗号
+```
+
+无需手工填写：
+
+```text
+@cols
+@row
+```
+
+转换工具会根据物理行自动计算行号、列数和顺序。详细语法参见：
+
+```text
+docs\CATALOG_TEXT_FORMAT.md
+```
+
+##### 如何生成 JSON
+
+只生成和检查数据：
+
+```powershell
+.\build.bat data
+```
+
+或者直接执行：
+
+```powershell
+python tools\catalog_text.py check
+python tools\catalog_text.py build
+python tools\audit_catalog.py
+python tools\generate_bilingual_data.py
+```
+
+生成文件：
+
+```text
+data-source\catalog.generated.json
+src\symbol_data.c
+```
+
+##### 如何再次编译生成并运行
+
+完成 TXT 修改后执行：
+
+```powershell
+.\build.bat run
+```
+
+##### 完整生成链路和关系：
+```text
+catalog.txt
+    ↓ tools\catalog_text.py build
+→ catalog.generated.json
+    | tools\generate_bilingual_data.py
+    ↓ tools\generate_bilingual_data.py
+→ src\symbol_data.c
+    ↓ MSVC/CMake
+→ yesymbol.exe
+
+```
+
+
+数据格式、重复项、分类完整性或C数据生成失败时，脚本会停止，不会继续运行旧版程序。
+
+## 技术说明
+
+### 原生架构
+
+```text
+语言：C11 主体；DirectWrite 渲染桥接单元使用 C++ 编译器模式
+界面：Win32 API
+普通符号：GDI
+彩色 Emoji：DirectWrite + Direct2D
+构建：CMake + MSVC
+数据生成：Python，仅构建期使用
+用户数据：HKCU 注册表
+发布形式：单 EXE
+```
+
+### 彩色 Emoji 绘制
+
+Emoji 网格和顶部最近使用区域使用同一套底层绘制流程：
+
+```text
+GDI绘制背景、边框和普通符号
+→ 收集当前可见的 Emoji
+→ DirectWrite进行文本整形和字体选择
+→ Direct2D DrawText启用颜色字体选项
+→ 一次批量绘制到双缓冲内存DC
+→ BitBlt显示到窗口
+```
+
+启用颜色字体的核心是：
+
+```text
+D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT
+```
+
+字体优先使用系统自带：
+
+```text
+Segoe UI Emoji
+```
+
+DirectWrite或Direct2D初始化失败时，程序自动使用原有 GDI 路径，符号仍可正常搜索和复制。
+
+### 数据为什么经过 JSON
+
+TXT适合人工维护，JSON适合构建工具校验和转换，C数组适合快速运行：
+
+```text
+TXT：可读、可手改、可重排
+JSON：结构化中间数据、方便审计
+C：编译进EXE、启动时无需解析
+```
+
+因此，`TXT → JSON → C` 没有给运行时增加JSON加载开销。
+
+### 性能设计
+
+- 大分类使用虚拟布局；
+- 只绘制当前可见行；
+- 搜索输入使用短延迟合并；
+- 符号文本使用构建期哈希索引；
+- 网格复用GDI双缓冲；
+- Emoji按当前可见区域批量交给DirectWrite绘制；
+- 最近、常用和自定义记录延迟合并写入注册表。
+
+### 开发维护检查
+
+修改代码或数据后建议执行：
+
+```powershell
+python tests\static_check.py
+.\build.bat data
+.\build.bat run
+```
+
+发布前至少检查：
+
+```text
+TXT、JSON、C符号数量一致
+同组重复为0
+同分类重复为0
+搜索结果可跳转
+常用符号每行12个
+Emoji彩色绘制
+自动插入
+托盘与关于窗口
+README本地链接
+```
+
+## 已知限制
+
+- 彩色 Emoji 依赖 Windows 系统的 `Segoe UI Emoji` 和 DirectWrite/Direct2D 支持；
+- Windows 的系统 Emoji 字体可能不提供所有国家旗帜图形，部分旗帜可能仍显示为区域指示字母，但复制的 Unicode 序列保持正确；
+- 不同 Windows 版本所包含的 Emoji 图形和新 Unicode 版本支持程度可能不同；
+- “自动插入”通过恢复目标窗口并发送 `Ctrl+V` 实现，管理员权限隔离、远程桌面、沙箱或特殊编辑器可能阻止自动粘贴；
+- 大篆和小篆属于字形风格，Unicode没有分别编码一整套独立字符；显示真实篆体需要用户系统已安装相应字体，本项目不分发字体；
+- 古文字是否显示取决于用户系统字体覆盖范围；缺少字体时可能出现方框；
+- 当前项目主要面向 Windows 10/11，不提供 macOS、Linux 或移动端版本。
+
+## 许可证
+
+项目源码使用 [MIT License](LICENSE)。
+
+Unicode CLDR 数据遵循 Unicode License v3，相关说明见：
+
+```text
+THIRD_PARTY_NOTICES.md
+```
+
+
+### DirectWrite 编译说明
+
+YeSymbol 的主程序、界面、数据、存储和剪贴板模块仍使用 C11。Windows SDK 10.0.26100 的 `dwrite.h` 包含 C++ 专用语法，因此 `src\emoji_renderer.c` 作为隔离的 DirectWrite 桥接单元由 C++ 编译器模式编译，并通过 `extern "C"` 向其余 C 模块暴露稳定的 C ABI。该桥接不使用 STL、异常或 RTTI，不改变单 EXE 发布方式。

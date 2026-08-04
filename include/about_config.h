@@ -8,6 +8,8 @@
 #define YESYMBOL_DEVELOPMENT_DATE L"2026-08-04"
 #define YESYMBOL_WEB_URL L""
 #define YESYMBOL_WEB_LABEL L"打开网页版"
+#define YESYMBOL_GITHUB_URL L"https://github.com/yakoye/yesymbol-dev"
+#define YESYMBOL_GITHUB_LABEL L"yesymbol-dev"
 
 #define YESYMBOL_DEVELOPMENT_PURPOSE \
     L"Windows 自带的“Win + .”符号面板启动较慢；其他输入法中的符号功能通常必须安装对应输入法才能使用，" \

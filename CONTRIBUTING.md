@@ -42,7 +42,7 @@ py -3 tests\static_check.py
 
 ## 代码约束
 
-- 保持 C11 和 Win32 API；
+- 主程序保持 C11 和 Win32 API；`src/emoji_renderer.c` 是唯一允许使用 C++ 编译器模式的 DirectWrite 桥接单元，仍须保持 C 风格接口和 `extern "C"` ABI；
 - 不引入 .NET、Qt、Electron 等运行时依赖；
 - 注意栈空间，不要在栈上声明超大结构体或大路径数组；
 - 大型持久化结构优先使用进程堆；

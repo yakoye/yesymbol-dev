@@ -19,8 +19,7 @@
 #define YS_MAX_COLUMNS 12
 
 /* 顶部最近使用区域 */
-#define YS_RECENT_MAX_VISIBLE 14
-#define YS_RECENT_CELL_WIDTH 42
+#define YS_RECENT_MAX_VISIBLE 17
 #define YS_RECENT_ROW_HEIGHT 44
 #define YS_RECENT_TOGGLE_WIDTH 92
 #define YS_RECENT_CLEAR_WIDTH 34
@@ -45,3 +44,6 @@
 #define YS_TOPMOST_WIDTH 58
 #define YS_CUSTOM_PANEL_HEIGHT 62
 #define YS_ADD_BUTTON_WIDTH 64
+
+/* 使用达到该次数后，自动追加到常用符号末尾 */
+#define YS_COMMON_AUTO_ADD_THRESHOLD 5u

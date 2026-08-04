@@ -69,6 +69,11 @@ dist\yesymbol.exe
 .\build.bat help
 ```
 
+
+## DirectWrite 编译单元
+
+Windows SDK 10.0.26100 的 `dwrite.h` 含有 C++ 专用语法。项目主体仍以 C11 编译，但 CMake 会把 `src/emoji_renderer.c` 单独设置为 `LANGUAGE CXX`。该文件定义 `CINTERFACE`、`COBJMACROS` 并通过 `extern "C"` 暴露接口，不使用 STL 或 RTTI。不要把该文件强制改回 `/TC`，否则会再次出现 `dwrite.h` 的 `C2059` 和 `static_cast` 错误。
+
 ## CMake 缓存处理
 
 脚本在 `build\CMakeCache.txt` 已存在时，不会强制改变生成器平台，而是先复用原来的生成器和平台。
@@ -142,3 +147,21 @@ rc13 会先比较目标文件内容。数据没有变化时直接跳过写入；
 - 版本资源。
 
 MSVC 链接参数继续保留 `/MANIFEST:NO`，防止链接器默认 manifest 与 `resource.rc` 中的手工 manifest 重复。
+
+## DirectWrite 彩色 Emoji
+
+v1.0.1 起，彩色 Emoji 使用 Windows SDK 自带的 DirectWrite 和 Direct2D：
+
+```text
+src\emoji_renderer.c
+include\emoji_renderer.h
+```
+
+CMake 必须链接：
+
+```text
+dwrite.lib
+d2d1.lib
+```
+
+它们是 Windows 系统组件，不需要随 EXE 分发额外 DLL。颜色字体绘制失败时，程序会退回 GDI 单色路径。

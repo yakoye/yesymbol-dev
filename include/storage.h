@@ -1,6 +1,8 @@
 #pragma once
 #include "yesymbol.h"
+
 #define YS_MAX_COMMON 256
+#define YS_MAX_USAGE 2048
 
 typedef struct YSDynamicList {
     WCHAR items[YS_MAX_CUSTOM][YS_MAX_SEQUENCE];
@@ -19,6 +21,18 @@ typedef struct YSCommonList {
     size_t count;
     uint32_t next_serial;
 } YSCommonList;
+
+typedef struct YSUsageItem {
+    WCHAR text[YS_MAX_SEQUENCE];
+    uint32_t use_count;
+    uint32_t serial;
+} YSUsageItem;
+
+typedef struct YSUsageList {
+    YSUsageItem items[YS_MAX_USAGE];
+    size_t count;
+    uint32_t next_serial;
+} YSUsageList;
 
 typedef struct YSSearchHistory {
     WCHAR items[YS_MAX_SEARCH_HISTORY][YS_MAX_QUERY];
@@ -41,7 +55,14 @@ int ys_common_find(const YSCommonList *, const WCHAR *);
 BOOL ys_common_add(YSCommonList *, const WCHAR *, uint32_t);
 BOOL ys_common_increment(YSCommonList *, const WCHAR *);
 BOOL ys_common_remove(YSCommonList *, size_t);
-void ys_common_sort(YSCommonList *);
+BOOL ys_common_move(YSCommonList *, size_t, size_t);
+
+void ys_usage_init(YSUsageList *);
+BOOL ys_storage_load_usage(YSUsageList *);
+void ys_storage_save_usage(const YSUsageList *);
+uint32_t ys_usage_increment(YSUsageList *, const WCHAR *);
+uint32_t ys_usage_get(const YSUsageList *, const WCHAR *);
+BOOL ys_usage_remove(YSUsageList *, const WCHAR *);
 
 BOOL ys_storage_load_bool(const WCHAR *value_name, BOOL default_value);
 void ys_storage_save_bool(const WCHAR *value_name, BOOL value);
