@@ -5,28 +5,110 @@
       "desc": "",
       "groups": [
         {
+          "title": "常用符号",
+          "cols": 12,
+          "row": 0,
+          "items": [
+            "✓",
+            "✔",
+            "☑",
+            "✕",
+            "✖",
+            "×",
+            "÷",
+            "±",
+            "≈",
+            "≠",
+            "≤",
+            "≥",
+            "°",
+            "℃",
+            "℉",
+            "©",
+            "®",
+            "™",
+            "№",
+            "§",
+            "¶",
+            "•",
+            "·",
+            "…",
+            "—",
+            "–",
+            "→",
+            "←",
+            "↑",
+            "↓",
+            "↔",
+            "⇒",
+            "⇔",
+            "∞",
+            "√",
+            "∑",
+            "∫",
+            "↖",
+            "↗",
+            "↙",
+            "↘",
+            "●",
+            "○",
+            "◉",
+            "◎",
+            "■",
+            "□",
+            "◆",
+            "◇",
+            "▲",
+            "△",
+            "▼",
+            "▽",
+            "◀",
+            "◁",
+            "▶",
+            "▷",
+            "①",
+            "②",
+            "③",
+            "④",
+            "⑤",
+            "⑥",
+            "⑦",
+            "⑧",
+            "⑨",
+            "⑩",
+            "⑪",
+            "⑫",
+            "「",
+            "」",
+            "『",
+            "』",
+            "【",
+            "】",
+            "《",
+            "》",
+            "〈",
+            "〉",
+            "〔",
+            "〕",
+            "（",
+            "）",
+            "{",
+            "}",
+            "[",
+            "]",
+            "<",
+            ">"
+          ]
+        },
+        {
           "title": "特殊符号",
           "cols": 12,
           "row": 0,
           "items": [
-            "△",
-            "▽",
-            "○",
-            "◇",
-            "□",
-            "▷",
-            "◁",
             "♤",
             "♡",
             "♢",
             "♧",
-            "▲",
-            "▼",
-            "●",
-            "◆",
-            "■",
-            "▶",
-            "◀",
             "♠",
             "♥",
             "♦",
@@ -34,7 +116,6 @@
             "♀",
             "☺",
             "◐",
-            "√",
             "☜",
             "☝",
             "☞",
@@ -43,15 +124,12 @@
             "☹",
             "◑",
             "☒",
-            "×",
             "☚",
             "☟",
             "☛",
             "㏘",
             "▪",
-            "•",
             "‥",
-            "…",
             "▁",
             "▂",
             "▃",
@@ -76,24 +154,18 @@
             "♪",
             "♫",
             "♬",
-            "§",
             "〼",
-            "◎",
             "¤",
             "۞",
             "℗",
-            "®",
-            "©",
             "♭",
             "♯",
             "♮",
             "‖",
-            "¶",
             "卍",
             "▬",
             "〓",
             "℡",
-            "™",
             "㏇",
             "☌",
             "☍",
@@ -106,7 +178,6 @@
             "◕",
             "@",
             "㈱",
-            "№",
             "♈",
             "♉",
             "♊",
@@ -119,9 +190,6 @@
             "♓",
             "♒",
             "♍",
-            "↖",
-            "↑",
-            "↗",
             "▨",
             "▤",
             "▧",
@@ -131,9 +199,7 @@
             "☴",
             "☲",
             "☷",
-            "←",
             "㊣",
-            "→",
             "▩",
             "▦",
             "▥",
@@ -142,9 +208,6 @@
             "㊨",
             "☳",
             "☱",
-            "↙",
-            "↓",
-            "↘",
             "▫",
             "◈",
             "▣",
@@ -155,7 +218,6 @@
             "☵",
             "☰",
             "↕",
-            "↔",
             "⊱",
             "⋛",
             "⋌",
@@ -214,8 +276,6 @@
             "⇑",
             "⇗",
             "⇐",
-            "⇔",
-            "⇒",
             "⇙",
             "⇓",
             "⇘",
@@ -244,11 +304,6 @@
             "⟽",
             "⟾",
             "⟿",
-            "✓",
-            "✔",
-            "☑",
-            "✕",
-            "✖",
             "✗",
             "✘",
             "✅",
@@ -1213,7 +1268,6 @@
             "🣖",
             "🣗",
             "🣘",
-            "◉",
             "◌",
             "◍",
             "◒",
@@ -1968,7 +2022,6 @@
             "！",
             "：",
             "；",
-            "·",
             "~",
             "&",
             "#",
@@ -1990,34 +2043,16 @@
             "´",
             "(",
             ")",
-            "【",
-            "】",
-            "《",
-            "》",
             "＜",
             "＞",
             "﹝",
             "﹞",
-            "<",
-            ">",
-            "[",
-            "]",
-            "〔",
-            "〕",
-            "〈",
-            "〉",
-            "{",
-            "}",
             "［",
             "］",
-            "「",
-            "」",
             "｛",
             "｝",
             "〖",
             "〗",
-            "『",
-            "』",
             "︵",
             "︷",
             "︹",
@@ -2108,8 +2143,6 @@
             "-",
             "+",
             "−",
-            "–",
-            "—",
             "‸",
             "¸",
             "‗",
@@ -2276,18 +2309,6 @@
           "cols": 12,
           "row": 0,
           "items": [
-            "①",
-            "②",
-            "③",
-            "④",
-            "⑤",
-            "⑥",
-            "⑦",
-            "⑧",
-            "⑨",
-            "⑩",
-            "⑪",
-            "⑫",
             "⑬",
             "⑭",
             "⑮",
@@ -2798,36 +2819,31 @@
           "cols": 12,
           "row": 0,
           "items": [
-            "±",
             "∓",
-            "÷",
             "∗",
             "∘",
             "∙",
             "∛",
             "∜",
-            "∞",
             "∝",
             "=",
-            "≠",
-            "≈",
             "≉",
             "≡",
             "≢",
-            "≤",
-            "≥",
             "≪",
             "≫",
             "≮",
             "≯",
             "≰",
             "≱",
-            "≲",
-            "≳",
             "≨",
             "≩",
             "≴",
             "≵",
+            "≸",
+            "≹",
+            "≲",
+            "≳",
             "≺",
             "≻",
             "≼",
@@ -2836,8 +2852,6 @@
             "≿",
             "≶",
             "≷",
-            "≸",
-            "≹",
             "≬",
             "≭",
             "⊀",
@@ -2886,7 +2900,6 @@
             "∂",
             "∆",
             "∇",
-            "∫",
             "∬",
             "∭",
             "∮",
@@ -2895,7 +2908,6 @@
             "∱",
             "∲",
             "∳",
-            "∑",
             "∏",
             "∐",
             "⋀",
@@ -3132,9 +3144,6 @@
             "⅝",
             "⅞",
             "⅟",
-            "°",
-            "℃",
-            "℉",
             "µ",
             "μ",
             "Ω",
@@ -8012,8 +8021,6 @@
             "〙",
             "〚",
             "〛",
-            "（",
-            "）",
             "﹙",
             "﹚",
             "ˉ",
@@ -14077,7 +14084,14 @@
             "𐻕",
             "𐻖",
             "𐻗",
-            "𐻘",
+            "𐻘"
+          ]
+        },
+        {
+          "title": "未分类补充",
+          "cols": 12,
+          "row": 0,
+          "items": [
             "𝧵",
             "𝧶",
             "🮰",
@@ -15139,7 +15153,162 @@
             "𝍖"
           ]
         }
-      ]
+      ],
+      "ui_section": "runtime",
+      "role": "all"
+    },
+    {
+      "name": "常用符号",
+      "desc": "",
+      "groups": [
+        {
+          "title": "",
+          "cols": 12,
+          "row": 1,
+          "items": [
+            "✓",
+            "✔",
+            "☑",
+            "✕",
+            "✖",
+            "×",
+            "÷",
+            "±",
+            "≈",
+            "≠",
+            "≤",
+            "≥"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 2,
+          "items": [
+            "°",
+            "℃",
+            "℉",
+            "©",
+            "®",
+            "™",
+            "№",
+            "§",
+            "¶",
+            "•",
+            "·",
+            "…"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 3,
+          "items": [
+            "—",
+            "–",
+            "→",
+            "←",
+            "↑",
+            "↓",
+            "↔",
+            "⇒",
+            "⇔",
+            "∞",
+            "√",
+            "∑"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 4,
+          "items": [
+            "∫",
+            "↖",
+            "↗",
+            "↙",
+            "↘",
+            "●",
+            "○",
+            "◉",
+            "◎",
+            "■",
+            "□",
+            "◆"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 5,
+          "items": [
+            "◇",
+            "▲",
+            "△",
+            "▼",
+            "▽",
+            "◀",
+            "◁",
+            "▶",
+            "▷",
+            "①",
+            "②",
+            "③"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 6,
+          "items": [
+            "④",
+            "⑤",
+            "⑥",
+            "⑦",
+            "⑧",
+            "⑨",
+            "⑩",
+            "⑪",
+            "⑫",
+            "「",
+            "」",
+            "『"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 12,
+          "row": 7,
+          "items": [
+            "』",
+            "【",
+            "】",
+            "《",
+            "》",
+            "〈",
+            "〉",
+            "〔",
+            "〕",
+            "（",
+            "）",
+            "{"
+          ]
+        },
+        {
+          "title": "",
+          "cols": 5,
+          "row": 8,
+          "items": [
+            "}",
+            "[",
+            "]",
+            "<",
+            ">"
+          ]
+        }
+      ],
+      "ui_section": "main",
+      "role": "common"
     },
     {
       "name": "特殊符号",
@@ -15254,8 +15423,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -15336,8 +15505,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -15418,8 +15587,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -15511,8 +15680,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "双线方向箭头",
@@ -15717,8 +15886,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "宗教、文化与公共标识",
@@ -17741,8 +17910,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "技术括角与定位符号",
@@ -18003,8 +18172,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "扑克牌（Unicode 顺序）",
@@ -18162,11 +18331,11 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
-          "title": "麻将牌（Unicode 顺序）",
+          "title": "麻将牌",
           "cols": 9,
           "row": 181,
           "items": [
@@ -18248,11 +18417,11 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
-          "title": "多米诺骨牌（Unicode 顺序）",
+          "title": "多米诺骨牌",
           "cols": 7,
           "row": 186,
           "items": [
@@ -18453,8 +18622,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "国际象棋扩展符号（Unicode 顺序）",
@@ -18617,7 +18786,9 @@
             "🩭"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "标点符号",
@@ -18676,8 +18847,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -18734,8 +18905,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -18814,8 +18985,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "成对引号",
@@ -18898,8 +19069,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "常用标点",
@@ -19207,7 +19378,9 @@
             "￨"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "序号字母",
@@ -19251,8 +19424,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19292,15 +19465,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
-        },
-        {
-          "title": "",
-          "cols": 0,
-          "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19323,8 +19489,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19347,8 +19513,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19373,8 +19539,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19397,8 +19563,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19421,8 +19587,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "带圈数字 21–50",
@@ -19479,8 +19645,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19501,8 +19667,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19542,8 +19708,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19583,8 +19749,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -19626,8 +19792,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "括号汉字",
@@ -19731,8 +19897,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "罗马数字",
@@ -19908,8 +20074,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "奥斯曼西亚克数字",
@@ -19923,8 +20089,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "字母序号",
@@ -20255,7 +20421,9 @@
             "🆉"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "数学/单位",
@@ -20291,7 +20459,7 @@
         },
         {
           "title": "比较与等价",
-          "cols": 10,
+          "cols": 12,
           "row": 3,
           "items": [
             "=",
@@ -20300,6 +20468,8 @@
             "≉",
             "≡",
             "≢",
+            "<",
+            ">",
             "≤",
             "≥",
             "≪",
@@ -20315,12 +20485,12 @@
             "≯",
             "≰",
             "≱",
-            "≲",
-            "≳",
             "≨",
             "≩",
             "≴",
-            "≵"
+            "≵",
+            "≸",
+            "≹"
           ]
         },
         {
@@ -20328,6 +20498,8 @@
           "cols": 10,
           "row": 5,
           "items": [
+            "≲",
+            "≳",
             "≺",
             "≻",
             "≼",
@@ -20335,9 +20507,7 @@
             "≾",
             "≿",
             "≶",
-            "≷",
-            "≸",
-            "≹"
+            "≷"
           ]
         },
         {
@@ -20470,7 +20640,7 @@
         },
         {
           "title": "",
-          "cols": 8,
+          "cols": 9,
           "row": 14,
           "items": [
             "⨇",
@@ -21032,7 +21202,9 @@
             "𝟃"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "希腊/拉丁",
@@ -21080,8 +21252,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -21125,8 +21297,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -21185,8 +21357,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "间距修饰字母",
@@ -22278,8 +22450,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "科普特文",
@@ -22294,7 +22466,9 @@
             "⳪"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "拼音/注音",
@@ -22355,8 +22529,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22423,7 +22597,9 @@
             "ㄙ"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "中文字符",
@@ -22471,8 +22647,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22619,8 +22795,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22673,8 +22849,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22836,8 +23012,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22852,8 +23028,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22931,8 +23107,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22948,8 +23124,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22964,8 +23140,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22979,8 +23155,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -22995,8 +23171,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -23076,8 +23252,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -23191,7 +23367,9 @@
             "彡"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "英文音标",
@@ -23287,7 +23465,9 @@
             "j"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "制表符",
@@ -23354,8 +23534,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -23486,8 +23666,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "块元素",
@@ -23552,8 +23732,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "控制字符图示",
@@ -24457,8 +24637,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "杂项技术符号",
@@ -24706,7 +24886,9 @@
             "⑊"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "Emoji·表情与人物",
@@ -25380,7 +25562,9 @@
             "🫨"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "Emoji·动物与自然",
@@ -25694,7 +25878,9 @@
             "🐦"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "Emoji·食物与活动",
@@ -25981,7 +26167,9 @@
             "🧁"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "Emoji·旅行与物品",
@@ -26341,7 +26529,9 @@
             "🫏"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "Emoji·符号与旗帜",
@@ -26764,8 +26954,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "地区旗帜（英格兰、苏格兰、威尔士）",
@@ -26781,8 +26971,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "旗帜",
@@ -28225,7 +28415,9 @@
             "🕊"
           ]
         }
-      ]
+      ],
+      "ui_section": "main",
+      "role": ""
     },
     {
       "name": "日文字符",
@@ -28351,8 +28543,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "片假名",
@@ -28474,8 +28666,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "平假名·浊音",
@@ -28529,8 +28721,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "片假名·浊音",
@@ -28584,8 +28776,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "平假名·半浊音",
@@ -28603,8 +28795,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "片假名·半浊音",
@@ -28622,8 +28814,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "小写平假名",
@@ -28663,8 +28855,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "小写片假名",
@@ -28704,8 +28896,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "日文标点与重复符号",
@@ -28736,7 +28928,9 @@
             "〃"
           ]
         }
-      ]
+      ],
+      "ui_section": "other",
+      "role": ""
     },
     {
       "name": "韩文字符",
@@ -28779,8 +28973,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "现代元音",
@@ -28821,8 +29015,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "兼容韩文字母",
@@ -28924,8 +29118,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "韩文初声字母",
@@ -29083,8 +29277,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "韩文中声与终声",
@@ -29348,8 +29542,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "括号韩文",
@@ -29407,8 +29601,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "带圈韩文",
@@ -29462,7 +29656,9 @@
             "㉾"
           ]
         }
-      ]
+      ],
+      "ui_section": "other",
+      "role": ""
     },
     {
       "name": "东亚字符",
@@ -30862,8 +31058,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "彝文部首",
@@ -30959,8 +31155,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "带圈表意文字补充",
@@ -30991,17 +31187,9 @@
             "🉥"
           ]
         }
-      ]
-    },
-    {
-      "name": "大篆",
-      "desc": "大篆属于汉字字形体系，Unicode 未将其作为独立字符集编码；当前分类预留，后续需配合专用字体或字形资源。",
-      "groups": []
-    },
-    {
-      "name": "小篆",
-      "desc": "小篆属于汉字字形体系，Unicode 未将其作为独立字符集编码；当前分类预留，后续需配合专用字体或字形资源。",
-      "groups": []
+      ],
+      "ui_section": "other",
+      "role": ""
     },
     {
       "name": "俄文字符",
@@ -31065,8 +31253,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "",
@@ -31122,7 +31310,9 @@
             "я"
           ]
         }
-      ]
+      ],
+      "ui_section": "other",
+      "role": ""
     },
     {
       "name": "古埃及文字",
@@ -31261,8 +31451,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "B类·女性与活动",
@@ -31285,8 +31475,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "C类·人形神祇",
@@ -31341,8 +31531,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "D类·人体部位",
@@ -31496,8 +31686,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "E类·哺乳动物",
@@ -31575,8 +31765,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "F类·哺乳动物部位",
@@ -31689,8 +31879,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "G类·鸟类",
@@ -31802,8 +31992,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "H类·鸟类部位",
@@ -31825,8 +32015,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "I类·两栖与爬行动物",
@@ -31865,8 +32055,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "K类·鱼类及部位",
@@ -31887,8 +32077,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "L类·无脊椎与小动物",
@@ -31911,8 +32101,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "M类·树木与植物",
@@ -32026,8 +32216,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "N类·天空、土地与水",
@@ -32117,8 +32307,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "NL类·下埃及地区标志",
@@ -32160,8 +32350,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "NU类·上埃及地区标志",
@@ -32214,8 +32404,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "O类·建筑及部件",
@@ -32345,8 +32535,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "P类·船舶及部件",
@@ -32379,8 +32569,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "Q类·家具与葬具",
@@ -32400,8 +32590,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "R类·神庙器物与神圣标志",
@@ -32462,8 +32652,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "S类·皇冠、服饰与权杖",
@@ -32558,8 +32748,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "T类·战争、狩猎与屠宰",
@@ -32637,8 +32827,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "U类·农业、工艺与职业",
@@ -32719,8 +32909,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "V类·绳索、纤维、篮筐与袋",
@@ -32853,8 +33043,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "W类·石器与陶器",
@@ -32913,8 +33103,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "X类·面包与糕点",
@@ -32939,8 +33129,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "Y类·书写、游戏与音乐",
@@ -32962,8 +33152,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "Z类·笔画与几何图形",
@@ -33038,8 +33228,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "AA类·未分类符号",
@@ -33100,8 +33290,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "排版与组合控制",
@@ -33169,7 +33359,9 @@
             "𓑕"
           ]
         }
-      ]
+      ],
+      "ui_section": "other",
+      "role": ""
     },
     {
       "name": "象形文字",
@@ -34105,8 +34297,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "楔形文字",
@@ -35573,8 +35765,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "楔形数字与标点",
@@ -35766,8 +35958,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "斐斯托斯圆盘文字",
@@ -35847,8 +36039,8 @@
           "title": "",
           "cols": 0,
           "row": 0,
-          "items": [],
-          "spacer": true
+          "spacer": true,
+          "items": []
         },
         {
           "title": "萨顿手语书写",
@@ -35937,7 +36129,9 @@
             "𝪋"
           ]
         }
-      ]
+      ],
+      "ui_section": "other",
+      "role": ""
     },
     {
       "name": "补充符号",
@@ -40278,7 +40472,15 @@
             "𐻗",
             "𐻘"
           ]
-        },
+        }
+      ],
+      "ui_section": "hidden",
+      "role": ""
+    },
+    {
+      "name": "未分类补充",
+      "desc": "由构建工具自动收纳未在正文中摆放的字符。",
+      "groups": [
         {
           "title": "未分类补充",
           "items": [
@@ -40296,7 +40498,7 @@
             "﹤"
           ],
           "cols": 12,
-          "row": 300
+          "row": 1
         },
         {
           "title": "",
@@ -40315,7 +40517,7 @@
             "∣"
           ],
           "cols": 12,
-          "row": 301
+          "row": 2
         },
         {
           "title": "",
@@ -40334,7 +40536,7 @@
             "₠"
           ],
           "cols": 12,
-          "row": 302
+          "row": 3
         },
         {
           "title": "",
@@ -40353,7 +40555,7 @@
             "⦁"
           ],
           "cols": 12,
-          "row": 303
+          "row": 4
         },
         {
           "title": "",
@@ -40372,7 +40574,7 @@
             "⦍"
           ],
           "cols": 12,
-          "row": 304
+          "row": 5
         },
         {
           "title": "",
@@ -40391,7 +40593,7 @@
             "⦙"
           ],
           "cols": 12,
-          "row": 305
+          "row": 6
         },
         {
           "title": "",
@@ -40410,7 +40612,7 @@
             "⦥"
           ],
           "cols": 12,
-          "row": 306
+          "row": 7
         },
         {
           "title": "",
@@ -40429,7 +40631,7 @@
             "⦻"
           ],
           "cols": 12,
-          "row": 307
+          "row": 8
         },
         {
           "title": "",
@@ -40448,7 +40650,7 @@
             "⧈"
           ],
           "cols": 12,
-          "row": 308
+          "row": 9
         },
         {
           "title": "",
@@ -40467,7 +40669,7 @@
             "⧔"
           ],
           "cols": 12,
-          "row": 309
+          "row": 10
         },
         {
           "title": "",
@@ -40486,7 +40688,7 @@
             "⧠"
           ],
           "cols": 12,
-          "row": 310
+          "row": 11
         },
         {
           "title": "",
@@ -40505,7 +40707,7 @@
             "⧯"
           ],
           "cols": 12,
-          "row": 311
+          "row": 12
         },
         {
           "title": "",
@@ -40524,7 +40726,7 @@
             "⧻"
           ],
           "cols": 12,
-          "row": 312
+          "row": 13
         },
         {
           "title": "",
@@ -40543,7 +40745,7 @@
             "⨖"
           ],
           "cols": 12,
-          "row": 313
+          "row": 14
         },
         {
           "title": "",
@@ -40562,7 +40764,7 @@
             "⨣"
           ],
           "cols": 12,
-          "row": 314
+          "row": 15
         },
         {
           "title": "",
@@ -40581,7 +40783,7 @@
             "⨯"
           ],
           "cols": 12,
-          "row": 315
+          "row": 16
         },
         {
           "title": "",
@@ -40600,7 +40802,7 @@
             "⨻"
           ],
           "cols": 12,
-          "row": 316
+          "row": 17
         },
         {
           "title": "",
@@ -40619,7 +40821,7 @@
             "⩇"
           ],
           "cols": 12,
-          "row": 317
+          "row": 18
         },
         {
           "title": "",
@@ -40638,7 +40840,7 @@
             "⩓"
           ],
           "cols": 12,
-          "row": 318
+          "row": 19
         },
         {
           "title": "",
@@ -40657,7 +40859,7 @@
             "⩟"
           ],
           "cols": 12,
-          "row": 319
+          "row": 20
         },
         {
           "title": "",
@@ -40676,7 +40878,7 @@
             "⩫"
           ],
           "cols": 12,
-          "row": 320
+          "row": 21
         },
         {
           "title": "",
@@ -40695,7 +40897,7 @@
             "⩷"
           ],
           "cols": 12,
-          "row": 321
+          "row": 22
         },
         {
           "title": "",
@@ -40714,7 +40916,7 @@
             "⪃"
           ],
           "cols": 12,
-          "row": 322
+          "row": 23
         },
         {
           "title": "",
@@ -40733,7 +40935,7 @@
             "⪏"
           ],
           "cols": 12,
-          "row": 323
+          "row": 24
         },
         {
           "title": "",
@@ -40752,7 +40954,7 @@
             "⪛"
           ],
           "cols": 12,
-          "row": 324
+          "row": 25
         },
         {
           "title": "",
@@ -40771,7 +40973,7 @@
             "⪧"
           ],
           "cols": 12,
-          "row": 325
+          "row": 26
         },
         {
           "title": "",
@@ -40790,7 +40992,7 @@
             "⪳"
           ],
           "cols": 12,
-          "row": 326
+          "row": 27
         },
         {
           "title": "",
@@ -40809,7 +41011,7 @@
             "⪿"
           ],
           "cols": 12,
-          "row": 327
+          "row": 28
         },
         {
           "title": "",
@@ -40828,7 +41030,7 @@
             "⫋"
           ],
           "cols": 12,
-          "row": 328
+          "row": 29
         },
         {
           "title": "",
@@ -40847,7 +41049,7 @@
             "⫗"
           ],
           "cols": 12,
-          "row": 329
+          "row": 30
         },
         {
           "title": "",
@@ -40866,7 +41068,7 @@
             "⫣"
           ],
           "cols": 12,
-          "row": 330
+          "row": 31
         },
         {
           "title": "",
@@ -40885,7 +41087,7 @@
             "⫯"
           ],
           "cols": 12,
-          "row": 331
+          "row": 32
         },
         {
           "title": "",
@@ -40904,7 +41106,7 @@
             "⫻"
           ],
           "cols": 12,
-          "row": 332
+          "row": 33
         },
         {
           "title": "",
@@ -40923,7 +41125,7 @@
             "𝠄"
           ],
           "cols": 12,
-          "row": 333
+          "row": 34
         },
         {
           "title": "",
@@ -40942,7 +41144,7 @@
             "𝠓"
           ],
           "cols": 12,
-          "row": 334
+          "row": 35
         },
         {
           "title": "",
@@ -40961,7 +41163,7 @@
             "𝠡"
           ],
           "cols": 12,
-          "row": 335
+          "row": 36
         },
         {
           "title": "",
@@ -40980,7 +41182,7 @@
             "𝠮"
           ],
           "cols": 12,
-          "row": 336
+          "row": 37
         },
         {
           "title": "",
@@ -40999,7 +41201,7 @@
             "𝠽"
           ],
           "cols": 12,
-          "row": 337
+          "row": 38
         },
         {
           "title": "",
@@ -41018,7 +41220,7 @@
             "𝡉"
           ],
           "cols": 12,
-          "row": 338
+          "row": 39
         },
         {
           "title": "",
@@ -41037,7 +41239,7 @@
             "𝡕"
           ],
           "cols": 12,
-          "row": 339
+          "row": 40
         },
         {
           "title": "",
@@ -41056,7 +41258,7 @@
             "𝡡"
           ],
           "cols": 12,
-          "row": 340
+          "row": 41
         },
         {
           "title": "",
@@ -41075,7 +41277,7 @@
             "𝡭"
           ],
           "cols": 12,
-          "row": 341
+          "row": 42
         },
         {
           "title": "",
@@ -41094,7 +41296,7 @@
             "𝡺"
           ],
           "cols": 12,
-          "row": 342
+          "row": 43
         },
         {
           "title": "",
@@ -41113,7 +41315,7 @@
             "𝢆"
           ],
           "cols": 12,
-          "row": 343
+          "row": 44
         },
         {
           "title": "",
@@ -41132,7 +41334,7 @@
             "𝢕"
           ],
           "cols": 12,
-          "row": 344
+          "row": 45
         },
         {
           "title": "",
@@ -41151,7 +41353,7 @@
             "𝢢"
           ],
           "cols": 12,
-          "row": 345
+          "row": 46
         },
         {
           "title": "",
@@ -41170,7 +41372,7 @@
             "𝢰"
           ],
           "cols": 12,
-          "row": 346
+          "row": 47
         },
         {
           "title": "",
@@ -41189,7 +41391,7 @@
             "𝢾"
           ],
           "cols": 12,
-          "row": 347
+          "row": 48
         },
         {
           "title": "",
@@ -41208,7 +41410,7 @@
             "𝣋"
           ],
           "cols": 12,
-          "row": 348
+          "row": 49
         },
         {
           "title": "",
@@ -41227,7 +41429,7 @@
             "𝣙"
           ],
           "cols": 12,
-          "row": 349
+          "row": 50
         },
         {
           "title": "",
@@ -41246,7 +41448,7 @@
             "𝣥"
           ],
           "cols": 12,
-          "row": 350
+          "row": 51
         },
         {
           "title": "",
@@ -41265,7 +41467,7 @@
             "𝣲"
           ],
           "cols": 12,
-          "row": 351
+          "row": 52
         },
         {
           "title": "",
@@ -41284,7 +41486,7 @@
             "𝣾"
           ],
           "cols": 12,
-          "row": 352
+          "row": 53
         },
         {
           "title": "",
@@ -41303,7 +41505,7 @@
             "𝤊"
           ],
           "cols": 12,
-          "row": 353
+          "row": 54
         },
         {
           "title": "",
@@ -41322,7 +41524,7 @@
             "𝤖"
           ],
           "cols": 12,
-          "row": 354
+          "row": 55
         },
         {
           "title": "",
@@ -41341,7 +41543,7 @@
             "𝤢"
           ],
           "cols": 12,
-          "row": 355
+          "row": 56
         },
         {
           "title": "",
@@ -41360,7 +41562,7 @@
             "𝤮"
           ],
           "cols": 12,
-          "row": 356
+          "row": 57
         },
         {
           "title": "",
@@ -41379,7 +41581,7 @@
             "𝤺"
           ],
           "cols": 12,
-          "row": 357
+          "row": 58
         },
         {
           "title": "",
@@ -41398,7 +41600,7 @@
             "𝥆"
           ],
           "cols": 12,
-          "row": 358
+          "row": 59
         },
         {
           "title": "",
@@ -41417,7 +41619,7 @@
             "𝥒"
           ],
           "cols": 12,
-          "row": 359
+          "row": 60
         },
         {
           "title": "",
@@ -41436,7 +41638,7 @@
             "𝥞"
           ],
           "cols": 12,
-          "row": 360
+          "row": 61
         },
         {
           "title": "",
@@ -41455,7 +41657,7 @@
             "𝥪"
           ],
           "cols": 12,
-          "row": 361
+          "row": 62
         },
         {
           "title": "",
@@ -41474,7 +41676,7 @@
             "𝥶"
           ],
           "cols": 12,
-          "row": 362
+          "row": 63
         },
         {
           "title": "",
@@ -41493,7 +41695,7 @@
             "𝦂"
           ],
           "cols": 12,
-          "row": 363
+          "row": 64
         },
         {
           "title": "",
@@ -41512,7 +41714,7 @@
             "𝦔"
           ],
           "cols": 12,
-          "row": 364
+          "row": 65
         },
         {
           "title": "",
@@ -41531,7 +41733,7 @@
             "𝦠"
           ],
           "cols": 12,
-          "row": 365
+          "row": 66
         },
         {
           "title": "",
@@ -41550,7 +41752,7 @@
             "𝦬"
           ],
           "cols": 12,
-          "row": 366
+          "row": 67
         },
         {
           "title": "",
@@ -41569,7 +41771,7 @@
             "𝦸"
           ],
           "cols": 12,
-          "row": 367
+          "row": 68
         },
         {
           "title": "",
@@ -41588,7 +41790,7 @@
             "𝧄"
           ],
           "cols": 12,
-          "row": 368
+          "row": 69
         },
         {
           "title": "",
@@ -41607,7 +41809,7 @@
             "𝧐"
           ],
           "cols": 12,
-          "row": 369
+          "row": 70
         },
         {
           "title": "",
@@ -41626,7 +41828,7 @@
             "𝧜"
           ],
           "cols": 12,
-          "row": 370
+          "row": 71
         },
         {
           "title": "",
@@ -41645,7 +41847,7 @@
             "𝧼"
           ],
           "cols": 12,
-          "row": 371
+          "row": 72
         },
         {
           "title": "",
@@ -41664,7 +41866,7 @@
             "𝩱"
           ],
           "cols": 12,
-          "row": 372
+          "row": 73
         },
         {
           "title": "",
@@ -41683,7 +41885,7 @@
             "𝩾"
           ],
           "cols": 12,
-          "row": 373
+          "row": 74
         },
         {
           "title": "",
@@ -41702,7 +41904,7 @@
             "䷄"
           ],
           "cols": 12,
-          "row": 374
+          "row": 75
         },
         {
           "title": "",
@@ -41721,7 +41923,7 @@
             "䷐"
           ],
           "cols": 12,
-          "row": 375
+          "row": 76
         },
         {
           "title": "",
@@ -41740,7 +41942,7 @@
             "䷜"
           ],
           "cols": 12,
-          "row": 376
+          "row": 77
         },
         {
           "title": "",
@@ -41759,7 +41961,7 @@
             "䷨"
           ],
           "cols": 12,
-          "row": 377
+          "row": 78
         },
         {
           "title": "",
@@ -41778,7 +41980,7 @@
             "䷴"
           ],
           "cols": 12,
-          "row": 378
+          "row": 79
         },
         {
           "title": "",
@@ -41797,7 +41999,7 @@
             "𐆐"
           ],
           "cols": 12,
-          "row": 379
+          "row": 80
         },
         {
           "title": "",
@@ -41816,7 +42018,7 @@
             "𐆜"
           ],
           "cols": 12,
-          "row": 380
+          "row": 81
         },
         {
           "title": "",
@@ -41835,7 +42037,7 @@
             "𝌋"
           ],
           "cols": 12,
-          "row": 381
+          "row": 82
         },
         {
           "title": "",
@@ -41854,7 +42056,7 @@
             "𝌗"
           ],
           "cols": 12,
-          "row": 382
+          "row": 83
         },
         {
           "title": "",
@@ -41873,7 +42075,7 @@
             "𝌣"
           ],
           "cols": 12,
-          "row": 383
+          "row": 84
         },
         {
           "title": "",
@@ -41892,7 +42094,7 @@
             "𝌯"
           ],
           "cols": 12,
-          "row": 384
+          "row": 85
         },
         {
           "title": "",
@@ -41911,7 +42113,7 @@
             "𝌻"
           ],
           "cols": 12,
-          "row": 385
+          "row": 86
         },
         {
           "title": "",
@@ -41930,7 +42132,7 @@
             "𝍇"
           ],
           "cols": 12,
-          "row": 386
+          "row": 87
         },
         {
           "title": "",
@@ -41949,7 +42151,7 @@
             "𝍓"
           ],
           "cols": 12,
-          "row": 387
+          "row": 88
         },
         {
           "title": "",
@@ -41959,25 +42161,307 @@
             "𝍖"
           ],
           "cols": 3,
-          "row": 388
+          "row": 89
         }
-      ]
+      ],
+      "ui_section": "hidden",
+      "role": "generated-supplement"
     }
   ],
   "symbols": [
     {
-      "text": "△",
-      "name": "WHITE UP-POINTING TRIANGLE",
+      "text": "✓",
+      "name": "CHECK MARK",
       "emoji": false,
-      "name_en": "WHITE UP-POINTING TRIANGLE",
-      "name_zh": "向上空心三角"
+      "name_en": "CHECK MARK",
+      "name_zh": "对勾"
     },
     {
-      "text": "▽",
-      "name": "WHITE DOWN-POINTING TRIANGLE",
+      "text": "✔",
+      "name": "HEAVY CHECK MARK",
+      "emoji": true,
+      "name_en": "HEAVY CHECK MARK",
+      "name_zh": "勾号"
+    },
+    {
+      "text": "☑",
+      "name": "BALLOT BOX WITH CHECK",
+      "emoji": true,
+      "name_en": "BALLOT BOX WITH CHECK",
+      "name_zh": "勾选框"
+    },
+    {
+      "text": "✕",
+      "name": "MULTIPLICATION X",
       "emoji": false,
-      "name_en": "WHITE DOWN-POINTING TRIANGLE",
-      "name_zh": "向下空心三角"
+      "name_en": "MULTIPLICATION X",
+      "name_zh": "乘形叉号"
+    },
+    {
+      "text": "✖",
+      "name": "HEAVY MULTIPLICATION X",
+      "emoji": true,
+      "name_en": "HEAVY MULTIPLICATION X",
+      "name_zh": "乘"
+    },
+    {
+      "text": "×",
+      "name": "MULTIPLICATION SIGN",
+      "emoji": false,
+      "name_en": "MULTIPLICATION SIGN",
+      "name_zh": "乘号"
+    },
+    {
+      "text": "÷",
+      "name": "DIVISION SIGN",
+      "emoji": false,
+      "name_en": "DIVISION SIGN",
+      "name_zh": "除号"
+    },
+    {
+      "text": "±",
+      "name": "PLUS-MINUS SIGN",
+      "emoji": false,
+      "name_en": "PLUS-MINUS SIGN",
+      "name_zh": "正负号"
+    },
+    {
+      "text": "≈",
+      "name": "ALMOST EQUAL TO",
+      "emoji": false,
+      "name_en": "ALMOST EQUAL TO",
+      "name_zh": "约等于"
+    },
+    {
+      "text": "≠",
+      "name": "NOT EQUAL TO",
+      "emoji": false,
+      "name_en": "NOT EQUAL TO",
+      "name_zh": "不等于"
+    },
+    {
+      "text": "≤",
+      "name": "LESS-THAN OR EQUAL TO",
+      "emoji": false,
+      "name_en": "LESS-THAN OR EQUAL TO",
+      "name_zh": "小于或等于"
+    },
+    {
+      "text": "≥",
+      "name": "GREATER-THAN OR EQUAL TO",
+      "emoji": false,
+      "name_en": "GREATER-THAN OR EQUAL TO",
+      "name_zh": "大于或等于"
+    },
+    {
+      "text": "°",
+      "name": "DEGREE SIGN",
+      "emoji": false,
+      "name_en": "DEGREE SIGN",
+      "name_zh": "度数符号"
+    },
+    {
+      "text": "℃",
+      "name": "DEGREE CELSIUS",
+      "emoji": false,
+      "name_en": "DEGREE CELSIUS",
+      "name_zh": "摄氏度"
+    },
+    {
+      "text": "℉",
+      "name": "DEGREE FAHRENHEIT",
+      "emoji": false,
+      "name_en": "DEGREE FAHRENHEIT",
+      "name_zh": "华氏度"
+    },
+    {
+      "text": "©",
+      "name": "COPYRIGHT SIGN",
+      "emoji": true,
+      "name_en": "COPYRIGHT SIGN",
+      "name_zh": "版权"
+    },
+    {
+      "text": "®",
+      "name": "REGISTERED SIGN",
+      "emoji": true,
+      "name_en": "REGISTERED SIGN",
+      "name_zh": "注册"
+    },
+    {
+      "text": "™",
+      "name": "TRADE MARK SIGN",
+      "emoji": true,
+      "name_en": "TRADE MARK SIGN",
+      "name_zh": "商标"
+    },
+    {
+      "text": "№",
+      "name": "NUMERO SIGN",
+      "emoji": false,
+      "name_en": "NUMERO SIGN",
+      "name_zh": "编号符号"
+    },
+    {
+      "text": "§",
+      "name": "SECTION SIGN",
+      "emoji": false,
+      "name_en": "SECTION SIGN",
+      "name_zh": "章节符号"
+    },
+    {
+      "text": "¶",
+      "name": "PILCROW SIGN",
+      "emoji": false,
+      "name_en": "PILCROW SIGN",
+      "name_zh": "段落符号"
+    },
+    {
+      "text": "•",
+      "name": "BULLET",
+      "emoji": false,
+      "name_en": "BULLET",
+      "name_zh": "项目符号"
+    },
+    {
+      "text": "·",
+      "name": "MIDDLE DOT",
+      "emoji": false,
+      "name_en": "MIDDLE DOT",
+      "name_zh": "间隔号"
+    },
+    {
+      "text": "…",
+      "name": "HORIZONTAL ELLIPSIS",
+      "emoji": false,
+      "name_en": "HORIZONTAL ELLIPSIS",
+      "name_zh": "省略号"
+    },
+    {
+      "text": "—",
+      "name": "EM DASH",
+      "emoji": false,
+      "name_en": "EM DASH",
+      "name_zh": "破折号"
+    },
+    {
+      "text": "–",
+      "name": "EN DASH",
+      "emoji": false,
+      "name_en": "EN DASH",
+      "name_zh": "连接号"
+    },
+    {
+      "text": "→",
+      "name": "RIGHTWARDS ARROW",
+      "emoji": false,
+      "name_en": "RIGHTWARDS ARROW",
+      "name_zh": "向右箭头"
+    },
+    {
+      "text": "←",
+      "name": "LEFTWARDS ARROW",
+      "emoji": false,
+      "name_en": "LEFTWARDS ARROW",
+      "name_zh": "向左箭头"
+    },
+    {
+      "text": "↑",
+      "name": "UPWARDS ARROW",
+      "emoji": false,
+      "name_en": "UPWARDS ARROW",
+      "name_zh": "向上箭头"
+    },
+    {
+      "text": "↓",
+      "name": "DOWNWARDS ARROW",
+      "emoji": false,
+      "name_en": "DOWNWARDS ARROW",
+      "name_zh": "向下箭头"
+    },
+    {
+      "text": "↔",
+      "name": "LEFT RIGHT ARROW",
+      "emoji": true,
+      "name_en": "LEFT RIGHT ARROW",
+      "name_zh": "左右箭头"
+    },
+    {
+      "text": "⇒",
+      "name": "RIGHTWARDS DOUBLE ARROW",
+      "emoji": false,
+      "name_en": "RIGHTWARDS DOUBLE ARROW",
+      "name_zh": "向右双线箭头"
+    },
+    {
+      "text": "⇔",
+      "name": "LEFT RIGHT DOUBLE ARROW",
+      "emoji": false,
+      "name_en": "LEFT RIGHT DOUBLE ARROW",
+      "name_zh": "左右双线箭头"
+    },
+    {
+      "text": "∞",
+      "name": "INFINITY",
+      "emoji": false,
+      "name_en": "INFINITY",
+      "name_zh": "无穷大"
+    },
+    {
+      "text": "√",
+      "name": "SQUARE ROOT",
+      "emoji": false,
+      "name_en": "SQUARE ROOT",
+      "name_zh": "平方根"
+    },
+    {
+      "text": "∑",
+      "name": "N-ARY SUMMATION",
+      "emoji": false,
+      "name_en": "N-ARY SUMMATION",
+      "name_zh": "求和"
+    },
+    {
+      "text": "∫",
+      "name": "INTEGRAL",
+      "emoji": false,
+      "name_en": "INTEGRAL",
+      "name_zh": "积分"
+    },
+    {
+      "text": "↖",
+      "name": "NORTH WEST ARROW",
+      "emoji": true,
+      "name_en": "NORTH WEST ARROW",
+      "name_zh": "左上箭头"
+    },
+    {
+      "text": "↗",
+      "name": "NORTH EAST ARROW",
+      "emoji": true,
+      "name_en": "NORTH EAST ARROW",
+      "name_zh": "右上箭头"
+    },
+    {
+      "text": "↙",
+      "name": "SOUTH WEST ARROW",
+      "emoji": true,
+      "name_en": "SOUTH WEST ARROW",
+      "name_zh": "左下箭头"
+    },
+    {
+      "text": "↘",
+      "name": "SOUTH EAST ARROW",
+      "emoji": true,
+      "name_en": "SOUTH EAST ARROW",
+      "name_zh": "右下箭头"
+    },
+    {
+      "text": "●",
+      "name": "BLACK CIRCLE",
+      "emoji": false,
+      "name_en": "BLACK CIRCLE",
+      "name_zh": "实心圆"
     },
     {
       "text": "○",
@@ -41987,11 +42471,25 @@
       "name_zh": "空心圆"
     },
     {
-      "text": "◇",
-      "name": "WHITE DIAMOND",
+      "text": "◉",
+      "name": "FISHEYE",
       "emoji": false,
-      "name_en": "WHITE DIAMOND",
-      "name_zh": "空心菱形"
+      "name_en": "FISHEYE",
+      "name_zh": "靶心圆"
+    },
+    {
+      "text": "◎",
+      "name": "BULLSEYE",
+      "emoji": false,
+      "name_en": "BULLSEYE",
+      "name_zh": "双圆"
+    },
+    {
+      "text": "■",
+      "name": "BLACK SQUARE",
+      "emoji": false,
+      "name_en": "BLACK SQUARE",
+      "name_zh": "实心方块"
     },
     {
       "text": "□",
@@ -42001,11 +42499,53 @@
       "name_zh": "空心方块"
     },
     {
-      "text": "▷",
-      "name": "WHITE RIGHT-POINTING TRIANGLE",
+      "text": "◆",
+      "name": "BLACK DIAMOND",
       "emoji": false,
-      "name_en": "WHITE RIGHT-POINTING TRIANGLE",
-      "name_zh": "向右空心三角"
+      "name_en": "BLACK DIAMOND",
+      "name_zh": "实心菱形"
+    },
+    {
+      "text": "◇",
+      "name": "WHITE DIAMOND",
+      "emoji": false,
+      "name_en": "WHITE DIAMOND",
+      "name_zh": "空心菱形"
+    },
+    {
+      "text": "▲",
+      "name": "BLACK UP-POINTING TRIANGLE",
+      "emoji": false,
+      "name_en": "BLACK UP-POINTING TRIANGLE",
+      "name_zh": "向上实心三角"
+    },
+    {
+      "text": "△",
+      "name": "WHITE UP-POINTING TRIANGLE",
+      "emoji": false,
+      "name_en": "WHITE UP-POINTING TRIANGLE",
+      "name_zh": "向上空心三角"
+    },
+    {
+      "text": "▼",
+      "name": "BLACK DOWN-POINTING TRIANGLE",
+      "emoji": false,
+      "name_en": "BLACK DOWN-POINTING TRIANGLE",
+      "name_zh": "向下实心三角"
+    },
+    {
+      "text": "▽",
+      "name": "WHITE DOWN-POINTING TRIANGLE",
+      "emoji": false,
+      "name_en": "WHITE DOWN-POINTING TRIANGLE",
+      "name_zh": "向下空心三角"
+    },
+    {
+      "text": "◀",
+      "name": "BLACK LEFT-POINTING TRIANGLE",
+      "emoji": true,
+      "name_en": "BLACK LEFT-POINTING TRIANGLE",
+      "name_zh": "倒退按钮"
     },
     {
       "text": "◁",
@@ -42013,6 +42553,244 @@
       "emoji": false,
       "name_en": "WHITE LEFT-POINTING TRIANGLE",
       "name_zh": "向左空心三角"
+    },
+    {
+      "text": "▶",
+      "name": "BLACK RIGHT-POINTING TRIANGLE",
+      "emoji": true,
+      "name_en": "BLACK RIGHT-POINTING TRIANGLE",
+      "name_zh": "播放按钮"
+    },
+    {
+      "text": "▷",
+      "name": "WHITE RIGHT-POINTING TRIANGLE",
+      "emoji": false,
+      "name_en": "WHITE RIGHT-POINTING TRIANGLE",
+      "name_zh": "向右空心三角"
+    },
+    {
+      "text": "①",
+      "name": "CIRCLED DIGIT ONE",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT ONE",
+      "name_zh": "带圈数字一"
+    },
+    {
+      "text": "②",
+      "name": "CIRCLED DIGIT TWO",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT TWO",
+      "name_zh": "带圈数字二"
+    },
+    {
+      "text": "③",
+      "name": "CIRCLED DIGIT THREE",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT THREE",
+      "name_zh": "带圈数字三"
+    },
+    {
+      "text": "④",
+      "name": "CIRCLED DIGIT FOUR",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT FOUR",
+      "name_zh": "带圈数字四"
+    },
+    {
+      "text": "⑤",
+      "name": "CIRCLED DIGIT FIVE",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT FIVE",
+      "name_zh": "带圈数字五"
+    },
+    {
+      "text": "⑥",
+      "name": "CIRCLED DIGIT SIX",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT SIX",
+      "name_zh": "带圈数字六"
+    },
+    {
+      "text": "⑦",
+      "name": "CIRCLED DIGIT SEVEN",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT SEVEN",
+      "name_zh": "带圈数字七"
+    },
+    {
+      "text": "⑧",
+      "name": "CIRCLED DIGIT EIGHT",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT EIGHT",
+      "name_zh": "带圈数字八"
+    },
+    {
+      "text": "⑨",
+      "name": "CIRCLED DIGIT NINE",
+      "emoji": false,
+      "name_en": "CIRCLED DIGIT NINE",
+      "name_zh": "带圈数字九"
+    },
+    {
+      "text": "⑩",
+      "name": "CIRCLED NUMBER TEN",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TEN",
+      "name_zh": "带圈数字十"
+    },
+    {
+      "text": "⑪",
+      "name": "CIRCLED NUMBER ELEVEN",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER ELEVEN",
+      "name_zh": "带圈数字十一"
+    },
+    {
+      "text": "⑫",
+      "name": "CIRCLED NUMBER TWELVE",
+      "emoji": false,
+      "name_en": "CIRCLED NUMBER TWELVE",
+      "name_zh": "带圈数字十二"
+    },
+    {
+      "text": "「",
+      "name": "LEFT CORNER BRACKET",
+      "emoji": false,
+      "name_en": "LEFT CORNER BRACKET",
+      "name_zh": "左角引号"
+    },
+    {
+      "text": "」",
+      "name": "RIGHT CORNER BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT CORNER BRACKET",
+      "name_zh": "右角引号"
+    },
+    {
+      "text": "『",
+      "name": "LEFT WHITE CORNER BRACKET",
+      "emoji": false,
+      "name_en": "LEFT WHITE CORNER BRACKET",
+      "name_zh": "左双角引号"
+    },
+    {
+      "text": "』",
+      "name": "RIGHT WHITE CORNER BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT WHITE CORNER BRACKET",
+      "name_zh": "右双角引号"
+    },
+    {
+      "text": "【",
+      "name": "LEFT BLACK LENTICULAR BRACKET",
+      "emoji": false,
+      "name_en": "LEFT BLACK LENTICULAR BRACKET",
+      "name_zh": "左方头括号"
+    },
+    {
+      "text": "】",
+      "name": "RIGHT BLACK LENTICULAR BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT BLACK LENTICULAR BRACKET",
+      "name_zh": "右方头括号"
+    },
+    {
+      "text": "《",
+      "name": "LEFT DOUBLE ANGLE BRACKET",
+      "emoji": false,
+      "name_en": "LEFT DOUBLE ANGLE BRACKET",
+      "name_zh": "左双书名号"
+    },
+    {
+      "text": "》",
+      "name": "RIGHT DOUBLE ANGLE BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT DOUBLE ANGLE BRACKET",
+      "name_zh": "右双书名号"
+    },
+    {
+      "text": "〈",
+      "name": "LEFT ANGLE BRACKET",
+      "emoji": false,
+      "name_en": "LEFT ANGLE BRACKET",
+      "name_zh": "左单书名号"
+    },
+    {
+      "text": "〉",
+      "name": "RIGHT ANGLE BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT ANGLE BRACKET",
+      "name_zh": "右单书名号"
+    },
+    {
+      "text": "〔",
+      "name": "LEFT TORTOISE SHELL BRACKET",
+      "emoji": false,
+      "name_en": "LEFT TORTOISE SHELL BRACKET",
+      "name_zh": "左龟甲括号"
+    },
+    {
+      "text": "〕",
+      "name": "RIGHT TORTOISE SHELL BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT TORTOISE SHELL BRACKET",
+      "name_zh": "右龟甲括号"
+    },
+    {
+      "text": "（",
+      "name": "FULLWIDTH LEFT PARENTHESIS",
+      "emoji": false,
+      "name_en": "FULLWIDTH LEFT PARENTHESIS",
+      "name_zh": "全角左圆括号"
+    },
+    {
+      "text": "）",
+      "name": "FULLWIDTH RIGHT PARENTHESIS",
+      "emoji": false,
+      "name_en": "FULLWIDTH RIGHT PARENTHESIS",
+      "name_zh": "全角右圆括号"
+    },
+    {
+      "text": "{",
+      "name": "LEFT CURLY BRACKET",
+      "emoji": false,
+      "name_en": "LEFT CURLY BRACKET",
+      "name_zh": "左花括号"
+    },
+    {
+      "text": "}",
+      "name": "RIGHT CURLY BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT CURLY BRACKET",
+      "name_zh": "右花括号"
+    },
+    {
+      "text": "[",
+      "name": "LEFT SQUARE BRACKET",
+      "emoji": false,
+      "name_en": "LEFT SQUARE BRACKET",
+      "name_zh": "左方括号"
+    },
+    {
+      "text": "]",
+      "name": "RIGHT SQUARE BRACKET",
+      "emoji": false,
+      "name_en": "RIGHT SQUARE BRACKET",
+      "name_zh": "右方括号"
+    },
+    {
+      "text": "<",
+      "name": "LESS-THAN SIGN",
+      "emoji": false,
+      "name_en": "LESS-THAN SIGN",
+      "name_zh": "小于号或左尖括号"
+    },
+    {
+      "text": ">",
+      "name": "GREATER-THAN SIGN",
+      "emoji": false,
+      "name_en": "GREATER-THAN SIGN",
+      "name_zh": "大于号或右尖括号"
     },
     {
       "text": "♤",
@@ -42041,55 +42819,6 @@
       "emoji": false,
       "name_en": "WHITE CLUB SUIT",
       "name_zh": "空心梅花"
-    },
-    {
-      "text": "▲",
-      "name": "BLACK UP-POINTING TRIANGLE",
-      "emoji": false,
-      "name_en": "BLACK UP-POINTING TRIANGLE",
-      "name_zh": "向上实心三角"
-    },
-    {
-      "text": "▼",
-      "name": "BLACK DOWN-POINTING TRIANGLE",
-      "emoji": false,
-      "name_en": "BLACK DOWN-POINTING TRIANGLE",
-      "name_zh": "向下实心三角"
-    },
-    {
-      "text": "●",
-      "name": "BLACK CIRCLE",
-      "emoji": false,
-      "name_en": "BLACK CIRCLE",
-      "name_zh": "实心圆"
-    },
-    {
-      "text": "◆",
-      "name": "BLACK DIAMOND",
-      "emoji": false,
-      "name_en": "BLACK DIAMOND",
-      "name_zh": "实心菱形"
-    },
-    {
-      "text": "■",
-      "name": "BLACK SQUARE",
-      "emoji": false,
-      "name_en": "BLACK SQUARE",
-      "name_zh": "实心方块"
-    },
-    {
-      "text": "▶",
-      "name": "BLACK RIGHT-POINTING TRIANGLE",
-      "emoji": true,
-      "name_en": "BLACK RIGHT-POINTING TRIANGLE",
-      "name_zh": "播放按钮"
-    },
-    {
-      "text": "◀",
-      "name": "BLACK LEFT-POINTING TRIANGLE",
-      "emoji": true,
-      "name_en": "BLACK LEFT-POINTING TRIANGLE",
-      "name_zh": "倒退按钮"
     },
     {
       "text": "♠",
@@ -42139,13 +42868,6 @@
       "emoji": false,
       "name_en": "CIRCLE WITH LEFT HALF BLACK",
       "name_zh": "左半黑圆"
-    },
-    {
-      "text": "√",
-      "name": "SQUARE ROOT",
-      "emoji": false,
-      "name_en": "SQUARE ROOT",
-      "name_zh": "平方根"
     },
     {
       "text": "☜",
@@ -42204,13 +42926,6 @@
       "name_zh": "叉选框"
     },
     {
-      "text": "×",
-      "name": "MULTIPLICATION SIGN",
-      "emoji": false,
-      "name_en": "MULTIPLICATION SIGN",
-      "name_zh": "乘号"
-    },
-    {
       "text": "☚",
       "name": "BLACK LEFT POINTING INDEX",
       "emoji": false,
@@ -42246,25 +42961,11 @@
       "name_zh": "黑色小方块"
     },
     {
-      "text": "•",
-      "name": "BULLET",
-      "emoji": false,
-      "name_en": "BULLET",
-      "name_zh": "项目符号"
-    },
-    {
       "text": "‥",
       "name": "TWO DOT LEADER",
       "emoji": false,
       "name_en": "TWO DOT LEADER",
       "name_zh": "二点省略号"
-    },
-    {
-      "text": "…",
-      "name": "HORIZONTAL ELLIPSIS",
-      "emoji": false,
-      "name_en": "HORIZONTAL ELLIPSIS",
-      "name_zh": "省略号"
     },
     {
       "text": "▁",
@@ -42435,25 +43136,11 @@
       "name_zh": "相连十六分音符"
     },
     {
-      "text": "§",
-      "name": "SECTION SIGN",
-      "emoji": false,
-      "name_en": "SECTION SIGN",
-      "name_zh": "章节符号"
-    },
-    {
       "text": "〼",
       "name": "MASU MARK",
       "emoji": false,
       "name_en": "MASU MARK",
       "name_zh": "升枡标记"
-    },
-    {
-      "text": "◎",
-      "name": "BULLSEYE",
-      "emoji": false,
-      "name_en": "BULLSEYE",
-      "name_zh": "双圆"
     },
     {
       "text": "¤",
@@ -42475,20 +43162,6 @@
       "emoji": false,
       "name_en": "SOUND RECORDING COPYRIGHT",
       "name_zh": "录音版权符号"
-    },
-    {
-      "text": "®",
-      "name": "REGISTERED SIGN",
-      "emoji": true,
-      "name_en": "REGISTERED SIGN",
-      "name_zh": "注册"
-    },
-    {
-      "text": "©",
-      "name": "COPYRIGHT SIGN",
-      "emoji": true,
-      "name_en": "COPYRIGHT SIGN",
-      "name_zh": "版权"
     },
     {
       "text": "♭",
@@ -42519,13 +43192,6 @@
       "name_zh": "双竖线"
     },
     {
-      "text": "¶",
-      "name": "PILCROW SIGN",
-      "emoji": false,
-      "name_en": "PILCROW SIGN",
-      "name_zh": "段落符号"
-    },
-    {
       "text": "卍",
       "name": "CJK UNIFIED IDEOGRAPH-534D",
       "emoji": false,
@@ -42552,13 +43218,6 @@
       "emoji": false,
       "name_en": "TELEPHONE SIGN",
       "name_zh": "电话符号"
-    },
-    {
-      "text": "™",
-      "name": "TRADE MARK SIGN",
-      "emoji": true,
-      "name_en": "TRADE MARK SIGN",
-      "name_zh": "商标"
     },
     {
       "text": "㏇",
@@ -42645,13 +43304,6 @@
       "name_zh": "括号株式会社"
     },
     {
-      "text": "№",
-      "name": "NUMERO SIGN",
-      "emoji": false,
-      "name_en": "NUMERO SIGN",
-      "name_zh": "编号符号"
-    },
-    {
       "text": "♈",
       "name": "ARIES",
       "emoji": true,
@@ -42736,27 +43388,6 @@
       "name_zh": "处女座"
     },
     {
-      "text": "↖",
-      "name": "NORTH WEST ARROW",
-      "emoji": true,
-      "name_en": "NORTH WEST ARROW",
-      "name_zh": "左上箭头"
-    },
-    {
-      "text": "↑",
-      "name": "UPWARDS ARROW",
-      "emoji": false,
-      "name_en": "UPWARDS ARROW",
-      "name_zh": "向上箭头"
-    },
-    {
-      "text": "↗",
-      "name": "NORTH EAST ARROW",
-      "emoji": true,
-      "name_en": "NORTH EAST ARROW",
-      "name_zh": "右上箭头"
-    },
-    {
       "text": "▨",
       "name": "SQUARE WITH UPPER RIGHT TO LOWER LEFT FILL",
       "emoji": false,
@@ -42820,25 +43451,11 @@
       "name_zh": "坤卦（地）"
     },
     {
-      "text": "←",
-      "name": "LEFTWARDS ARROW",
-      "emoji": false,
-      "name_en": "LEFTWARDS ARROW",
-      "name_zh": "向左箭头"
-    },
-    {
       "text": "㊣",
       "name": "CIRCLED IDEOGRAPH CORRECT",
       "emoji": false,
       "name_en": "CIRCLED IDEOGRAPH CORRECT",
       "name_zh": "圈正字"
-    },
-    {
-      "text": "→",
-      "name": "RIGHTWARDS ARROW",
-      "emoji": false,
-      "name_en": "RIGHTWARDS ARROW",
-      "name_zh": "向右箭头"
     },
     {
       "text": "▩",
@@ -42895,27 +43512,6 @@
       "emoji": false,
       "name_en": "TRIGRAM FOR LAKE",
       "name_zh": "兑卦（泽）"
-    },
-    {
-      "text": "↙",
-      "name": "SOUTH WEST ARROW",
-      "emoji": true,
-      "name_en": "SOUTH WEST ARROW",
-      "name_zh": "左下箭头"
-    },
-    {
-      "text": "↓",
-      "name": "DOWNWARDS ARROW",
-      "emoji": false,
-      "name_en": "DOWNWARDS ARROW",
-      "name_zh": "向下箭头"
-    },
-    {
-      "text": "↘",
-      "name": "SOUTH EAST ARROW",
-      "emoji": true,
-      "name_en": "SOUTH EAST ARROW",
-      "name_zh": "右下箭头"
     },
     {
       "text": "▫",
@@ -42986,13 +43582,6 @@
       "emoji": true,
       "name_en": "UP DOWN ARROW",
       "name_zh": "上下箭头"
-    },
-    {
-      "text": "↔",
-      "name": "LEFT RIGHT ARROW",
-      "emoji": true,
-      "name_en": "LEFT RIGHT ARROW",
-      "name_zh": "左右箭头"
     },
     {
       "text": "⊱",
@@ -43067,7 +43656,7 @@
     {
       "text": "*",
       "name": "ASTERISK",
-      "emoji": true,
+      "emoji": false,
       "name_en": "ASTERISK",
       "name_zh": "星号"
     },
@@ -43401,20 +43990,6 @@
       "name_zh": "向左双线箭头"
     },
     {
-      "text": "⇔",
-      "name": "LEFT RIGHT DOUBLE ARROW",
-      "emoji": false,
-      "name_en": "LEFT RIGHT DOUBLE ARROW",
-      "name_zh": "左右双线箭头"
-    },
-    {
-      "text": "⇒",
-      "name": "RIGHTWARDS DOUBLE ARROW",
-      "emoji": false,
-      "name_en": "RIGHTWARDS DOUBLE ARROW",
-      "name_zh": "向右双线箭头"
-    },
-    {
       "text": "⇙",
       "name": "SOUTH WEST DOUBLE ARROW",
       "emoji": false,
@@ -43609,41 +44184,6 @@
       "emoji": false,
       "name_en": "LONG RIGHTWARDS SQUIGGLE ARROW",
       "name_zh": "向右长波浪箭头"
-    },
-    {
-      "text": "✓",
-      "name": "CHECK MARK",
-      "emoji": false,
-      "name_en": "CHECK MARK",
-      "name_zh": "对勾"
-    },
-    {
-      "text": "✔",
-      "name": "HEAVY CHECK MARK",
-      "emoji": true,
-      "name_en": "HEAVY CHECK MARK",
-      "name_zh": "勾号"
-    },
-    {
-      "text": "☑",
-      "name": "BALLOT BOX WITH CHECK",
-      "emoji": true,
-      "name_en": "BALLOT BOX WITH CHECK",
-      "name_zh": "勾选框"
-    },
-    {
-      "text": "✕",
-      "name": "MULTIPLICATION X",
-      "emoji": false,
-      "name_en": "MULTIPLICATION X",
-      "name_zh": "乘形叉号"
-    },
-    {
-      "text": "✖",
-      "name": "HEAVY MULTIPLICATION X",
-      "emoji": true,
-      "name_en": "HEAVY MULTIPLICATION X",
-      "name_zh": "乘"
     },
     {
       "text": "✗",
@@ -50394,13 +50934,6 @@
       "name_zh": "U+1F8D8"
     },
     {
-      "text": "◉",
-      "name": "FISHEYE",
-      "emoji": false,
-      "name_en": "FISHEYE",
-      "name_zh": "靶心圆"
-    },
-    {
       "text": "◌",
       "name": "DOTTED CIRCLE",
       "emoji": false,
@@ -55630,13 +56163,6 @@
       "name_zh": "全角分号"
     },
     {
-      "text": "·",
-      "name": "MIDDLE DOT",
-      "emoji": false,
-      "name_en": "MIDDLE DOT",
-      "name_zh": "间隔号"
-    },
-    {
       "text": "~",
       "name": "TILDE",
       "emoji": false,
@@ -55653,7 +56179,7 @@
     {
       "text": "#",
       "name": "NUMBER SIGN",
-      "emoji": true,
+      "emoji": false,
       "name_en": "NUMBER SIGN",
       "name_zh": "井号"
     },
@@ -55784,34 +56310,6 @@
       "name_zh": "右圆括号"
     },
     {
-      "text": "【",
-      "name": "LEFT BLACK LENTICULAR BRACKET",
-      "emoji": false,
-      "name_en": "LEFT BLACK LENTICULAR BRACKET",
-      "name_zh": "左方头括号"
-    },
-    {
-      "text": "】",
-      "name": "RIGHT BLACK LENTICULAR BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT BLACK LENTICULAR BRACKET",
-      "name_zh": "右方头括号"
-    },
-    {
-      "text": "《",
-      "name": "LEFT DOUBLE ANGLE BRACKET",
-      "emoji": false,
-      "name_en": "LEFT DOUBLE ANGLE BRACKET",
-      "name_zh": "左双书名号"
-    },
-    {
-      "text": "》",
-      "name": "RIGHT DOUBLE ANGLE BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT DOUBLE ANGLE BRACKET",
-      "name_zh": "右双书名号"
-    },
-    {
       "text": "＜",
       "name": "FULLWIDTH LESS-THAN SIGN",
       "emoji": false,
@@ -55840,76 +56338,6 @@
       "name_zh": "小型右龟甲括号"
     },
     {
-      "text": "<",
-      "name": "LESS-THAN SIGN",
-      "emoji": false,
-      "name_en": "LESS-THAN SIGN",
-      "name_zh": "小于号或左尖括号"
-    },
-    {
-      "text": ">",
-      "name": "GREATER-THAN SIGN",
-      "emoji": false,
-      "name_en": "GREATER-THAN SIGN",
-      "name_zh": "大于号或右尖括号"
-    },
-    {
-      "text": "[",
-      "name": "LEFT SQUARE BRACKET",
-      "emoji": false,
-      "name_en": "LEFT SQUARE BRACKET",
-      "name_zh": "左方括号"
-    },
-    {
-      "text": "]",
-      "name": "RIGHT SQUARE BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT SQUARE BRACKET",
-      "name_zh": "右方括号"
-    },
-    {
-      "text": "〔",
-      "name": "LEFT TORTOISE SHELL BRACKET",
-      "emoji": false,
-      "name_en": "LEFT TORTOISE SHELL BRACKET",
-      "name_zh": "左龟甲括号"
-    },
-    {
-      "text": "〕",
-      "name": "RIGHT TORTOISE SHELL BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT TORTOISE SHELL BRACKET",
-      "name_zh": "右龟甲括号"
-    },
-    {
-      "text": "〈",
-      "name": "LEFT ANGLE BRACKET",
-      "emoji": false,
-      "name_en": "LEFT ANGLE BRACKET",
-      "name_zh": "左单书名号"
-    },
-    {
-      "text": "〉",
-      "name": "RIGHT ANGLE BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT ANGLE BRACKET",
-      "name_zh": "右单书名号"
-    },
-    {
-      "text": "{",
-      "name": "LEFT CURLY BRACKET",
-      "emoji": false,
-      "name_en": "LEFT CURLY BRACKET",
-      "name_zh": "左花括号"
-    },
-    {
-      "text": "}",
-      "name": "RIGHT CURLY BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT CURLY BRACKET",
-      "name_zh": "右花括号"
-    },
-    {
       "text": "［",
       "name": "FULLWIDTH LEFT SQUARE BRACKET",
       "emoji": false,
@@ -55922,20 +56350,6 @@
       "emoji": false,
       "name_en": "FULLWIDTH RIGHT SQUARE BRACKET",
       "name_zh": "全角右方括号"
-    },
-    {
-      "text": "「",
-      "name": "LEFT CORNER BRACKET",
-      "emoji": false,
-      "name_en": "LEFT CORNER BRACKET",
-      "name_zh": "左角引号"
-    },
-    {
-      "text": "」",
-      "name": "RIGHT CORNER BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT CORNER BRACKET",
-      "name_zh": "右角引号"
     },
     {
       "text": "｛",
@@ -55964,20 +56378,6 @@
       "emoji": false,
       "name_en": "RIGHT WHITE LENTICULAR BRACKET",
       "name_zh": "右白方头括号"
-    },
-    {
-      "text": "『",
-      "name": "LEFT WHITE CORNER BRACKET",
-      "emoji": false,
-      "name_en": "LEFT WHITE CORNER BRACKET",
-      "name_zh": "左双角引号"
-    },
-    {
-      "text": "』",
-      "name": "RIGHT WHITE CORNER BRACKET",
-      "emoji": false,
-      "name_en": "RIGHT WHITE CORNER BRACKET",
-      "name_zh": "右双角引号"
     },
     {
       "text": "︵",
@@ -56608,20 +57008,6 @@
       "emoji": false,
       "name_en": "MINUS SIGN",
       "name_zh": "减号"
-    },
-    {
-      "text": "–",
-      "name": "EN DASH",
-      "emoji": false,
-      "name_en": "EN DASH",
-      "name_zh": "连接号"
-    },
-    {
-      "text": "—",
-      "name": "EM DASH",
-      "emoji": false,
-      "name_en": "EM DASH",
-      "name_zh": "破折号"
     },
     {
       "text": "‸",
@@ -57735,90 +58121,6 @@
       "emoji": false,
       "name_en": "HALFWIDTH FORMS LIGHT VERTICAL",
       "name_zh": "半角Forms浅色垂直"
-    },
-    {
-      "text": "①",
-      "name": "CIRCLED DIGIT ONE",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT ONE",
-      "name_zh": "带圈数字一"
-    },
-    {
-      "text": "②",
-      "name": "CIRCLED DIGIT TWO",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT TWO",
-      "name_zh": "带圈数字二"
-    },
-    {
-      "text": "③",
-      "name": "CIRCLED DIGIT THREE",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT THREE",
-      "name_zh": "带圈数字三"
-    },
-    {
-      "text": "④",
-      "name": "CIRCLED DIGIT FOUR",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT FOUR",
-      "name_zh": "带圈数字四"
-    },
-    {
-      "text": "⑤",
-      "name": "CIRCLED DIGIT FIVE",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT FIVE",
-      "name_zh": "带圈数字五"
-    },
-    {
-      "text": "⑥",
-      "name": "CIRCLED DIGIT SIX",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT SIX",
-      "name_zh": "带圈数字六"
-    },
-    {
-      "text": "⑦",
-      "name": "CIRCLED DIGIT SEVEN",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT SEVEN",
-      "name_zh": "带圈数字七"
-    },
-    {
-      "text": "⑧",
-      "name": "CIRCLED DIGIT EIGHT",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT EIGHT",
-      "name_zh": "带圈数字八"
-    },
-    {
-      "text": "⑨",
-      "name": "CIRCLED DIGIT NINE",
-      "emoji": false,
-      "name_en": "CIRCLED DIGIT NINE",
-      "name_zh": "带圈数字九"
-    },
-    {
-      "text": "⑩",
-      "name": "CIRCLED NUMBER TEN",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TEN",
-      "name_zh": "带圈数字十"
-    },
-    {
-      "text": "⑪",
-      "name": "CIRCLED NUMBER ELEVEN",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER ELEVEN",
-      "name_zh": "带圈数字十一"
-    },
-    {
-      "text": "⑫",
-      "name": "CIRCLED NUMBER TWELVE",
-      "emoji": false,
-      "name_en": "CIRCLED NUMBER TWELVE",
-      "name_zh": "带圈数字十二"
     },
     {
       "text": "⑬",
@@ -61342,25 +61644,11 @@
       "name_zh": "Negative带方框拉丁大写字母Z"
     },
     {
-      "text": "±",
-      "name": "PLUS-MINUS SIGN",
-      "emoji": false,
-      "name_en": "PLUS-MINUS SIGN",
-      "name_zh": "正负号"
-    },
-    {
       "text": "∓",
       "name": "MINUS-OR-PLUS SIGN",
       "emoji": false,
       "name_en": "MINUS-OR-PLUS SIGN",
       "name_zh": "负正号"
-    },
-    {
-      "text": "÷",
-      "name": "DIVISION SIGN",
-      "emoji": false,
-      "name_en": "DIVISION SIGN",
-      "name_zh": "除号"
     },
     {
       "text": "∗",
@@ -61398,13 +61686,6 @@
       "name_zh": "四次方根"
     },
     {
-      "text": "∞",
-      "name": "INFINITY",
-      "emoji": false,
-      "name_en": "INFINITY",
-      "name_zh": "无穷大"
-    },
-    {
       "text": "∝",
       "name": "PROPORTIONAL TO",
       "emoji": false,
@@ -61417,20 +61698,6 @@
       "emoji": false,
       "name_en": "EQUALS SIGN",
       "name_zh": "等号"
-    },
-    {
-      "text": "≠",
-      "name": "NOT EQUAL TO",
-      "emoji": false,
-      "name_en": "NOT EQUAL TO",
-      "name_zh": "不等于"
-    },
-    {
-      "text": "≈",
-      "name": "ALMOST EQUAL TO",
-      "emoji": false,
-      "name_en": "ALMOST EQUAL TO",
-      "name_zh": "约等于"
     },
     {
       "text": "≉",
@@ -61452,20 +61719,6 @@
       "emoji": false,
       "name_en": "NOT IDENTICAL TO",
       "name_zh": "不恒等于"
-    },
-    {
-      "text": "≤",
-      "name": "LESS-THAN OR EQUAL TO",
-      "emoji": false,
-      "name_en": "LESS-THAN OR EQUAL TO",
-      "name_zh": "小于或等于"
-    },
-    {
-      "text": "≥",
-      "name": "GREATER-THAN OR EQUAL TO",
-      "emoji": false,
-      "name_en": "GREATER-THAN OR EQUAL TO",
-      "name_zh": "大于或等于"
     },
     {
       "text": "≪",
@@ -61510,20 +61763,6 @@
       "name_zh": "不大于或等于"
     },
     {
-      "text": "≲",
-      "name": "LESS-THAN OR EQUIVALENT TO",
-      "emoji": false,
-      "name_en": "LESS-THAN OR EQUIVALENT TO",
-      "name_zh": "Less-Than或Equivalent到"
-    },
-    {
-      "text": "≳",
-      "name": "GREATER-THAN OR EQUIVALENT TO",
-      "emoji": false,
-      "name_en": "GREATER-THAN OR EQUIVALENT TO",
-      "name_zh": "大于或等价于"
-    },
-    {
       "text": "≨",
       "name": "LESS-THAN BUT NOT EQUAL TO",
       "emoji": false,
@@ -61550,6 +61789,34 @@
       "emoji": false,
       "name_en": "NEITHER GREATER-THAN NOR EQUIVALENT TO",
       "name_zh": "NeitherGreater-ThanNorEquivalent到"
+    },
+    {
+      "text": "≸",
+      "name": "NEITHER LESS-THAN NOR GREATER-THAN",
+      "emoji": false,
+      "name_en": "NEITHER LESS-THAN NOR GREATER-THAN",
+      "name_zh": "NeitherLess-ThanNorGreater-Than"
+    },
+    {
+      "text": "≹",
+      "name": "NEITHER GREATER-THAN NOR LESS-THAN",
+      "emoji": false,
+      "name_en": "NEITHER GREATER-THAN NOR LESS-THAN",
+      "name_zh": "NeitherGreater-ThanNorLess-Than"
+    },
+    {
+      "text": "≲",
+      "name": "LESS-THAN OR EQUIVALENT TO",
+      "emoji": false,
+      "name_en": "LESS-THAN OR EQUIVALENT TO",
+      "name_zh": "Less-Than或Equivalent到"
+    },
+    {
+      "text": "≳",
+      "name": "GREATER-THAN OR EQUIVALENT TO",
+      "emoji": false,
+      "name_en": "GREATER-THAN OR EQUIVALENT TO",
+      "name_zh": "大于或等价于"
     },
     {
       "text": "≺",
@@ -61606,20 +61873,6 @@
       "emoji": false,
       "name_en": "GREATER-THAN OR LESS-THAN",
       "name_zh": "Greater-Than或Less-Than"
-    },
-    {
-      "text": "≸",
-      "name": "NEITHER LESS-THAN NOR GREATER-THAN",
-      "emoji": false,
-      "name_en": "NEITHER LESS-THAN NOR GREATER-THAN",
-      "name_zh": "NeitherLess-ThanNorGreater-Than"
-    },
-    {
-      "text": "≹",
-      "name": "NEITHER GREATER-THAN NOR LESS-THAN",
-      "emoji": false,
-      "name_en": "NEITHER GREATER-THAN NOR LESS-THAN",
-      "name_zh": "NeitherGreater-ThanNorLess-Than"
     },
     {
       "text": "≬",
@@ -61958,13 +62211,6 @@
       "name_zh": "梯度算子"
     },
     {
-      "text": "∫",
-      "name": "INTEGRAL",
-      "emoji": false,
-      "name_en": "INTEGRAL",
-      "name_zh": "积分"
-    },
-    {
       "text": "∬",
       "name": "DOUBLE INTEGRAL",
       "emoji": false,
@@ -62019,13 +62265,6 @@
       "emoji": false,
       "name_en": "ANTICLOCKWISE CONTOUR INTEGRAL",
       "name_zh": "AnticlockwiseContourIntegral"
-    },
-    {
-      "text": "∑",
-      "name": "N-ARY SUMMATION",
-      "emoji": false,
-      "name_en": "N-ARY SUMMATION",
-      "name_zh": "求和"
     },
     {
       "text": "∏",
@@ -63678,27 +63917,6 @@
       "emoji": false,
       "name_en": "FRACTION NUMERATOR ONE",
       "name_zh": "FractionNumerator一"
-    },
-    {
-      "text": "°",
-      "name": "DEGREE SIGN",
-      "emoji": false,
-      "name_en": "DEGREE SIGN",
-      "name_zh": "度数符号"
-    },
-    {
-      "text": "℃",
-      "name": "DEGREE CELSIUS",
-      "emoji": false,
-      "name_en": "DEGREE CELSIUS",
-      "name_zh": "摄氏度"
-    },
-    {
-      "text": "℉",
-      "name": "DEGREE FAHRENHEIT",
-      "emoji": false,
-      "name_en": "DEGREE FAHRENHEIT",
-      "name_zh": "华氏度"
     },
     {
       "text": "µ",
@@ -70199,7 +70417,7 @@
     {
       "text": "𤤴",
       "name": "CJK UNIFIED IDEOGRAPH-24934",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-24934",
       "name_zh": "中日韩统一表意文字 𤤴"
     },
@@ -70661,42 +70879,42 @@
     {
       "text": "𣊫",
       "name": "CJK UNIFIED IDEOGRAPH-232AB",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-232AB",
       "name_zh": "中日韩统一表意文字 𣊫"
     },
     {
       "text": "𣊷",
       "name": "CJK UNIFIED IDEOGRAPH-232B7",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-232B7",
       "name_zh": "中日韩统一表意文字 𣊷"
     },
     {
       "text": "𣥖",
       "name": "CJK UNIFIED IDEOGRAPH-23956",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-23956",
       "name_zh": "中日韩统一表意文字 𣥖"
     },
     {
       "text": "𦧚",
       "name": "CJK UNIFIED IDEOGRAPH-269DA",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-269DA",
       "name_zh": "中日韩统一表意文字 𦧚"
     },
     {
       "text": "𩡐",
       "name": "CJK UNIFIED IDEOGRAPH-29850",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-29850",
       "name_zh": "中日韩统一表意文字 𩡐"
     },
     {
       "text": "𪙹",
       "name": "CJK UNIFIED IDEOGRAPH-2A679",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2A679",
       "name_zh": "中日韩统一表意文字 𪙹"
     },
@@ -70822,35 +71040,35 @@
     {
       "text": "𡦪",
       "name": "CJK UNIFIED IDEOGRAPH-219AA",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-219AA",
       "name_zh": "中日韩统一表意文字 𡦪"
     },
     {
       "text": "𣊧",
       "name": "CJK UNIFIED IDEOGRAPH-232A7",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-232A7",
       "name_zh": "中日韩统一表意文字 𣊧"
     },
     {
       "text": "𣥕",
       "name": "CJK UNIFIED IDEOGRAPH-23955",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-23955",
       "name_zh": "中日韩统一表意文字 𣥕"
     },
     {
       "text": "𣬅",
       "name": "CJK UNIFIED IDEOGRAPH-23B05",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-23B05",
       "name_zh": "中日韩统一表意文字 𣬅"
     },
     {
       "text": "𩺰",
       "name": "CJK UNIFIED IDEOGRAPH-29EB0",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-29EB0",
       "name_zh": "中日韩统一表意文字 𩺰"
     },
@@ -70920,56 +71138,56 @@
     {
       "text": "𡥦",
       "name": "CJK UNIFIED IDEOGRAPH-21966",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-21966",
       "name_zh": "中日韩统一表意文字 𡥦"
     },
     {
       "text": "𦧵",
       "name": "CJK UNIFIED IDEOGRAPH-269F5",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-269F5",
       "name_zh": "中日韩统一表意文字 𦧵"
     },
     {
       "text": "𩧢",
       "name": "CJK UNIFIED IDEOGRAPH-299E2",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-299E2",
       "name_zh": "中日韩统一表意文字 𩧢"
     },
     {
       "text": "𢏝",
       "name": "CJK UNIFIED IDEOGRAPH-223DD",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-223DD",
       "name_zh": "中日韩统一表意文字 𢏝"
     },
     {
       "text": "𠬑",
       "name": "CJK UNIFIED IDEOGRAPH-20B11",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-20B11",
       "name_zh": "中日韩统一表意文字 𠬑"
     },
     {
       "text": "𧭛",
       "name": "CJK UNIFIED IDEOGRAPH-27B5B",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-27B5B",
       "name_zh": "中日韩统一表意文字 𧭛"
     },
     {
       "text": "𡕇",
       "name": "CJK UNIFIED IDEOGRAPH-21547",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-21547",
       "name_zh": "中日韩统一表意文字 𡕇"
     },
     {
       "text": "𧔗",
       "name": "CJK UNIFIED IDEOGRAPH-27517",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-27517",
       "name_zh": "中日韩统一表意文字 𧔗"
     },
@@ -71424,7 +71642,7 @@
     {
       "text": "𤾩",
       "name": "CJK UNIFIED IDEOGRAPH-24FA9",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-24FA9",
       "name_zh": "中日韩统一表意文字 𤾩"
     },
@@ -71459,77 +71677,77 @@
     {
       "text": "𣦴",
       "name": "CJK UNIFIED IDEOGRAPH-239B4",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-239B4",
       "name_zh": "中日韩统一表意文字 𣦴"
     },
     {
       "text": "𦜳",
       "name": "CJK UNIFIED IDEOGRAPH-26733",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-26733",
       "name_zh": "中日韩统一表意文字 𦜳"
     },
     {
       "text": "𥴒",
       "name": "CJK UNIFIED IDEOGRAPH-25D12",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-25D12",
       "name_zh": "中日韩统一表意文字 𥴒"
     },
     {
       "text": "𦏱",
       "name": "CJK UNIFIED IDEOGRAPH-263F1",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-263F1",
       "name_zh": "中日韩统一表意文字 𦏱"
     },
     {
       "text": "𦧅",
       "name": "CJK UNIFIED IDEOGRAPH-269C5",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-269C5",
       "name_zh": "中日韩统一表意文字 𦧅"
     },
     {
       "text": "𩖏",
       "name": "CJK UNIFIED IDEOGRAPH-2958F",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2958F",
       "name_zh": "中日韩统一表意文字 𩖏"
     },
     {
       "text": "𪈼",
       "name": "CJK UNIFIED IDEOGRAPH-2A23C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2A23C",
       "name_zh": "中日韩统一表意文字 𪈼"
     },
     {
       "text": "𠁼",
       "name": "CJK UNIFIED IDEOGRAPH-2007C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2007C",
       "name_zh": "中日韩统一表意文字 𠁼"
     },
     {
       "text": "𨑂",
       "name": "CJK UNIFIED IDEOGRAPH-28442",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-28442",
       "name_zh": "中日韩统一表意文字 𨑂"
     },
     {
       "text": "𠄕",
       "name": "CJK UNIFIED IDEOGRAPH-20115",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-20115",
       "name_zh": "中日韩统一表意文字 𠄕"
     },
     {
       "text": "𠚛",
       "name": "CJK UNIFIED IDEOGRAPH-2069B",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2069B",
       "name_zh": "中日韩统一表意文字 𠚛"
     },
@@ -71543,7 +71761,7 @@
     {
       "text": "𠦌",
       "name": "CJK UNIFIED IDEOGRAPH-2098C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2098C",
       "name_zh": "中日韩统一表意文字 𠦌"
     },
@@ -71592,7 +71810,7 @@
     {
       "text": "𠔻",
       "name": "CJK UNIFIED IDEOGRAPH-2053B",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2053B",
       "name_zh": "中日韩统一表意文字 𠔻"
     },
@@ -71613,28 +71831,28 @@
     {
       "text": "𠈌",
       "name": "CJK UNIFIED IDEOGRAPH-2020C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2020C",
       "name_zh": "中日韩统一表意文字 𠈌"
     },
     {
       "text": "𠫬",
       "name": "CJK UNIFIED IDEOGRAPH-20AEC",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-20AEC",
       "name_zh": "中日韩统一表意文字 𠫬"
     },
     {
       "text": "𡮐",
       "name": "CJK UNIFIED IDEOGRAPH-21B90",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-21B90",
       "name_zh": "中日韩统一表意文字 𡮐"
     },
     {
       "text": "𣊭",
       "name": "CJK UNIFIED IDEOGRAPH-232AD",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-232AD",
       "name_zh": "中日韩统一表意文字 𣊭"
     },
@@ -71648,133 +71866,133 @@
     {
       "text": "𡚌",
       "name": "CJK UNIFIED IDEOGRAPH-2168C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2168C",
       "name_zh": "中日韩统一表意文字 𡚌"
     },
     {
       "text": "𤛭",
       "name": "CJK UNIFIED IDEOGRAPH-246ED",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-246ED",
       "name_zh": "中日韩统一表意文字 𤛭"
     },
     {
       "text": "𤳳",
       "name": "CJK UNIFIED IDEOGRAPH-24CF3",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-24CF3",
       "name_zh": "中日韩统一表意文字 𤳳"
     },
     {
       "text": "𥗉",
       "name": "CJK UNIFIED IDEOGRAPH-255C9",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-255C9",
       "name_zh": "中日韩统一表意文字 𥗉"
     },
     {
       "text": "𠁠",
       "name": "CJK UNIFIED IDEOGRAPH-20060",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-20060",
       "name_zh": "中日韩统一表意文字 𠁠"
     },
     {
       "text": "𡈶",
       "name": "CJK UNIFIED IDEOGRAPH-21236",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-21236",
       "name_zh": "中日韩统一表意文字 𡈶"
     },
     {
       "text": "𤳵",
       "name": "CJK UNIFIED IDEOGRAPH-24CF5",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-24CF5",
       "name_zh": "中日韩统一表意文字 𤳵"
     },
     {
       "text": "𣡍",
       "name": "CJK UNIFIED IDEOGRAPH-2384D",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2384D",
       "name_zh": "中日韩统一表意文字 𣡍"
     },
     {
       "text": "𠓙",
       "name": "CJK UNIFIED IDEOGRAPH-204D9",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-204D9",
       "name_zh": "中日韩统一表意文字 𠓙"
     },
     {
       "text": "𥷹",
       "name": "CJK UNIFIED IDEOGRAPH-25DF9",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-25DF9",
       "name_zh": "中日韩统一表意文字 𥷹"
     },
     {
       "text": "𦓋",
       "name": "CJK UNIFIED IDEOGRAPH-264CB",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-264CB",
       "name_zh": "中日韩统一表意文字 𦓋"
     },
     {
       "text": "𧮦",
       "name": "CJK UNIFIED IDEOGRAPH-27BA6",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-27BA6",
       "name_zh": "中日韩统一表意文字 𧮦"
     },
     {
       "text": "𨏿",
       "name": "CJK UNIFIED IDEOGRAPH-283FF",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-283FF",
       "name_zh": "中日韩统一表意文字 𨏿"
     },
     {
       "text": "𨰻",
       "name": "CJK UNIFIED IDEOGRAPH-28C3B",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-28C3B",
       "name_zh": "中日韩统一表意文字 𨰻"
     },
     {
       "text": "𣡾",
       "name": "CJK UNIFIED IDEOGRAPH-2387E",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2387E",
       "name_zh": "中日韩统一表意文字 𣡾"
     },
     {
       "text": "𨷾",
       "name": "CJK UNIFIED IDEOGRAPH-28DFE",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-28DFE",
       "name_zh": "中日韩统一表意文字 𨷾"
     },
     {
       "text": "𩙡",
       "name": "CJK UNIFIED IDEOGRAPH-29661",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-29661",
       "name_zh": "中日韩统一表意文字 𩙡"
     },
     {
       "text": "𣌠",
       "name": "CJK UNIFIED IDEOGRAPH-23320",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-23320",
       "name_zh": "中日韩统一表意文字 𣌠"
     },
     {
       "text": "𤆁",
       "name": "CJK UNIFIED IDEOGRAPH-24181",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-24181",
       "name_zh": "中日韩统一表意文字 𤆁"
     },
@@ -71788,7 +72006,7 @@
     {
       "text": "𩇔",
       "name": "CJK UNIFIED IDEOGRAPH-291D4",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-291D4",
       "name_zh": "中日韩统一表意文字 𩇔"
     },
@@ -71802,21 +72020,21 @@
     {
       "text": "𪚥",
       "name": "CJK UNIFIED IDEOGRAPH-2A6A5",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2A6A5",
       "name_zh": "中日韩统一表意文字 𪚥"
     },
     {
       "text": "𠾅",
       "name": "CJK UNIFIED IDEOGRAPH-20F85",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-20F85",
       "name_zh": "中日韩统一表意文字 𠾅"
     },
     {
       "text": "𠉭",
       "name": "CJK UNIFIED IDEOGRAPH-2026D",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2026D",
       "name_zh": "中日韩统一表意文字 𠉭"
     },
@@ -71830,35 +72048,35 @@
     {
       "text": "𣡕",
       "name": "CJK UNIFIED IDEOGRAPH-23855",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-23855",
       "name_zh": "中日韩统一表意文字 𣡕"
     },
     {
       "text": "𡿭",
       "name": "CJK UNIFIED IDEOGRAPH-21FED",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-21FED",
       "name_zh": "中日韩统一表意文字 𡿭"
     },
     {
       "text": "𣡽",
       "name": "CJK UNIFIED IDEOGRAPH-2387D",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2387D",
       "name_zh": "中日韩统一表意文字 𣡽"
     },
     {
       "text": "𰻝",
       "name": "CJK UNIFIED IDEOGRAPH-30EDD",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-30EDD",
       "name_zh": "中日韩统一表意文字 𰻝"
     },
     {
       "text": "𱁬",
       "name": "CJK UNIFIED IDEOGRAPH-3106C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-3106C",
       "name_zh": "中日韩统一表意文字 𱁬"
     },
@@ -71942,21 +72160,21 @@
     {
       "text": "𠃊",
       "name": "CJK UNIFIED IDEOGRAPH-200CA",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-200CA",
       "name_zh": "中日韩统一表意文字 𠃊"
     },
     {
       "text": "𠃎",
       "name": "CJK UNIFIED IDEOGRAPH-200CE",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-200CE",
       "name_zh": "中日韩统一表意文字 𠃎"
     },
     {
       "text": "𠃍",
       "name": "CJK UNIFIED IDEOGRAPH-200CD",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-200CD",
       "name_zh": "中日韩统一表意文字 𠃍"
     },
@@ -71998,28 +72216,28 @@
     {
       "text": "𠄌",
       "name": "CJK UNIFIED IDEOGRAPH-2010C",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-2010C",
       "name_zh": "中日韩统一表意文字 𠄌"
     },
     {
       "text": "𠃋",
       "name": "CJK UNIFIED IDEOGRAPH-200CB",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-200CB",
       "name_zh": "中日韩统一表意文字 𠃋"
     },
     {
       "text": "𡿨",
       "name": "CJK UNIFIED IDEOGRAPH-21FE8",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-21FE8",
       "name_zh": "中日韩统一表意文字 𡿨"
     },
     {
       "text": "𠃌",
       "name": "CJK UNIFIED IDEOGRAPH-200CC",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-200CC",
       "name_zh": "中日韩统一表意文字 𠃌"
     },
@@ -72264,7 +72482,7 @@
     {
       "text": "𠘨",
       "name": "CJK UNIFIED IDEOGRAPH-20628",
-      "emoji": true,
+      "emoji": false,
       "name_en": "CJK UNIFIED IDEOGRAPH-20628",
       "name_zh": "中日韩统一表意文字 𠘨"
     },
@@ -91752,70 +91970,70 @@
     {
       "text": "0",
       "name": "DIGIT ZERO",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT ZERO",
       "name_zh": "数字零"
     },
     {
       "text": "1",
       "name": "DIGIT ONE",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT ONE",
       "name_zh": "数字一"
     },
     {
       "text": "2",
       "name": "DIGIT TWO",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT TWO",
       "name_zh": "数字二"
     },
     {
       "text": "3",
       "name": "DIGIT THREE",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT THREE",
       "name_zh": "数字三"
     },
     {
       "text": "4",
       "name": "DIGIT FOUR",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT FOUR",
       "name_zh": "数字四"
     },
     {
       "text": "5",
       "name": "DIGIT FIVE",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT FIVE",
       "name_zh": "数字五"
     },
     {
       "text": "6",
       "name": "DIGIT SIX",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT SIX",
       "name_zh": "数字六"
     },
     {
       "text": "7",
       "name": "DIGIT SEVEN",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT SEVEN",
       "name_zh": "数字七"
     },
     {
       "text": "8",
       "name": "DIGIT EIGHT",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT EIGHT",
       "name_zh": "数字八"
     },
     {
       "text": "9",
       "name": "DIGIT NINE",
-      "emoji": true,
+      "emoji": false,
       "name_en": "DIGIT NINE",
       "name_zh": "数字九"
     },
@@ -97201,20 +97419,6 @@
       "emoji": false,
       "name_en": "RIGHT WHITE SQUARE BRACKET",
       "name_zh": "右白方括号"
-    },
-    {
-      "text": "（",
-      "name": "FULLWIDTH LEFT PARENTHESIS",
-      "emoji": false,
-      "name_en": "FULLWIDTH LEFT PARENTHESIS",
-      "name_zh": "全角左圆括号"
-    },
-    {
-      "text": "）",
-      "name": "FULLWIDTH RIGHT PARENTHESIS",
-      "emoji": false,
-      "name_en": "FULLWIDTH RIGHT PARENTHESIS",
-      "name_zh": "全角右圆括号"
     },
     {
       "text": "﹙",
@@ -158830,8 +159034,6 @@
     "日文字符",
     "韩文字符",
     "东亚字符",
-    "大篆",
-    "小篆",
     "俄文字符",
     "古埃及文字",
     "象形文字",
@@ -158843,13 +159045,35 @@
       "日文字符",
       "韩文字符",
       "东亚字符",
-      "大篆",
-      "小篆",
       "俄文字符",
       "古埃及文字",
       "象形文字"
     ]
   },
+  "ui_main_category_indices": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "ui_other_category_indices": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ],
   "name_languages": [
     "zh-CN",
     "en"

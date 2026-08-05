@@ -1,7 +1,9 @@
 # CMake / Visual Studio build outputs
 /build/
 /dist/
+/dist-web/
 /dist-debug/
+/data-source/emoji-images/
 /.vs/
 /out/
 

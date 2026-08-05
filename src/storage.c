@@ -4,19 +4,35 @@
 #include <string.h>
 
 #define YS_COMMON_MAGIC 0x31435359u
-#define YS_COMMON_VERSION 2u
+#define YS_COMMON_VERSION 3u
 #define YS_USAGE_MAGIC 0x31555359u
 #define YS_USAGE_VERSION 1u
 
 static const WCHAR *YS_REG_PATH = L"Software\\YeTools\\YeSymbol";
 
-typedef struct YSCommonPersist {
+typedef struct YSCommonItemV2 {
+    WCHAR text[YS_MAX_SEQUENCE];
+    uint32_t use_count;
+    uint32_t serial;
+} YSCommonItemV2;
+
+typedef struct YSCommonPersistV2 {
     uint32_t magic;
     uint32_t version;
     uint32_t count;
     uint32_t next_serial;
+    YSCommonItemV2 items[YS_MAX_COMMON];
+} YSCommonPersistV2;
+
+typedef struct YSCommonPersistV3 {
+    uint32_t magic;
+    uint32_t version;
+    uint32_t count;
+    uint32_t next_serial;
+    uint32_t suppressed_count;
     YSCommonItem items[YS_MAX_COMMON];
-} YSCommonPersist;
+    WCHAR suppressed[YS_MAX_COMMON_SUPPRESSED][YS_MAX_SEQUENCE];
+} YSCommonPersistV3;
 
 typedef struct YSUsagePersist {
     uint32_t magic;
@@ -152,15 +168,60 @@ int ys_common_find(const YSCommonList *list, const WCHAR *text) {
 }
 
 BOOL ys_common_add(YSCommonList *list, const WCHAR *text, uint32_t use_count) {
+    return ys_common_add_user(list, text, use_count);
+}
+
+static BOOL ys_common_append(YSCommonList *list, const WCHAR *text, uint32_t use_count,
+                             uint32_t serial, uint32_t origin) {
     YSCommonItem *item;
     if (!list || !text || !text[0] || list->count >= YS_MAX_COMMON || ys_common_find(list, text) >= 0) return FALSE;
     item = &list->items[list->count++];
     ZeroMemory(item, sizeof(*item));
     ys_copy_sequence(item->text, text);
     item->use_count = use_count;
-    item->serial = list->next_serial++;
+    item->serial = serial ? serial : list->next_serial++;
+    item->origin = origin;
+    if (item->serial >= list->next_serial) list->next_serial = item->serial + 1u;
     if (!list->next_serial) list->next_serial = 1u;
     return TRUE;
+}
+
+static int ys_common_suppression_find(const YSCommonList *list, const WCHAR *text) {
+    size_t index;
+    if (!list || !text) return -1;
+    for (index = 0; index < list->suppressed_count; ++index) {
+        if (wcscmp(list->suppressed[index], text) == 0) return (int)index;
+    }
+    return -1;
+}
+
+BOOL ys_common_is_suppressed(const YSCommonList *list, const WCHAR *text) {
+    return ys_common_suppression_find(list, text) >= 0;
+}
+
+static BOOL ys_common_suppress(YSCommonList *list, const WCHAR *text) {
+    if (!list || !text || !text[0] || ys_common_is_suppressed(list, text)) return FALSE;
+    if (list->suppressed_count >= YS_MAX_COMMON_SUPPRESSED) return FALSE;
+    ys_copy_sequence(list->suppressed[list->suppressed_count++], text);
+    return TRUE;
+}
+
+static BOOL ys_common_unsuppress(YSCommonList *list, const WCHAR *text) {
+    int found = ys_common_suppression_find(list, text);
+    size_t index;
+    if (found < 0) return FALSE;
+    for (index = (size_t)found; index + 1u < list->suppressed_count; ++index) {
+        ys_copy_sequence(list->suppressed[index], list->suppressed[index + 1u]);
+    }
+    --list->suppressed_count;
+    list->suppressed[list->suppressed_count][0] = 0;
+    return TRUE;
+}
+
+BOOL ys_common_add_user(YSCommonList *list, const WCHAR *text, uint32_t use_count) {
+    if (!list || !text || !text[0]) return FALSE;
+    ys_common_unsuppress(list, text);
+    return ys_common_append(list, text, use_count, 0u, YS_COMMON_ORIGIN_USER);
 }
 
 BOOL ys_common_increment(YSCommonList *list, const WCHAR *text) {
@@ -173,6 +234,9 @@ BOOL ys_common_increment(YSCommonList *list, const WCHAR *text) {
 BOOL ys_common_remove(YSCommonList *list, size_t remove_index) {
     size_t index;
     if (!list || remove_index >= list->count) return FALSE;
+    if (list->items[remove_index].origin == YS_COMMON_ORIGIN_DEFAULT) {
+        ys_common_suppress(list, list->items[remove_index].text);
+    }
     for (index = remove_index; index + 1u < list->count; ++index) list->items[index] = list->items[index + 1u];
     --list->count;
     ZeroMemory(&list->items[list->count], sizeof(list->items[0]));
@@ -206,6 +270,9 @@ static void ys_common_normalize(YSCommonList *list) {
             if (wcscmp(list->items[existing].text, item.text) == 0) break;
         }
         if (existing < write_index) continue;
+        if (item.origin != YS_COMMON_ORIGIN_DEFAULT && item.origin != YS_COMMON_ORIGIN_USER) {
+            item.origin = YS_COMMON_ORIGIN_USER;
+        }
         if (!item.serial) item.serial = maximum_serial + 1u;
         if (item.serial > maximum_serial) maximum_serial = item.serial;
         list->items[write_index++] = item;
@@ -214,22 +281,157 @@ static void ys_common_normalize(YSCommonList *list) {
     while (write_index < YS_MAX_COMMON) ZeroMemory(&list->items[write_index++], sizeof(list->items[0]));
     if (list->next_serial <= maximum_serial) list->next_serial = maximum_serial + 1u;
     if (!list->next_serial) list->next_serial = 1u;
+
+    write_index = 0;
+    for (read_index = 0; read_index < list->suppressed_count && read_index < YS_MAX_COMMON_SUPPRESSED; ++read_index) {
+        size_t existing;
+        if (!list->suppressed[read_index][0]) continue;
+        for (existing = 0; existing < write_index; ++existing) {
+            if (wcscmp(list->suppressed[existing], list->suppressed[read_index]) == 0) break;
+        }
+        if (existing < write_index) continue;
+        if (write_index != read_index) ys_copy_sequence(list->suppressed[write_index], list->suppressed[read_index]);
+        ++write_index;
+    }
+    list->suppressed_count = write_index;
+    while (write_index < YS_MAX_COMMON_SUPPRESSED) list->suppressed[write_index++][0] = 0;
 }
 
-static BOOL ys_load_common_value(HKEY key, const WCHAR *value_name, uint32_t expected_version,
-                                 YSCommonList *list) {
+static BOOL ys_common_text_in_defaults(const WCHAR *text, const WCHAR *const *defaults, size_t default_count) {
+    size_t index;
+    if (!text || !defaults) return FALSE;
+    for (index = 0; index < default_count; ++index) {
+        if (defaults[index] && wcscmp(text, defaults[index]) == 0) return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL ys_common_list_equal(const YSCommonList *left, const YSCommonList *right) {
+    if (left->count != right->count || left->next_serial != right->next_serial ||
+        left->suppressed_count != right->suppressed_count || left->loaded_version != right->loaded_version) return FALSE;
+    if (memcmp(left->items, right->items, left->count * sizeof(left->items[0])) != 0) return FALSE;
+    return memcmp(left->suppressed, right->suppressed,
+                  left->suppressed_count * sizeof(left->suppressed[0])) == 0;
+}
+
+BOOL ys_common_reconcile(YSCommonList *list, const WCHAR *const *defaults, size_t default_count) {
+    YSCommonList before;
+    YSCommonItem existing[YS_MAX_COMMON];
+    size_t existing_count;
+    size_t index;
+    if (!list || (!defaults && default_count)) return FALSE;
+    if (default_count > YS_MAX_COMMON) default_count = YS_MAX_COMMON;
+    before = *list;
+    ys_common_normalize(list);
+
+    if (list->loaded_version > 0u && list->loaded_version < YS_COMMON_VERSION) {
+        for (index = 0; index < list->count; ++index) {
+            list->items[index].origin = ys_common_text_in_defaults(list->items[index].text, defaults, default_count)
+                                            ? YS_COMMON_ORIGIN_DEFAULT : YS_COMMON_ORIGIN_USER;
+        }
+        for (index = 0; index < default_count; ++index) {
+            if (ys_common_find(list, defaults[index]) < 0) ys_common_suppress(list, defaults[index]);
+        }
+    }
+
+    /* Drop stale suppressions so the fixed array can always represent the
+       complete current default set. */
+    for (index = list->suppressed_count; index > 0; --index) {
+        if (!ys_common_text_in_defaults(list->suppressed[index - 1u], defaults, default_count)) {
+            ys_common_unsuppress(list, list->suppressed[index - 1u]);
+        }
+    }
+
+    existing_count = list->count;
+    memcpy(existing, list->items, existing_count * sizeof(existing[0]));
+    ZeroMemory(list->items, sizeof(list->items));
+    list->count = 0;
+
+    /* Surviving defaults keep the user's established relative order. */
+    for (index = 0; index < existing_count; ++index) {
+        YSCommonItem *item = &existing[index];
+        if (item->origin == YS_COMMON_ORIGIN_DEFAULT &&
+            ys_common_text_in_defaults(item->text, defaults, default_count) &&
+            !ys_common_is_suppressed(list, item->text)) {
+            ys_common_append(list, item->text, item->use_count, item->serial, YS_COMMON_ORIGIN_DEFAULT);
+        }
+    }
+
+    /* New generated defaults are inserted after surviving defaults, in the
+       catalog's order, unless a user explicitly suppressed them. */
+    for (index = 0; index < default_count; ++index) {
+        size_t existing_index;
+        BOOL user_item_exists = FALSE;
+        for (existing_index = 0; existing_index < existing_count; ++existing_index) {
+            if (existing[existing_index].origin == YS_COMMON_ORIGIN_USER &&
+                wcscmp(existing[existing_index].text, defaults[index]) == 0) {
+                user_item_exists = TRUE;
+                break;
+            }
+        }
+        if (!user_item_exists && !ys_common_is_suppressed(list, defaults[index]) &&
+            ys_common_find(list, defaults[index]) < 0) {
+            ys_common_append(list, defaults[index], 0u, 0u, YS_COMMON_ORIGIN_DEFAULT);
+        }
+    }
+
+    /* Learned/manual items always survive and remain in their relative order. */
+    for (index = 0; index < existing_count; ++index) {
+        YSCommonItem *item = &existing[index];
+        if (item->origin == YS_COMMON_ORIGIN_USER && ys_common_find(list, item->text) < 0) {
+            ys_common_append(list, item->text, item->use_count, item->serial, YS_COMMON_ORIGIN_USER);
+        }
+    }
+    list->loaded_version = YS_COMMON_VERSION;
+    return !ys_common_list_equal(&before, list);
+}
+
+static BOOL ys_load_common_v3(HKEY key, YSCommonList *list) {
     DWORD type = 0;
-    DWORD bytes = sizeof(YSCommonPersist);
-    YSCommonPersist *persist;
+    DWORD bytes = sizeof(YSCommonPersistV3);
+    YSCommonPersistV3 *persist;
     BOOL loaded = FALSE;
-    persist = (YSCommonPersist *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*persist));
+    persist = (YSCommonPersistV3 *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*persist));
+    if (!persist) return FALSE;
+    if (RegQueryValueExW(key, L"CommonV3", NULL, &type, (BYTE *)persist, &bytes) == ERROR_SUCCESS &&
+        type == REG_BINARY && bytes == sizeof(*persist) && persist->magic == YS_COMMON_MAGIC &&
+        persist->version == YS_COMMON_VERSION && persist->count <= YS_MAX_COMMON &&
+        persist->suppressed_count <= YS_MAX_COMMON_SUPPRESSED) {
+        list->count = persist->count;
+        list->next_serial = persist->next_serial ? persist->next_serial : 1u;
+        memcpy(list->items, persist->items, persist->count * sizeof(YSCommonItem));
+        list->suppressed_count = persist->suppressed_count;
+        memcpy(list->suppressed, persist->suppressed,
+               persist->suppressed_count * sizeof(list->suppressed[0]));
+        list->loaded_version = YS_COMMON_VERSION;
+        ys_common_normalize(list);
+        loaded = TRUE;
+    }
+    HeapFree(GetProcessHeap(), 0, persist);
+    return loaded;
+}
+
+static BOOL ys_load_common_legacy(HKEY key, const WCHAR *value_name, uint32_t expected_version,
+                                  YSCommonList *list) {
+    DWORD type = 0;
+    DWORD bytes = sizeof(YSCommonPersistV2);
+    YSCommonPersistV2 *persist;
+    BOOL loaded = FALSE;
+    size_t index;
+    persist = (YSCommonPersistV2 *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*persist));
     if (!persist) return FALSE;
     if (RegQueryValueExW(key, value_name, NULL, &type, (BYTE *)persist, &bytes) == ERROR_SUCCESS &&
         type == REG_BINARY && bytes == sizeof(*persist) && persist->magic == YS_COMMON_MAGIC &&
         persist->version == expected_version && persist->count <= YS_MAX_COMMON) {
         list->count = persist->count;
         list->next_serial = persist->next_serial ? persist->next_serial : 1u;
-        memcpy(list->items, persist->items, persist->count * sizeof(YSCommonItem));
+        for (index = 0; index < persist->count; ++index) {
+            ys_copy_sequence(list->items[index].text, persist->items[index].text);
+            list->items[index].use_count = persist->items[index].use_count;
+            list->items[index].serial = persist->items[index].serial;
+            list->items[index].origin = YS_COMMON_ORIGIN_USER;
+        }
+        list->loaded_version = expected_version;
         ys_common_normalize(list);
         loaded = TRUE;
     }
@@ -240,34 +442,33 @@ static BOOL ys_load_common_value(HKEY key, const WCHAR *value_name, uint32_t exp
 BOOL ys_storage_load_common(YSCommonList *list) {
     HKEY key;
     BOOL loaded = FALSE;
-    BOOL migrated = FALSE;
     if (!list) return FALSE;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, YS_REG_PATH, 0, KEY_QUERY_VALUE, &key) != ERROR_SUCCESS) return FALSE;
-    loaded = ys_load_common_value(key, L"CommonV2", YS_COMMON_VERSION, list);
-    if (!loaded) {
-        loaded = ys_load_common_value(key, L"CommonV1", 1u, list);
-        migrated = loaded;
-    }
+    loaded = ys_load_common_v3(key, list);
+    if (!loaded) loaded = ys_load_common_legacy(key, L"CommonV2", 2u, list);
+    if (!loaded) loaded = ys_load_common_legacy(key, L"CommonV1", 1u, list);
     RegCloseKey(key);
-    if (migrated) ys_storage_save_common(list);
     return loaded;
 }
 
 void ys_storage_save_common(const YSCommonList *list) {
     HKEY key;
     DWORD disposition;
-    YSCommonPersist *persist;
+    YSCommonPersistV3 *persist;
     if (!list) return;
-    persist = (YSCommonPersist *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*persist));
+    persist = (YSCommonPersistV3 *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, sizeof(*persist));
     if (!persist) return;
     persist->magic = YS_COMMON_MAGIC;
     persist->version = YS_COMMON_VERSION;
     persist->count = (uint32_t)list->count;
     persist->next_serial = list->next_serial;
+    persist->suppressed_count = (uint32_t)list->suppressed_count;
     memcpy(persist->items, list->items, list->count * sizeof(YSCommonItem));
+    memcpy(persist->suppressed, list->suppressed,
+           list->suppressed_count * sizeof(list->suppressed[0]));
     if (RegCreateKeyExW(HKEY_CURRENT_USER, YS_REG_PATH, 0, NULL, 0, KEY_SET_VALUE, NULL,
                         &key, &disposition) == ERROR_SUCCESS) {
-        RegSetValueExW(key, L"CommonV2", 0, REG_BINARY, (const BYTE *)persist, sizeof(*persist));
+        RegSetValueExW(key, L"CommonV3", 0, REG_BINARY, (const BYTE *)persist, sizeof(*persist));
         RegCloseKey(key);
     }
     HeapFree(GetProcessHeap(), 0, persist);

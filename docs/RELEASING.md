@@ -11,16 +11,16 @@ README.md
 RELEASE_NOTES.md
 ```
 
-下一候选版建议使用：
+当前发布版本：
 
 ```text
-1.0.3-rc1
+1.1.0
 ```
 
-当前正式版：
+Git 标签：
 
 ```text
-1.0.3-rc1
+v1.1.0
 ```
 
 ## 2. 数据生成和检查
@@ -35,6 +35,9 @@ RELEASE_NOTES.md
 
 ```powershell
 py -3 tests\static_check.py
+py -3 tests\emoji_images_check.py
+cmake --build build --config Release --target common_v3_check
+.\build\Release\common_v3_check.exe
 ```
 
 ## 3. 干净构建
@@ -62,7 +65,7 @@ dist\yesymbol.exe
 - 中英文搜索；
 - Unicode 编码搜索；
 - 最近使用；
-- 常用收藏、删除和频率排序；
+- 常用收藏、删除、拖动排序和默认项升级合并；
 - 自定义添加和删除；
 - 托盘隐藏、恢复和退出；
 - Explorer 重启后的托盘恢复；
@@ -70,7 +73,7 @@ dist\yesymbol.exe
 - 固定窗口尺寸和所有长分类名称；
 - EXE、标题栏、任务栏和托盘图标；
 - 标题栏图标系统菜单与托盘菜单中的“关于”；
-- 邮箱链接和网页版链接。
+- 邮箱、GitHub、Unicode List 和网页版链接。
 
 ## 5. 生成校验值
 
@@ -82,7 +85,7 @@ Get-FileHash .\dist\yesymbol.exe -Algorithm SHA256 |
 建议把结果保存为：
 
 ```text
-yesymbol-v1.0.3-rc1.sha256
+yesymbol-v1.1.0.sha256
 ```
 
 ## 6. GitHub Release 内容
@@ -91,8 +94,8 @@ yesymbol-v1.0.3-rc1.sha256
 
 ```text
 yesymbol.exe                        用户运行文件
-yesymbol-v1.0.3-rc1.zip     源码包
-yesymbol-v1.0.3-rc1.sha256         校验值
+yesymbol-v1.1.0-windows-x64.zip    Windows 便携包
+yesymbol-v1.1.0.sha256             校验值
 ```
 
 Release 说明至少包含：
@@ -112,6 +115,8 @@ Release 说明至少包含：
 build\
 dist\
 dist-debug\
+dist-web\
+data-source\emoji-images\
 .vs\
 __pycache__\
 ```

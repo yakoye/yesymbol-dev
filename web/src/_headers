@@ -1,0 +1,17 @@
+/index.html
+  Cache-Control: no-cache
+
+/data/*
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/assets/*
+  Cache-Control: public, max-age=3600
+
+/icons/*
+  Cache-Control: public, max-age=86400
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()

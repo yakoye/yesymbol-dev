@@ -55,10 +55,12 @@
 #define YS_TIMER_SEARCH 2u
 #define YS_TIMER_STORAGE 3u
 #define YS_TIMER_SEARCH_HISTORY 4u
+#define YS_TIMER_CLIPBOARD 5u
 #define YS_SEARCH_DEBOUNCE_MS 90u
 #define YS_STORAGE_FLUSH_MS 350u
 #define YS_SEARCH_HISTORY_COMMIT_MS 650u
 #define YS_FOREGROUND_POLL_MS 150u
+#define YS_CLIPBOARD_RETRY_MS 10u
 #define YS_STORAGE_DIRTY_RECENT 0x01u
 #define YS_STORAGE_DIRTY_COMMON 0x02u
 #define YS_STORAGE_DIRTY_CUSTOM 0x04u
@@ -73,18 +75,6 @@
 #define ID_MENU_TONE_BASE 2300
 #define YS_MAX_TONE_OPTIONS 6
 #define YS_MAX_VISIBLE_EMOJI_DRAWS 512u
-
-static const WCHAR *g_ys_main_category_names[] = {
-    L"特殊符号", L"标点符号", L"序号字母", L"数学/单位", L"希腊/拉丁",
-    L"拼音/注音", L"中文字符", L"英文音标", L"制表符",
-    L"Emoji·表情与人物", L"Emoji·动物与自然", L"Emoji·食物与活动",
-    L"Emoji·旅行与物品", L"Emoji·符号与旗帜"
-};
-
-static const WCHAR *g_ys_other_category_names[] = {
-    L"日文字符", L"韩文字符", L"东亚字符", L"大篆", L"小篆",
-    L"俄文字符", L"古埃及文字", L"象形文字"
-};
 
 typedef struct YSViewSymbol {
     const WCHAR *text;
@@ -219,6 +209,7 @@ typedef struct YSAppState {
     int grid_buffer_height;
     WCHAR search_header[96];
     WCHAR search_history_draft[YS_MAX_QUERY];
+    WCHAR pending_clipboard[YS_MAX_SEQUENCE];
     WCHAR tooltip_text[1280];
 } YSAppState;
 
@@ -555,34 +546,6 @@ static void ys_layout_symbol_range(YSAppState *state, size_t first_view, size_t 
     *y += rows * YS_CELL_H + YS_GROUP_GAP;
 }
 
-static void ys_layout_symbol_range_fit_columns(YSAppState *state, size_t first_view, size_t count,
-                                               int requested_columns, int *y,
-                                               uint16_t category_index, uint16_t row_number) {
-    int columns = max(1, min(YS_MAX_COLUMNS, requested_columns));
-    int available_width = max(columns, ys_grid_width(state) - 8);
-    int cell_width = max(24, available_width / columns);
-    size_t i;
-    int rows;
-    for (i = 0; i < count; ++i) {
-        int row = (int)(i / (size_t)columns);
-        int column = (int)(i % (size_t)columns);
-        YSLayoutItem item;
-        ZeroMemory(&item, sizeof(item));
-        item.type = YS_ITEM_SYMBOL;
-        item.view_index = (uint32_t)(first_view + i);
-        item.category_index = category_index;
-        item.row_number = row_number;
-        item.column_number = (uint16_t)(i + 1u);
-        item.rect.left = 4 + column * cell_width;
-        item.rect.top = *y + row * YS_CELL_H;
-        item.rect.right = (column == columns - 1) ? ys_grid_width(state) - 4 : item.rect.left + cell_width - 2;
-        item.rect.bottom = item.rect.top + YS_CELL_H - 2;
-        ys_append_layout(state, &item);
-    }
-    rows = count ? (int)((count + (size_t)columns - 1u) / (size_t)columns) : 0;
-    *y += rows * YS_CELL_H + YS_GROUP_GAP;
-}
-
 static void ys_reset_virtual_layout(YSAppState *state) {
     if (!state) return;
     state->virtual_group_count = 0;
@@ -763,7 +726,7 @@ static void ys_build_common(YSAppState *state, int *y) {
                        YS_SOURCE_COMMON, (uint16_t)index);
     }
     ys_layout_group_begin(state, L"常用符号（拖动排序，右键删除）", y);
-    ys_layout_symbol_range_fit_columns(state, first, state->view_count - first, 12, y, UINT16_MAX, 0);
+    ys_layout_symbol_range(state, first, state->view_count - first, 12, y, UINT16_MAX, 0);
 }
 
 static void ys_build_dynamic(YSAppState *state, YSDynamicList *list, uint16_t source, const WCHAR *title, int *y) {
@@ -1073,21 +1036,47 @@ static void ys_capture_external_target(YSAppState *state) {
  * surrogate as two consecutive events, which is exactly how Windows text
  * controls expect to reassemble a supplementary-plane character from
  * injected input. */
+static BOOL ys_focus_accepts_direct_chars(HWND focus) {
+    WCHAR class_name[96];
+    if (!focus || !GetClassNameW(focus, class_name, YS_ARRAY_COUNT(class_name))) return FALSE;
+    return _wcsicmp(class_name, L"Edit") == 0 ||
+           _wcsicmp(class_name, L"Scintilla") == 0 ||
+           _wcsnicmp(class_name, L"RichEdit", 8) == 0 ||
+           _wcsnicmp(class_name, L"RICHEDIT", 8) == 0 ||
+           _wcsnicmp(class_name, L"WindowsForms10.EDIT", 19) == 0;
+}
+
 static BOOL ys_send_auto_insert(YSAppState *state, const WCHAR *text) {
     INPUT inputs[YS_MAX_SEQUENCE * 2u];
     HWND root, focus;
     DWORD target_thread, current_thread;
     BOOL attached = FALSE;
     size_t length, i;
-    int attempt;
     UINT sent;
+    HWND foreground;
     if (!state || !text || !text[0]) return FALSE;
     length = wcslen(text);
     if (length > YS_ARRAY_COUNT(inputs) / 2u) return FALSE;
+    /* Grid clicks use MA_NOACTIVATE, so the real target should still be
+     * foreground. Refresh it at the exact click instead of relying only on
+     * the 150 ms background poll. */
+    ys_capture_external_target(state);
     root = state->last_external_root;
     focus = state->last_external_focus;
     if (!root || !IsWindow(root)) return FALSE;
     if (focus && !IsWindow(focus)) focus = NULL;
+    foreground = GetForegroundWindow();
+    if (foreground && GetAncestor(foreground, GA_ROOT) == root) {
+        if (focus && ys_focus_accepts_direct_chars(focus)) {
+            for (i = 0; i < length; ++i) {
+                if (!PostMessageW(focus, WM_CHAR, (WPARAM)text[i], 1)) return FALSE;
+            }
+            return TRUE;
+        }
+        target_thread = 0;
+        current_thread = 0;
+        goto send_text;
+    }
     target_thread = state->last_external_thread;
     if (!target_thread) target_thread = GetWindowThreadProcessId(root, NULL);
     current_thread = GetCurrentThreadId();
@@ -1098,12 +1087,8 @@ static BOOL ys_send_auto_insert(YSAppState *state, const WCHAR *text) {
     BringWindowToTop(root);
     SetForegroundWindow(root);
     if (focus) SetFocus(focus);
-    for (attempt = 0; attempt < 4; ++attempt) {
-        HWND foreground = GetForegroundWindow();
-        if (foreground && GetAncestor(foreground, GA_ROOT) == root) break;
-        SwitchToThread();
-    }
     if (focus && IsWindow(focus)) SetFocus(focus);
+send_text:
     ZeroMemory(inputs, sizeof(inputs[0]) * length * 2u);
     for (i = 0; i < length; ++i) {
         inputs[i * 2u].type = INPUT_KEYBOARD;
@@ -1116,6 +1101,22 @@ static BOOL ys_send_auto_insert(YSAppState *state, const WCHAR *text) {
     sent = SendInput((UINT)(length * 2u), inputs, sizeof(INPUT));
     if (attached) AttachThreadInput(current_thread, target_thread, FALSE);
     return sent == (UINT)(length * 2u);
+}
+
+static BOOL ys_flush_pending_clipboard(YSAppState *state) {
+    if (!state || !state->pending_clipboard[0]) return TRUE;
+    if (!ys_clipboard_try_set(state->hwnd, state->pending_clipboard)) return FALSE;
+    state->pending_clipboard[0] = L'\0';
+    KillTimer(state->hwnd, YS_TIMER_CLIPBOARD);
+    return TRUE;
+}
+
+static void ys_queue_clipboard(YSAppState *state, const WCHAR *text) {
+    if (!state || !text || !text[0]) return;
+    StringCchCopyW(state->pending_clipboard, YS_ARRAY_COUNT(state->pending_clipboard), text);
+    if (!ys_flush_pending_clipboard(state)) {
+        SetTimer(state->hwnd, YS_TIMER_CLIPBOARD, YS_CLIPBOARD_RETRY_MS, NULL);
+    }
 }
 
 static void ys_flush_storage(YSAppState *state) {
@@ -1270,7 +1271,7 @@ static BOOL ys_record_symbol_use(YSAppState *state, const WCHAR *text) {
     use_count = ys_usage_increment(&state->usage, text);
     ys_schedule_storage(state, YS_STORAGE_DIRTY_USAGE);
     if (use_count < YS_COMMON_AUTO_ADD_THRESHOLD) return FALSE;
-    if (!ys_common_add(&state->common, text, use_count)) return FALSE;
+    if (!ys_common_add_user(&state->common, text, use_count)) return FALSE;
     ys_usage_remove(&state->usage, text);
     ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON | YS_STORAGE_DIRTY_USAGE);
     ys_request_common_rebuild(state);
@@ -1281,19 +1282,21 @@ static void ys_copy_view(YSAppState *state, const YSViewSymbol *source_view, con
     YSViewSymbol view;
     WCHAR copied[YS_MAX_SEQUENCE];
     BOOL recent_changed;
+    BOOL insert_requested;
+    BOOL insert_ok = TRUE;
     if (!state || !source_view || !source_view->text || !source_view->text[0]) return;
     view = *source_view;
     StringCchCopyW(copied, YS_ARRAY_COUNT(copied), source_view->text);
     view.text = copied;
-    if (!ys_clipboard_set(state->hwnd, copied)) {
-        SetWindowTextW(state->status, L"复制失败：剪贴板正被其他程序占用。");
-        return;
-    }
-    ys_set_footer(state, &view, category ? category : ys_category_name_for_view(&view), prefix ? prefix : L"已复制：");
-
     /* Auto insert is the latency-sensitive path.  Restore the previous target
        and type the symbol directly before sorting lists or writing the registry. */
-    if (Button_GetCheck(state->auto_insert) == BST_CHECKED) ys_send_auto_insert(state, copied);
+    insert_requested = Button_GetCheck(state->auto_insert) == BST_CHECKED;
+    if (insert_requested) insert_ok = ys_send_auto_insert(state, copied);
+    ys_queue_clipboard(state, copied);
+    ys_set_footer(state, &view, category ? category : ys_category_name_for_view(&view), prefix ? prefix : L"已复制：");
+    if (insert_requested && !insert_ok) {
+        SetWindowTextW(state->status, L"已复制到剪贴板；自动插入失败，请重新选择目标窗口。");
+    }
 
     recent_changed = ys_list_add_front_unique(&state->recent, copied);
     if (recent_changed) {
@@ -1512,7 +1515,7 @@ static void ys_show_symbol_context_menu(YSAppState *state, const WCHAR *text, ui
     }
     if (command == ID_MENU_ADD_COMMON) {
         previous_use_count = ys_usage_get(&state->usage, symbol);
-        if (ys_common_add(&state->common, symbol, previous_use_count)) {
+        if (ys_common_add_user(&state->common, symbol, previous_use_count)) {
             ys_usage_remove(&state->usage, symbol);
             ys_schedule_storage(state, YS_STORAGE_DIRTY_COMMON | YS_STORAGE_DIRTY_USAGE);
             SetWindowTextW(state->status, L"已追加到常用符号末尾。");
@@ -1690,6 +1693,8 @@ static LRESULT CALLBACK ys_recent_proc(HWND hwnd, UINT message, WPARAM wparam, L
         if (state) state->recent_grid = hwnd;
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)state);
         return 0;
+    case WM_MOUSEACTIVATE:
+        return MA_NOACTIVATE;
     case WM_ERASEBKGND:
         return 1;
     case WM_MOUSEMOVE:
@@ -1988,6 +1993,8 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         if (state) state->grid = hwnd;
         SetWindowLongPtrW(hwnd, GWLP_USERDATA, (LONG_PTR)state);
         return 0;
+    case WM_MOUSEACTIVATE:
+        return MA_NOACTIVATE;
     case WM_ERASEBKGND:
         return 1;
     case WM_SIZE:
@@ -2050,7 +2057,6 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
                 state->common_drag_start.y = GET_Y_LPARAM(lparam);
                 state->common_dragging = FALSE;
                 SetCapture(hwnd);
-                SetFocus(hwnd);
                 return 0;
             }
         }
@@ -2376,21 +2382,19 @@ static BOOL ys_add_category_mapping_item(YSAppState *state, const WCHAR *name, i
     return TRUE;
 }
 
-static int ys_find_data_category_by_name(const WCHAR *name) {
-    size_t i;
-    if (!name) return -1;
-    for (i = 0; i < g_ys_category_count; ++i) {
-        if (wcscmp(ys_pool_string(g_ys_categories[i].name_offset), name) == 0) return (int)i;
-    }
-    return -1;
-}
-
-static BOOL ys_add_named_category(YSAppState *state, const WCHAR *display_name, const WCHAR *data_name, int *selected_index, int preferred_mapping) {
-    int data_index = ys_find_data_category_by_name(data_name);
+static BOOL ys_add_data_category(YSAppState *state, uint16_t data_index, BOOL indented,
+                                 int *selected_index, int preferred_mapping) {
+    const WCHAR *name;
+    WCHAR display_name[64];
     int ui_index;
-    if (data_index < 0) return FALSE;
+    if ((size_t)data_index >= g_ys_category_count) return FALSE;
+    name = ys_pool_string(g_ys_categories[data_index].name_offset);
     ui_index = (int)state->category_item_count;
-    if (!ys_add_category_mapping_item(state, display_name, data_index)) return FALSE;
+    if (indented) {
+        StringCchPrintfW(display_name, YS_ARRAY_COUNT(display_name), L"    %s", name);
+        name = display_name;
+    }
+    if (!ys_add_category_mapping_item(state, name, (int)data_index)) return FALSE;
     if (data_index == preferred_mapping) *selected_index = ui_index;
     return TRUE;
 }
@@ -2412,26 +2416,26 @@ static void ys_add_category_items(YSAppState *state, int preferred_mapping) {
     ys_add_category_mapping_item(state, L"常用符号", YS_CATEGORY_MAP_COMMON);
     if (preferred_mapping == YS_CATEGORY_MAP_COMMON) selected_index = 0;
 
-    for (i = 0; i < YS_ARRAY_COUNT(g_ys_main_category_names); ++i) {
-        ys_add_named_category(state, g_ys_main_category_names[i], g_ys_main_category_names[i],
-                              &selected_index, preferred_mapping);
+    for (i = 0; i < g_ys_ui_main_category_count; ++i) {
+        ys_add_data_category(state, g_ys_ui_main_categories[i], FALSE,
+                             &selected_index, preferred_mapping);
     }
 
-    ys_add_category_mapping_item(state, state->other_expanded ? L"其他符号⯆" : L"其他符号⯈",
+    ys_add_category_mapping_item(state, state->other_expanded ? L"其他符号 v" : L"其他符号 >",
                                  YS_CATEGORY_MAP_OTHER_HEADER);
     if (state->other_expanded) {
-        for (i = 0; i < YS_ARRAY_COUNT(g_ys_other_category_names); ++i) {
-            WCHAR display_name[64];
-            StringCchPrintfW(display_name, YS_ARRAY_COUNT(display_name), L"    %s", g_ys_other_category_names[i]);
-            ys_add_named_category(state, display_name, g_ys_other_category_names[i],
-                                  &selected_index, preferred_mapping);
+        for (i = 0; i < g_ys_ui_other_category_count; ++i) {
+            ys_add_data_category(state, g_ys_ui_other_categories[i], TRUE,
+                                 &selected_index, preferred_mapping);
         }
     }
 
-    all_data_index = ys_find_data_category_by_name(L"全部符号");
+    all_data_index = g_ys_category_count ? 0 : -1;
     if (all_data_index >= 0) {
         state->all_symbols_ui_index = (int)state->category_item_count;
-        ys_add_category_mapping_item(state, L"全部符号", all_data_index);
+        ys_add_category_mapping_item(state,
+                                     ys_pool_string(g_ys_categories[all_data_index].name_offset),
+                                     all_data_index);
         if (preferred_mapping == all_data_index) selected_index = state->all_symbols_ui_index;
     }
     state->custom_ui_index = (int)state->category_item_count;
@@ -2456,12 +2460,19 @@ static int ys_find_category_ui_index(const YSAppState *state, int mapping) {
 }
 
 static BOOL ys_is_other_category_index(int data_index) {
-    const WCHAR *name;
     size_t index;
     if (data_index < 0 || (size_t)data_index >= g_ys_category_count) return FALSE;
-    name = ys_pool_string(g_ys_categories[data_index].name_offset);
-    for (index = 0; index < YS_ARRAY_COUNT(g_ys_other_category_names); ++index) {
-        if (wcscmp(name, g_ys_other_category_names[index]) == 0) return TRUE;
+    for (index = 0; index < g_ys_ui_other_category_count; ++index) {
+        if ((int)g_ys_ui_other_categories[index] == data_index) return TRUE;
+    }
+    return FALSE;
+}
+
+static BOOL ys_is_main_category_index(int data_index) {
+    size_t index;
+    if (data_index < 0 || (size_t)data_index >= g_ys_category_count) return FALSE;
+    for (index = 0; index < g_ys_ui_main_category_count; ++index) {
+        if ((int)g_ys_ui_main_categories[index] == data_index) return TRUE;
     }
     return FALSE;
 }
@@ -2547,10 +2558,12 @@ static void ys_jump_to_symbol_origin(YSAppState *state, uint32_t symbol_index) {
     target_row = origin->row_number;
     target_column = origin->column_number;
 
-    /* 补充符号不在侧边栏。对于只存在于该分类的少量字符，跳到
-       “全部符号”中对应的真实位置，而悬浮信息仍显示原始分类。 */
-    if (wcscmp(ys_pool_string(g_ys_categories[target_category].name_offset), L"补充符号") == 0) {
-        int all_category = ys_find_data_category_by_name(L"全部符号");
+    /* Hidden categories are not present in the sidebar. For symbols whose
+       preferred origin is hidden, jump to the generated all-symbol category
+       while preserving the original category in the hover metadata. */
+    if (target_category != 0 && !ys_is_main_category_index(target_category) &&
+        !ys_is_other_category_index(target_category)) {
+        int all_category = g_ys_category_count ? 0 : -1;
         if (all_category >= 0 &&
             ys_find_symbol_location_in_category(all_category, symbol_index, &target_group, &target_item,
                                                 &target_row, &target_column)) {
@@ -2622,108 +2635,6 @@ static LRESULT CALLBACK ys_categories_subclass_proc(HWND hwnd, UINT message, WPA
     return DefSubclassProc(hwnd, message, wparam, lparam);
 }
 
-/* How many emoji symbols to warm synchronously (blocking WM_CREATE, before
- * the window is shown) per "Emoji·" category. Large enough to cover more
- * than one screenful (YS_MAX_COLUMNS=12 wide) so a first click needs no
- * scrolling to feel warm; small enough that the one-time startup delay
- * this adds stays well under what a user would notice as a slow launch. */
-#define YS_EMOJI_SYNC_PREWARM_PER_CATEGORY 60u
-
-static BOOL ys_category_name_starts_with(uint32_t category_index, const WCHAR *prefix) {
-    const WCHAR *name = ys_pool_string(g_ys_categories[category_index].name_offset);
-    return wcsncmp(name, prefix, wcslen(prefix)) == 0;
-}
-
-/* Kicks off background worker threads (see ys_emoji_renderer_warm_cache_async)
- * that pre-create the DirectWrite text layout for every emoji symbol in the
- * catalog, so opening an emoji-heavy category for the first time in a
- * session is already served from cache instead of shaping ~3900 symbols on
- * demand. texts[] holds pointers into g_ys_string_pool, which is static
- * program-lifetime data, so it is safe for the background threads to read
- * them at their own pace; the warm-up call takes ownership of the texts
- * array itself and frees it when done (or immediately on failure here).
- *
- * Symbols are collected by walking categories in sidebar display order
- * (skipping index 0, "全部符号", a synthetic aggregate of every other
- * category -- see generate_bilingual_data.py) rather than by raw
- * g_ys_symbols index order, which does not track display order.
- *
- * Reordering alone still depends on the background pass having had enough
- * wall-clock time to reach a given category before the user opens it --
- * for the biggest category ("Emoji·符号与旗帜", mostly flags, and also the
- * last of the five "Emoji·" categories in display order) that was
- * observed to still lose the race in practice. So before starting the
- * background pass, this also synchronously warms a bounded first slice of
- * every "Emoji·" category (see ys_emoji_renderer_warm_cache_sync), which
- * guarantees those categories' first screenful is already cached the
- * moment the window appears, independent of background thread timing. */
-static void ys_warm_emoji_layout_cache(YSAppState *state) {
-    const WCHAR **texts;
-    BYTE *seen;
-    size_t capacity = 0, count = 0;
-    uint32_t symbol_index, ci, gi, ii;
-    if (!state || !ys_emoji_renderer_is_available(state->emoji_renderer)) return;
-    for (symbol_index = 0; symbol_index < g_ys_symbol_count; ++symbol_index) {
-        if (g_ys_symbols[symbol_index].flags & YS_SYMBOL_FLAG_EMOJI) ++capacity;
-    }
-    if (!capacity) return;
-    texts = (const WCHAR **)HeapAlloc(GetProcessHeap(), 0, sizeof(WCHAR *) * capacity);
-    if (!texts) return;
-    seen = (BYTE *)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, g_ys_symbol_count);
-    if (!seen) {
-        HeapFree(GetProcessHeap(), 0, texts);
-        return;
-    }
-
-    for (ci = 1; ci < g_ys_category_count; ++ci) {
-        const YSCategoryRecord *category;
-        const WCHAR *sync_texts[YS_EMOJI_SYNC_PREWARM_PER_CATEGORY];
-        size_t sync_count = 0;
-        if (!ys_category_name_starts_with(ci, L"Emoji")) continue;
-        category = &g_ys_categories[ci];
-        for (gi = 0; gi < category->group_count && sync_count < YS_EMOJI_SYNC_PREWARM_PER_CATEGORY; ++gi) {
-            const YSGroupRecord *group = &g_ys_groups[category->first_group + gi];
-            for (ii = 0; ii < group->item_count && sync_count < YS_EMOJI_SYNC_PREWARM_PER_CATEGORY; ++ii) {
-                symbol_index = g_ys_group_items[group->item_start + ii];
-                if (symbol_index >= g_ys_symbol_count || seen[symbol_index]) continue;
-                seen[symbol_index] = 1;
-                if (g_ys_symbols[symbol_index].flags & YS_SYMBOL_FLAG_EMOJI) {
-                    sync_texts[sync_count++] = ys_symbol_text(symbol_index);
-                }
-            }
-        }
-        if (sync_count) {
-            ys_emoji_renderer_warm_cache_sync(state->emoji_renderer, sync_texts, sync_count,
-                                              YS_CELL_W - 6, YS_CELL_H - 6);
-        }
-    }
-
-    /* Everything else -- the rest of each "Emoji·" category beyond the
-     * synchronous slice above, plus any other category's emoji symbols --
-     * goes to the background pass; `seen` already excludes what was just
-     * warmed synchronously. */
-    for (ci = 1; ci < g_ys_category_count && count < capacity; ++ci) {
-        const YSCategoryRecord *category = &g_ys_categories[ci];
-        for (gi = 0; gi < category->group_count; ++gi) {
-            const YSGroupRecord *group = &g_ys_groups[category->first_group + gi];
-            for (ii = 0; ii < group->item_count; ++ii) {
-                symbol_index = g_ys_group_items[group->item_start + ii];
-                if (symbol_index >= g_ys_symbol_count || seen[symbol_index]) continue;
-                seen[symbol_index] = 1;
-                if (g_ys_symbols[symbol_index].flags & YS_SYMBOL_FLAG_EMOJI) {
-                    texts[count++] = ys_symbol_text(symbol_index);
-                }
-            }
-        }
-    }
-    HeapFree(GetProcessHeap(), 0, seen);
-
-    if (!count || !ys_emoji_renderer_warm_cache_async(state->emoji_renderer, texts, count,
-                                                       YS_CELL_W - 6, YS_CELL_H - 6)) {
-        HeapFree(GetProcessHeap(), 0, texts);
-    }
-}
-
 static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) {
     YSAppState *state = (YSAppState *)GetWindowLongPtrW(hwnd, GWLP_USERDATA);
     if (state && state->taskbar_created_message && message == state->taskbar_created_message) {
@@ -2764,18 +2675,22 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         state->emoji_font = CreateFontW(YS_EMOJI_FONT_HEIGHT, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
                                         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                                         CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI Emoji");
-        state->emoji_renderer = ys_emoji_renderer_create((float)(-YS_EMOJI_FONT_HEIGHT));
-        ys_warm_emoji_layout_cache(state);
+        state->emoji_renderer = ys_emoji_renderer_create((float)(-YS_EMOJI_FONT_HEIGHT), YS_CELL_W - 6, YS_CELL_H - 6);
 
         ys_storage_init_list(&state->recent, YS_MAX_RECENT);
         ys_common_init(&state->common);
         ys_usage_init(&state->usage);
         ys_storage_init_list(&state->custom, YS_MAX_CUSTOM);
         ys_storage_load_recent(&state->recent);
-        if (!ys_storage_load_common(&state->common)) {
+        {
+            const WCHAR *defaults[YS_MAX_COMMON];
+            size_t default_count = min(g_ys_default_common_count, (size_t)YS_MAX_COMMON);
             size_t i;
-            for (i = 0; i < g_ys_default_common_count; ++i) ys_common_add(&state->common, ys_symbol_text(g_ys_default_common_items[i]), 0);
-            state->storage_dirty_flags |= YS_STORAGE_DIRTY_COMMON;
+            ys_storage_load_common(&state->common);
+            for (i = 0; i < default_count; ++i) defaults[i] = ys_symbol_text(g_ys_default_common_items[i]);
+            if (ys_common_reconcile(&state->common, defaults, default_count)) {
+                state->storage_dirty_flags |= YS_STORAGE_DIRTY_COMMON;
+            }
         }
         ys_storage_load_usage(&state->usage);
         ys_storage_load_custom(&state->custom);
@@ -3036,6 +2951,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         } else if (wparam == YS_TIMER_SEARCH_HISTORY) {
             KillTimer(hwnd, YS_TIMER_SEARCH_HISTORY);
             ys_search_history_commit_current(state);
+        } else if (wparam == YS_TIMER_CLIPBOARD) {
+            ys_flush_pending_clipboard(state);
         }
         return 0;
     case YESYMBOL_DEFERRED_INIT_MESSAGE:
@@ -3084,6 +3001,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             KillTimer(hwnd, YS_TIMER_SEARCH);
             KillTimer(hwnd, YS_TIMER_STORAGE);
             KillTimer(hwnd, YS_TIMER_SEARCH_HISTORY);
+            KillTimer(hwnd, YS_TIMER_CLIPBOARD);
+            ys_flush_pending_clipboard(state);
             ys_flush_storage(state);
             if (state->search) RemoveWindowSubclass(state->search, ys_search_subclass_proc, 1u);
             if (state->categories) RemoveWindowSubclass(state->categories, ys_categories_subclass_proc, 1u);

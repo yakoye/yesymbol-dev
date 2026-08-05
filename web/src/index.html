@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="YeSymbol 网页版：浏览、搜索、收藏和复制 Unicode 符号与 Emoji。">
+  <title>YeSymbol · 符号大全</title>
+  <link rel="icon" href="./icons/icon-64.png" sizes="64x64">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+  <noscript>
+    <div class="noscript">YeSymbol 网页版需要启用 JavaScript。</div>
+  </noscript>
+
+  <main id="app" class="app-shell" aria-busy="true">
+    <header id="topPanel" class="top-panel is-sticky">
+      <div class="toolbar-row">
+        <button id="recentToggle" class="recent-toggle" type="button" aria-expanded="true">
+          <span>最近使用</span><span id="recentArrow" aria-hidden="true">▼</span>
+        </button>
+
+        <label class="search-wrap" aria-label="搜索">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+          <input id="searchInput" type="search" autocomplete="off" spellcheck="false"
+                 placeholder="搜索符号、名称或 Unicode…">
+          <button id="searchClear" class="search-clear" type="button" aria-label="清空搜索" hidden>×</button>
+        </label>
+
+        <label class="check-option" title="单击符号后复制到剪贴板">
+          <input id="copyToggle" type="checkbox" checked><span>点击复制</span>
+        </label>
+        <label class="check-option" title="滚动时保持顶部区域可见">
+          <input id="stickyToggle" type="checkbox" checked><span>固定顶部</span>
+        </label>
+        <button id="aboutButton" class="icon-button" type="button" aria-label="关于 YeSymbol" title="关于">i</button>
+      </div>
+
+      <div id="recentRow" class="recent-row">
+        <div id="recentGrid" class="recent-grid" aria-label="最近使用符号"></div>
+        <button id="clearRecent" class="trash-button" type="button" aria-label="清空最近使用" title="清空最近使用">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13M10 11v5m4-5v5"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <nav id="sidebar" class="sidebar" aria-label="符号分类"></nav>
+
+      <section class="content-panel" aria-live="polite">
+        <div id="viewHeader" class="view-header">
+          <div>
+            <h1 id="viewTitle">常用符号</h1>
+            <p id="viewMeta">正在加载符号数据…</p>
+          </div>
+          <div id="viewActions" class="view-actions"></div>
+        </div>
+
+        <div id="customEditor" class="custom-editor" hidden>
+          <div class="custom-copy">
+            <strong>添加自定义符号</strong>
+            <span>支持单个字符、Emoji 组合、逗号或换行分隔，以及 U+2605 形式。</span>
+          </div>
+          <div class="custom-controls">
+            <input id="customInput" type="text" placeholder="例如：★、👨‍💻、U+2714">
+            <button id="customAdd" type="button" class="primary-button">添加</button>
+          </div>
+        </div>
+
+        <div id="symbolViewport" class="symbol-viewport" tabindex="-1">
+          <div id="symbolContent" class="symbol-content"></div>
+          <div id="loadSentinel" class="load-sentinel" aria-hidden="true"></div>
+          <div id="emptyState" class="empty-state" hidden>
+            <div class="empty-icon">⌕</div>
+            <strong>没有找到匹配的符号</strong>
+            <span>可以尝试中文名称、英文名称、分类或 U+ 编码。</span>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <footer id="statusBar" class="status-bar">
+      <span id="statusSymbol" class="status-symbol">✓</span>
+      <span id="statusZh">勾号</span>
+      <span id="statusCode" class="status-code">U+2713</span>
+      <span id="statusEn">CHECK MARK</span>
+      <span id="statusCategory">特殊符号</span>
+      <span class="status-spacer"></span>
+      <span id="dataBadge" class="data-badge">载入中</span>
+    </footer>
+  </main>
+
+  <div id="tooltip" class="symbol-tooltip" role="tooltip" hidden></div>
+
+  <div id="contextMenu" class="context-menu" role="menu" hidden>
+    <button id="ctxCommon" type="button" role="menuitem"></button>
+    <button id="ctxJump" type="button" role="menuitem">跳到所在位置</button>
+    <button id="ctxDeleteCustom" type="button" role="menuitem">从自定义删除</button>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <dialog id="aboutDialog" class="about-dialog">
+    <form method="dialog">
+      <button class="dialog-close" value="close" aria-label="关闭">×</button>
+      <img src="./icons/icon-192.png" width="72" height="72" alt="YeSymbol">
+      <h2>YeSymbol 网页版</h2>
+      <p>使用与桌面版相同的 <code>catalog.generated.json</code>，用于浏览、搜索、收藏和复制 Unicode 符号与彩色 Emoji。</p>
+      <dl>
+        <div><dt>网页版</dt><dd id="webVersion">v1.0.0-rc1</dd></div>
+        <div><dt>数据</dt><dd id="aboutDataCount">载入中</dd></div>
+      </dl>
+      <a href="https://github.com/yakoye/yesymbol-dev" target="_blank" rel="noopener noreferrer">github：yesymbol-dev</a>
+    </form>
+  </dialog>
+
+  <script src="./assets/app.js" defer></script>
+</body>
+</html>

@@ -2,11 +2,21 @@
 @name-languages zh-CN,en
 @name-note 中文名称优先使用 Unicode CLDR 中文短名称、常见中文符号网站的通用叫法和人工校订；数字、箭头、数学、货币、单位、技术按键等系列使用统一中文命名。英文名称保留 Unicode 正式名称。
 @curation-note 本版以 catalog.txt 作为人工主表；去重只清理同一分组和同一分类中的重复显示，不删除唯一符号；全部符号自动生成唯一并集。
-@default-common ✓,✔,☑,✕,✖,×,÷,±,≈,≠,≤,≥,°,℃,℉,©,®,™,№,§,¶,•,·,…,—,–,→,←,↑,↓,↔,⇒,⇔,∞,√,∑,∫,↖,↗,↙,↘,●,○,◉,◎,■,□,◆,◇,▲,△,▼,▽,◀,◁,▶,▷,①,②,③,④,⑤,⑥,⑦,⑧,⑨,⑩,⑪,⑫,「,」,『,』,【,】,《,》,〈,〉,〔,〕,（,）,{,},[,],<,>
-
 <!-- 全部符号由转换工具自动生成，不在此文件重复维护。 -->
 <!-- 一级分类直接由正文中的 # 标题生成，不需要维护分类名单。 -->
 <!-- 普通符号直接用逗号分隔；只有空格、逗号等特殊项目才需要双引号。 -->
+
+# 常用符号
+@role common
+
+✓,✔,☑,✕,✖,×,÷,±,≈,≠,≤,≥
+°,℃,℉,©,®,™,№,§,¶,•,·,…
+—,–,→,←,↑,↓,↔,⇒,⇔,∞,√,∑
+∫,↖,↗,↙,↘,●,○,◉,◎,■,□,◆
+◇,▲,△,▼,▽,◀,◁,▶,▷,①,②,③
+④,⑤,⑥,⑦,⑧,⑨,⑩,⑪,⑫,「,」,『
+』,【,】,《,》,〈,〉,〔,〕,（,）,{
+},[,],<,>
 
 # 特殊符号
 @desc 按照符号大全-v0.11.txt 的原始行列排列。
@@ -299,7 +309,7 @@
 
 ---
 
-## 麻将牌（Unicode 顺序）
+## 麻将牌
 🀇,🀈,🀉,🀊,🀋,🀌,🀍,🀎,🀏
 🀐,🀑,🀒,🀓,🀔,🀕,🀖,🀗,🀘
 🀙,🀚,🀛,🀜,🀝,🀞,🀟,🀠,🀡
@@ -307,7 +317,7 @@
 🀀,🀁,🀂,🀃,🀄,🀅,🀆,🀪,🀫
 ---
 
-## 多米诺骨牌（Unicode 顺序）
+## 多米诺骨牌
 🀱,🀲,🀳,🀴,🀵,🀶,🀷,
 🀸,🀹,🀺,🀻,🀼,🀽,🀾,
 🀿,🁀,🁁,🁂,🁃,🁄,🁅,
@@ -530,9 +540,9 @@ _,＿,﹏,﹍,﹎,`,¦,¡,^,­,¨,ˊ
 ∞,∝
 
 ## 比较与等价
-=,≠,≈,≉,≡,≢,≤,≥,≪,≫
-≮,≯,≰,≱,≲,≳,≨,≩,≴,≵
-≺,≻,≼,≽,≾,≿,≶,≷,≸,≹
+=,≠,≈,≉,≡,≢,<,>,≤,≥,≪,≫
+≮,≯,≰,≱,≨,≩,≴,≵,≸,≹
+≲,≳,≺,≻,≼,≽,≾,≿,≶,≷
 ≬,≭,⊀,⊁
 
 ## 集合与逻辑
@@ -552,7 +562,7 @@ _,＿,﹏,﹍,﹎,`,¦,¡,^,­,¨,ˊ
 
 ## 大型运算符
 ⋀,⋁,⋂,⋃,⨀,⨁,⨂,⨃,⨄,⨅,⨆
-⨇,⨉,⨊,⨋,⨌,⨍,⨎,⨏
+⨇,⨉,∑,⨊,⨋,⨌,⨍,⨎,⨏
 
 
 ## 数学关系扩展
@@ -1209,7 +1219,7 @@ h,m,n,ŋ,l,r,w,j
 ✒,✔,➡,⤴,⤵,⬅,⬆,⬇,🕊
 
 
-<!-- 以下分类在界面中折叠到“其他符号”下面。 -->
+@ui-section other
 
 # 日文字符
 @desc 平假名、片假名、浊音、半浊音、小写假名和日文标点。
@@ -1476,14 +1486,6 @@ h,m,n,ŋ,l,r,w,j
 ## 带圈表意文字补充
 🉀,🉁,🉂,🉃,🉄,🉅,🉆,🉇,🉈,🉠,🉡,🉢
 🉣,🉤,🉥
-
-
-# 大篆
-@desc 大篆属于汉字字形体系，Unicode 未将其作为独立字符集编码；当前分类预留，后续需配合专用字体或字形资源。
-
-
-# 小篆
-@desc 小篆属于汉字字形体系，Unicode 未将其作为独立字符集编码；当前分类预留，后续需配合专用字体或字形资源。
 
 
 # 俄文字符
@@ -1890,7 +1892,7 @@ h,m,n,ŋ,l,r,w,j
 𝪈,𝪉,𝪊,𝪋
 
 
-<!-- 补充符号不单独显示在侧边栏，仍参与搜索和“全部符号”。 -->
+@ui-section hidden
 
 # 补充符号
 @desc 尚未归入常用分类的技术符号、历史文字与其他补充内容。
@@ -2617,7 +2619,7 @@ h,m,n,ŋ,l,r,w,j
 @symbol ▔|上八分之一块|UPPER ONE EIGHTH BLOCK|false
 @symbol †|匕首符号|DAGGER|false
 @symbol ‡|双匕首符号|DOUBLE DAGGER|false
-@symbol *|星号|ASTERISK|emoji
+@symbol *|星号|ASTERISK|false
 @symbol ＊|全角星号|FULLWIDTH ASTERISK|false
 @symbol ✲|空心中心星号|OPEN CENTRE ASTERISK|false
 @symbol ✚|粗体希腊十字|HEAVY GREEK CROSS|false
@@ -5242,7 +5244,7 @@ h,m,n,ŋ,l,r,w,j
 @symbol ·|间隔号|MIDDLE DOT|false
 @symbol ~|波浪号|TILDE|false
 @symbol &|与号|AMPERSAND|false
-@symbol #|井号|NUMBER SIGN|emoji
+@symbol #|井号|NUMBER SIGN|false
 @symbol ,|逗号|COMMA|false
 @symbol .|句点|FULL STOP|false
 @symbol ?|问号|QUESTION MARK|false
@@ -8220,7 +8222,7 @@ h,m,n,ŋ,l,r,w,j
 @symbol 双|中日韩统一表意文字 双|CJK UNIFIED IDEOGRAPH-53CC|false
 @symbol 林|中日韩统一表意文字 林|CJK UNIFIED IDEOGRAPH-6797|false
 @symbol 玨|中日韩统一表意文字 玨|CJK UNIFIED IDEOGRAPH-73A8|false
-@symbol 𤤴|中日韩统一表意文字 𤤴|CJK UNIFIED IDEOGRAPH-24934|emoji
+@symbol 𤤴|中日韩统一表意文字 𤤴|CJK UNIFIED IDEOGRAPH-24934|false
 @symbol 昍|中日韩统一表意文字 昍|CJK UNIFIED IDEOGRAPH-660D|false
 @symbol 朋|中日韩统一表意文字 朋|CJK UNIFIED IDEOGRAPH-670B|false
 @symbol 牪|中日韩统一表意文字 牪|CJK UNIFIED IDEOGRAPH-726A|false
@@ -8286,12 +8288,12 @@ h,m,n,ŋ,l,r,w,j
 @symbol 䣈|中日韩统一表意文字 䣈|CJK UNIFIED IDEOGRAPH-48C8|false
 @symbol 䪭|中日韩统一表意文字 䪭|CJK UNIFIED IDEOGRAPH-4AAD|false
 @symbol 䲆|中日韩统一表意文字 䲆|CJK UNIFIED IDEOGRAPH-4C86|false
-@symbol 𣊫|中日韩统一表意文字 𣊫|CJK UNIFIED IDEOGRAPH-232AB|emoji
-@symbol 𣊷|中日韩统一表意文字 𣊷|CJK UNIFIED IDEOGRAPH-232B7|emoji
-@symbol 𣥖|中日韩统一表意文字 𣥖|CJK UNIFIED IDEOGRAPH-23956|emoji
-@symbol 𦧚|中日韩统一表意文字 𦧚|CJK UNIFIED IDEOGRAPH-269DA|emoji
-@symbol 𩡐|中日韩统一表意文字 𩡐|CJK UNIFIED IDEOGRAPH-29850|emoji
-@symbol 𪙹|中日韩统一表意文字 𪙹|CJK UNIFIED IDEOGRAPH-2A679|emoji
+@symbol 𣊫|中日韩统一表意文字 𣊫|CJK UNIFIED IDEOGRAPH-232AB|false
+@symbol 𣊷|中日韩统一表意文字 𣊷|CJK UNIFIED IDEOGRAPH-232B7|false
+@symbol 𣥖|中日韩统一表意文字 𣥖|CJK UNIFIED IDEOGRAPH-23956|false
+@symbol 𦧚|中日韩统一表意文字 𦧚|CJK UNIFIED IDEOGRAPH-269DA|false
+@symbol 𩡐|中日韩统一表意文字 𩡐|CJK UNIFIED IDEOGRAPH-29850|false
+@symbol 𪙹|中日韩统一表意文字 𪙹|CJK UNIFIED IDEOGRAPH-2A679|false
 @symbol 二|中日韩统一表意文字 二|CJK UNIFIED IDEOGRAPH-4E8C|false
 @symbol 爻|中日韩统一表意文字 爻|CJK UNIFIED IDEOGRAPH-723B|false
 @symbol 圭|中日韩统一表意文字 圭|CJK UNIFIED IDEOGRAPH-572D|false
@@ -8309,11 +8311,11 @@ h,m,n,ŋ,l,r,w,j
 @symbol 㕕|中日韩统一表意文字 㕕|CJK UNIFIED IDEOGRAPH-3555|false
 @symbol 㕛|中日韩统一表意文字 㕛|CJK UNIFIED IDEOGRAPH-355B|false
 @symbol 㚣|中日韩统一表意文字 㚣|CJK UNIFIED IDEOGRAPH-36A3|false
-@symbol 𡦪|中日韩统一表意文字 𡦪|CJK UNIFIED IDEOGRAPH-219AA|emoji
-@symbol 𣊧|中日韩统一表意文字 𣊧|CJK UNIFIED IDEOGRAPH-232A7|emoji
-@symbol 𣥕|中日韩统一表意文字 𣥕|CJK UNIFIED IDEOGRAPH-23955|emoji
-@symbol 𣬅|中日韩统一表意文字 𣬅|CJK UNIFIED IDEOGRAPH-23B05|emoji
-@symbol 𩺰|中日韩统一表意文字 𩺰|CJK UNIFIED IDEOGRAPH-29EB0|emoji
+@symbol 𡦪|中日韩统一表意文字 𡦪|CJK UNIFIED IDEOGRAPH-219AA|false
+@symbol 𣊧|中日韩统一表意文字 𣊧|CJK UNIFIED IDEOGRAPH-232A7|false
+@symbol 𣥕|中日韩统一表意文字 𣥕|CJK UNIFIED IDEOGRAPH-23955|false
+@symbol 𣬅|中日韩统一表意文字 𣬅|CJK UNIFIED IDEOGRAPH-23B05|false
+@symbol 𩺰|中日韩统一表意文字 𩺰|CJK UNIFIED IDEOGRAPH-29EB0|false
 @symbol 玊|中日韩统一表意文字 玊|CJK UNIFIED IDEOGRAPH-738A|false
 @symbol 嘂|中日韩统一表意文字 嘂|CJK UNIFIED IDEOGRAPH-5602|false
 @symbol 嬲|中日韩统一表意文字 嬲|CJK UNIFIED IDEOGRAPH-5B32|false
@@ -8323,14 +8325,14 @@ h,m,n,ŋ,l,r,w,j
 @symbol 巛|中日韩统一表意文字 巛|CJK UNIFIED IDEOGRAPH-5DDB|false
 @symbol 雦|中日韩统一表意文字 雦|CJK UNIFIED IDEOGRAPH-96E6|false
 @symbol 㴇|中日韩统一表意文字 㴇|CJK UNIFIED IDEOGRAPH-3D07|false
-@symbol 𡥦|中日韩统一表意文字 𡥦|CJK UNIFIED IDEOGRAPH-21966|emoji
-@symbol 𦧵|中日韩统一表意文字 𦧵|CJK UNIFIED IDEOGRAPH-269F5|emoji
-@symbol 𩧢|中日韩统一表意文字 𩧢|CJK UNIFIED IDEOGRAPH-299E2|emoji
-@symbol 𢏝|中日韩统一表意文字 𢏝|CJK UNIFIED IDEOGRAPH-223DD|emoji
-@symbol 𠬑|中日韩统一表意文字 𠬑|CJK UNIFIED IDEOGRAPH-20B11|emoji
-@symbol 𧭛|中日韩统一表意文字 𧭛|CJK UNIFIED IDEOGRAPH-27B5B|emoji
-@symbol 𡕇|中日韩统一表意文字 𡕇|CJK UNIFIED IDEOGRAPH-21547|emoji
-@symbol 𧔗|中日韩统一表意文字 𧔗|CJK UNIFIED IDEOGRAPH-27517|emoji
+@symbol 𡥦|中日韩统一表意文字 𡥦|CJK UNIFIED IDEOGRAPH-21966|false
+@symbol 𦧵|中日韩统一表意文字 𦧵|CJK UNIFIED IDEOGRAPH-269F5|false
+@symbol 𩧢|中日韩统一表意文字 𩧢|CJK UNIFIED IDEOGRAPH-299E2|false
+@symbol 𢏝|中日韩统一表意文字 𢏝|CJK UNIFIED IDEOGRAPH-223DD|false
+@symbol 𠬑|中日韩统一表意文字 𠬑|CJK UNIFIED IDEOGRAPH-20B11|false
+@symbol 𧭛|中日韩统一表意文字 𧭛|CJK UNIFIED IDEOGRAPH-27B5B|false
+@symbol 𡕇|中日韩统一表意文字 𡕇|CJK UNIFIED IDEOGRAPH-21547|false
+@symbol 𧔗|中日韩统一表意文字 𧔗|CJK UNIFIED IDEOGRAPH-27517|false
 @symbol 嘦|中日韩统一表意文字 嘦|CJK UNIFIED IDEOGRAPH-5626|false
 @symbol 巭|中日韩统一表意文字 巭|CJK UNIFIED IDEOGRAPH-5DED|false
 @symbol 勥|中日韩统一表意文字 勥|CJK UNIFIED IDEOGRAPH-52E5|false
@@ -8395,69 +8397,69 @@ h,m,n,ŋ,l,r,w,j
 @symbol 嚞|中日韩统一表意文字 嚞|CJK UNIFIED IDEOGRAPH-569E|false
 @symbol 皛|中日韩统一表意文字 皛|CJK UNIFIED IDEOGRAPH-769B|false
 @symbol 䨺|中日韩统一表意文字 䨺|CJK UNIFIED IDEOGRAPH-4A3A|false
-@symbol 𤾩|中日韩统一表意文字 𤾩|CJK UNIFIED IDEOGRAPH-24FA9|emoji
+@symbol 𤾩|中日韩统一表意文字 𤾩|CJK UNIFIED IDEOGRAPH-24FA9|false
 @symbol 㐂|中日韩统一表意文字 㐂|CJK UNIFIED IDEOGRAPH-3402|false
 @symbol 㽓|中日韩统一表意文字 㽓|CJK UNIFIED IDEOGRAPH-3F53|false
 @symbol 䆐|中日韩统一表意文字 䆐|CJK UNIFIED IDEOGRAPH-4190|false
 @symbol 䖃|中日韩统一表意文字 䖃|CJK UNIFIED IDEOGRAPH-4583|false
-@symbol 𣦴|中日韩统一表意文字 𣦴|CJK UNIFIED IDEOGRAPH-239B4|emoji
-@symbol 𦜳|中日韩统一表意文字 𦜳|CJK UNIFIED IDEOGRAPH-26733|emoji
-@symbol 𥴒|中日韩统一表意文字 𥴒|CJK UNIFIED IDEOGRAPH-25D12|emoji
-@symbol 𦏱|中日韩统一表意文字 𦏱|CJK UNIFIED IDEOGRAPH-263F1|emoji
-@symbol 𦧅|中日韩统一表意文字 𦧅|CJK UNIFIED IDEOGRAPH-269C5|emoji
-@symbol 𩖏|中日韩统一表意文字 𩖏|CJK UNIFIED IDEOGRAPH-2958F|emoji
-@symbol 𪈼|中日韩统一表意文字 𪈼|CJK UNIFIED IDEOGRAPH-2A23C|emoji
-@symbol 𠁼|中日韩统一表意文字 𠁼|CJK UNIFIED IDEOGRAPH-2007C|emoji
-@symbol 𨑂|中日韩统一表意文字 𨑂|CJK UNIFIED IDEOGRAPH-28442|emoji
-@symbol 𠄕|中日韩统一表意文字 𠄕|CJK UNIFIED IDEOGRAPH-20115|emoji
-@symbol 𠚛|中日韩统一表意文字 𠚛|CJK UNIFIED IDEOGRAPH-2069B|emoji
+@symbol 𣦴|中日韩统一表意文字 𣦴|CJK UNIFIED IDEOGRAPH-239B4|false
+@symbol 𦜳|中日韩统一表意文字 𦜳|CJK UNIFIED IDEOGRAPH-26733|false
+@symbol 𥴒|中日韩统一表意文字 𥴒|CJK UNIFIED IDEOGRAPH-25D12|false
+@symbol 𦏱|中日韩统一表意文字 𦏱|CJK UNIFIED IDEOGRAPH-263F1|false
+@symbol 𦧅|中日韩统一表意文字 𦧅|CJK UNIFIED IDEOGRAPH-269C5|false
+@symbol 𩖏|中日韩统一表意文字 𩖏|CJK UNIFIED IDEOGRAPH-2958F|false
+@symbol 𪈼|中日韩统一表意文字 𪈼|CJK UNIFIED IDEOGRAPH-2A23C|false
+@symbol 𠁼|中日韩统一表意文字 𠁼|CJK UNIFIED IDEOGRAPH-2007C|false
+@symbol 𨑂|中日韩统一表意文字 𨑂|CJK UNIFIED IDEOGRAPH-28442|false
+@symbol 𠄕|中日韩统一表意文字 𠄕|CJK UNIFIED IDEOGRAPH-20115|false
+@symbol 𠚛|中日韩统一表意文字 𠚛|CJK UNIFIED IDEOGRAPH-2069B|false
 @symbol 卌|中日韩统一表意文字 卌|CJK UNIFIED IDEOGRAPH-534C|false
-@symbol 𠦌|中日韩统一表意文字 𠦌|CJK UNIFIED IDEOGRAPH-2098C|emoji
+@symbol 𠦌|中日韩统一表意文字 𠦌|CJK UNIFIED IDEOGRAPH-2098C|false
 @symbol 朤|中日韩统一表意文字 朤|CJK UNIFIED IDEOGRAPH-6724|false
 @symbol 燚|中日韩统一表意文字 燚|CJK UNIFIED IDEOGRAPH-71DA|false
 @symbol 叕|中日韩统一表意文字 叕|CJK UNIFIED IDEOGRAPH-53D5|false
 @symbol 茻|中日韩统一表意文字 茻|CJK UNIFIED IDEOGRAPH-833B|false
 @symbol 㗊|中日韩统一表意文字 㗊|CJK UNIFIED IDEOGRAPH-35CA|false
 @symbol 㠭|中日韩统一表意文字 㠭|CJK UNIFIED IDEOGRAPH-382D|false
-@symbol 𠔻|中日韩统一表意文字 𠔻|CJK UNIFIED IDEOGRAPH-2053B|emoji
+@symbol 𠔻|中日韩统一表意文字 𠔻|CJK UNIFIED IDEOGRAPH-2053B|false
 @symbol 井|中日韩统一表意文字 井|CJK UNIFIED IDEOGRAPH-4E95|false
 @symbol 㸚|中日韩统一表意文字 㸚|CJK UNIFIED IDEOGRAPH-3E1A|false
-@symbol 𠈌|中日韩统一表意文字 𠈌|CJK UNIFIED IDEOGRAPH-2020C|emoji
-@symbol 𠫬|中日韩统一表意文字 𠫬|CJK UNIFIED IDEOGRAPH-20AEC|emoji
-@symbol 𡮐|中日韩统一表意文字 𡮐|CJK UNIFIED IDEOGRAPH-21B90|emoji
-@symbol 𣊭|中日韩统一表意文字 𣊭|CJK UNIFIED IDEOGRAPH-232AD|emoji
+@symbol 𠈌|中日韩统一表意文字 𠈌|CJK UNIFIED IDEOGRAPH-2020C|false
+@symbol 𠫬|中日韩统一表意文字 𠫬|CJK UNIFIED IDEOGRAPH-20AEC|false
+@symbol 𡮐|中日韩统一表意文字 𡮐|CJK UNIFIED IDEOGRAPH-21B90|false
+@symbol 𣊭|中日韩统一表意文字 𣊭|CJK UNIFIED IDEOGRAPH-232AD|false
 @symbol 㵘|中日韩统一表意文字 㵘|CJK UNIFIED IDEOGRAPH-3D58|false
-@symbol 𡚌|中日韩统一表意文字 𡚌|CJK UNIFIED IDEOGRAPH-2168C|emoji
-@symbol 𤛭|中日韩统一表意文字 𤛭|CJK UNIFIED IDEOGRAPH-246ED|emoji
-@symbol 𤳳|中日韩统一表意文字 𤳳|CJK UNIFIED IDEOGRAPH-24CF3|emoji
-@symbol 𥗉|中日韩统一表意文字 𥗉|CJK UNIFIED IDEOGRAPH-255C9|emoji
-@symbol 𠁠|中日韩统一表意文字 𠁠|CJK UNIFIED IDEOGRAPH-20060|emoji
-@symbol 𡈶|中日韩统一表意文字 𡈶|CJK UNIFIED IDEOGRAPH-21236|emoji
-@symbol 𤳵|中日韩统一表意文字 𤳵|CJK UNIFIED IDEOGRAPH-24CF5|emoji
-@symbol 𣡍|中日韩统一表意文字 𣡍|CJK UNIFIED IDEOGRAPH-2384D|emoji
-@symbol 𠓙|中日韩统一表意文字 𠓙|CJK UNIFIED IDEOGRAPH-204D9|emoji
-@symbol 𥷹|中日韩统一表意文字 𥷹|CJK UNIFIED IDEOGRAPH-25DF9|emoji
-@symbol 𦓋|中日韩统一表意文字 𦓋|CJK UNIFIED IDEOGRAPH-264CB|emoji
-@symbol 𧮦|中日韩统一表意文字 𧮦|CJK UNIFIED IDEOGRAPH-27BA6|emoji
-@symbol 𨏿|中日韩统一表意文字 𨏿|CJK UNIFIED IDEOGRAPH-283FF|emoji
-@symbol 𨰻|中日韩统一表意文字 𨰻|CJK UNIFIED IDEOGRAPH-28C3B|emoji
-@symbol 𣡾|中日韩统一表意文字 𣡾|CJK UNIFIED IDEOGRAPH-2387E|emoji
-@symbol 𨷾|中日韩统一表意文字 𨷾|CJK UNIFIED IDEOGRAPH-28DFE|emoji
-@symbol 𩙡|中日韩统一表意文字 𩙡|CJK UNIFIED IDEOGRAPH-29661|emoji
-@symbol 𣌠|中日韩统一表意文字 𣌠|CJK UNIFIED IDEOGRAPH-23320|emoji
-@symbol 𤆁|中日韩统一表意文字 𤆁|CJK UNIFIED IDEOGRAPH-24181|emoji
+@symbol 𡚌|中日韩统一表意文字 𡚌|CJK UNIFIED IDEOGRAPH-2168C|false
+@symbol 𤛭|中日韩统一表意文字 𤛭|CJK UNIFIED IDEOGRAPH-246ED|false
+@symbol 𤳳|中日韩统一表意文字 𤳳|CJK UNIFIED IDEOGRAPH-24CF3|false
+@symbol 𥗉|中日韩统一表意文字 𥗉|CJK UNIFIED IDEOGRAPH-255C9|false
+@symbol 𠁠|中日韩统一表意文字 𠁠|CJK UNIFIED IDEOGRAPH-20060|false
+@symbol 𡈶|中日韩统一表意文字 𡈶|CJK UNIFIED IDEOGRAPH-21236|false
+@symbol 𤳵|中日韩统一表意文字 𤳵|CJK UNIFIED IDEOGRAPH-24CF5|false
+@symbol 𣡍|中日韩统一表意文字 𣡍|CJK UNIFIED IDEOGRAPH-2384D|false
+@symbol 𠓙|中日韩统一表意文字 𠓙|CJK UNIFIED IDEOGRAPH-204D9|false
+@symbol 𥷹|中日韩统一表意文字 𥷹|CJK UNIFIED IDEOGRAPH-25DF9|false
+@symbol 𦓋|中日韩统一表意文字 𦓋|CJK UNIFIED IDEOGRAPH-264CB|false
+@symbol 𧮦|中日韩统一表意文字 𧮦|CJK UNIFIED IDEOGRAPH-27BA6|false
+@symbol 𨏿|中日韩统一表意文字 𨏿|CJK UNIFIED IDEOGRAPH-283FF|false
+@symbol 𨰻|中日韩统一表意文字 𨰻|CJK UNIFIED IDEOGRAPH-28C3B|false
+@symbol 𣡾|中日韩统一表意文字 𣡾|CJK UNIFIED IDEOGRAPH-2387E|false
+@symbol 𨷾|中日韩统一表意文字 𨷾|CJK UNIFIED IDEOGRAPH-28DFE|false
+@symbol 𩙡|中日韩统一表意文字 𩙡|CJK UNIFIED IDEOGRAPH-29661|false
+@symbol 𣌠|中日韩统一表意文字 𣌠|CJK UNIFIED IDEOGRAPH-23320|false
+@symbol 𤆁|中日韩统一表意文字 𤆁|CJK UNIFIED IDEOGRAPH-24181|false
 @symbol 䲜|中日韩统一表意文字 䲜|CJK UNIFIED IDEOGRAPH-4C9C|false
-@symbol 𩇔|中日韩统一表意文字 𩇔|CJK UNIFIED IDEOGRAPH-291D4|emoji
+@symbol 𩇔|中日韩统一表意文字 𩇔|CJK UNIFIED IDEOGRAPH-291D4|false
 @symbol 䨻|中日韩统一表意文字 䨻|CJK UNIFIED IDEOGRAPH-4A3B|false
-@symbol 𪚥|中日韩统一表意文字 𪚥|CJK UNIFIED IDEOGRAPH-2A6A5|emoji
-@symbol 𠾅|中日韩统一表意文字 𠾅|CJK UNIFIED IDEOGRAPH-20F85|emoji
-@symbol 𠉭|中日韩统一表意文字 𠉭|CJK UNIFIED IDEOGRAPH-2026D|emoji
+@symbol 𪚥|中日韩统一表意文字 𪚥|CJK UNIFIED IDEOGRAPH-2A6A5|false
+@symbol 𠾅|中日韩统一表意文字 𠾅|CJK UNIFIED IDEOGRAPH-20F85|false
+@symbol 𠉭|中日韩统一表意文字 𠉭|CJK UNIFIED IDEOGRAPH-2026D|false
 @symbol 傘|中日韩统一表意文字 傘|CJK UNIFIED IDEOGRAPH-5098|false
-@symbol 𣡕|中日韩统一表意文字 𣡕|CJK UNIFIED IDEOGRAPH-23855|emoji
-@symbol 𡿭|中日韩统一表意文字 𡿭|CJK UNIFIED IDEOGRAPH-21FED|emoji
-@symbol 𣡽|中日韩统一表意文字 𣡽|CJK UNIFIED IDEOGRAPH-2387D|emoji
-@symbol 𰻝|中日韩统一表意文字 𰻝|CJK UNIFIED IDEOGRAPH-30EDD|emoji
-@symbol 𱁬|中日韩统一表意文字 𱁬|CJK UNIFIED IDEOGRAPH-3106C|emoji
+@symbol 𣡕|中日韩统一表意文字 𣡕|CJK UNIFIED IDEOGRAPH-23855|false
+@symbol 𡿭|中日韩统一表意文字 𡿭|CJK UNIFIED IDEOGRAPH-21FED|false
+@symbol 𣡽|中日韩统一表意文字 𣡽|CJK UNIFIED IDEOGRAPH-2387D|false
+@symbol 𰻝|中日韩统一表意文字 𰻝|CJK UNIFIED IDEOGRAPH-30EDD|false
+@symbol 𱁬|中日韩统一表意文字 𱁬|CJK UNIFIED IDEOGRAPH-3106C|false
 @symbol 一|中日韩统一表意文字 一|CJK UNIFIED IDEOGRAPH-4E00|false
 @symbol 丨|中日韩统一表意文字 丨|CJK UNIFIED IDEOGRAPH-4E28|false
 @symbol 丿|中日韩统一表意文字 丿|CJK UNIFIED IDEOGRAPH-4E3F|false
@@ -8469,18 +8471,18 @@ h,m,n,ŋ,l,r,w,j
 @symbol ㇀|中日韩笔画T|CJK STROKE T|false
 @symbol 乀|中日韩统一表意文字 乀|CJK UNIFIED IDEOGRAPH-4E40|false
 @symbol 〇|表意文字数字零|IDEOGRAPHIC NUMBER ZERO|false
-@symbol 𠃊|中日韩统一表意文字 𠃊|CJK UNIFIED IDEOGRAPH-200CA|emoji
-@symbol 𠃎|中日韩统一表意文字 𠃎|CJK UNIFIED IDEOGRAPH-200CE|emoji
-@symbol 𠃍|中日韩统一表意文字 𠃍|CJK UNIFIED IDEOGRAPH-200CD|emoji
+@symbol 𠃊|中日韩统一表意文字 𠃊|CJK UNIFIED IDEOGRAPH-200CA|false
+@symbol 𠃎|中日韩统一表意文字 𠃎|CJK UNIFIED IDEOGRAPH-200CE|false
+@symbol 𠃍|中日韩统一表意文字 𠃍|CJK UNIFIED IDEOGRAPH-200CD|false
 @symbol 匚|中日韩统一表意文字 匚|CJK UNIFIED IDEOGRAPH-531A|false
 @symbol 凵|中日韩统一表意文字 凵|CJK UNIFIED IDEOGRAPH-51F5|false
 @symbol 冂|中日韩统一表意文字 冂|CJK UNIFIED IDEOGRAPH-5182|false
 @symbol 丅|中日韩统一表意文字 丅|CJK UNIFIED IDEOGRAPH-4E05|false
 @symbol 丄|中日韩统一表意文字 丄|CJK UNIFIED IDEOGRAPH-4E04|false
-@symbol 𠄌|中日韩统一表意文字 𠄌|CJK UNIFIED IDEOGRAPH-2010C|emoji
-@symbol 𠃋|中日韩统一表意文字 𠃋|CJK UNIFIED IDEOGRAPH-200CB|emoji
-@symbol 𡿨|中日韩统一表意文字 𡿨|CJK UNIFIED IDEOGRAPH-21FE8|emoji
-@symbol 𠃌|中日韩统一表意文字 𠃌|CJK UNIFIED IDEOGRAPH-200CC|emoji
+@symbol 𠄌|中日韩统一表意文字 𠄌|CJK UNIFIED IDEOGRAPH-2010C|false
+@symbol 𠃋|中日韩统一表意文字 𠃋|CJK UNIFIED IDEOGRAPH-200CB|false
+@symbol 𡿨|中日韩统一表意文字 𡿨|CJK UNIFIED IDEOGRAPH-21FE8|false
+@symbol 𠃌|中日韩统一表意文字 𠃌|CJK UNIFIED IDEOGRAPH-200CC|false
 @symbol 曱|中日韩统一表意文字 曱|CJK UNIFIED IDEOGRAPH-66F1|false
 @symbol 〡|苏州码子一|HANGZHOU NUMERAL ONE|false
 @symbol 〢|苏州码子二|HANGZHOU NUMERAL TWO|false
@@ -8515,7 +8517,7 @@ h,m,n,ŋ,l,r,w,j
 @symbol 彳|中日韩统一表意文字 彳|CJK UNIFIED IDEOGRAPH-5F73|false
 @symbol 厃|中日韩统一表意文字 厃|CJK UNIFIED IDEOGRAPH-5383|false
 @symbol ⺁|中日韩部首：厂|CJK RADICAL CLIFF|false
-@symbol 𠘨|中日韩统一表意文字 𠘨|CJK UNIFIED IDEOGRAPH-20628|emoji
+@symbol 𠘨|中日韩统一表意文字 𠘨|CJK UNIFIED IDEOGRAPH-20628|false
 @symbol ⺆|中日韩部首 方框|CJK RADICAL BOX|false
 @symbol ⺄|中日韩部首：乙的变体三|CJK RADICAL SECOND THREE|false
 @symbol 广|中日韩统一表意文字 广|CJK UNIFIED IDEOGRAPH-5E7F|false
@@ -16612,16 +16614,16 @@ h,m,n,ŋ,l,r,w,j
 @symbol 🫒|Olive|OLIVE|emoji
 @symbol 🫔|Tamale|TAMALE|emoji
 @symbol 🫕|Fondue|FONDUE|emoji
-@symbol 0|数字零|DIGIT ZERO|emoji
-@symbol 1|数字一|DIGIT ONE|emoji
-@symbol 2|数字二|DIGIT TWO|emoji
-@symbol 3|数字三|DIGIT THREE|emoji
-@symbol 4|数字四|DIGIT FOUR|emoji
-@symbol 5|数字五|DIGIT FIVE|emoji
-@symbol 6|数字六|DIGIT SIX|emoji
-@symbol 7|数字七|DIGIT SEVEN|emoji
-@symbol 8|数字八|DIGIT EIGHT|emoji
-@symbol 9|数字九|DIGIT NINE|emoji
+@symbol 0|数字零|DIGIT ZERO|false
+@symbol 1|数字一|DIGIT ONE|false
+@symbol 2|数字二|DIGIT TWO|false
+@symbol 3|数字三|DIGIT THREE|false
+@symbol 4|数字四|DIGIT FOUR|false
+@symbol 5|数字五|DIGIT FIVE|false
+@symbol 6|数字六|DIGIT SIX|false
+@symbol 7|数字七|DIGIT SEVEN|false
+@symbol 8|数字八|DIGIT EIGHT|false
+@symbol 9|数字九|DIGIT NINE|false
 @symbol ℹ|InformationSource|INFORMATION SOURCE|emoji
 @symbol ⏱|Stopwatch|STOPWATCH|emoji
 @symbol ☘|Shamrock|SHAMROCK|emoji

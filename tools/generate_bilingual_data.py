@@ -65,6 +65,8 @@ for ci, category in enumerate(cat['categories']):
     crows.append((intern(category['name']), intern(category.get('desc', '')), first_group, len(category['groups'])))
 
 dinds = [idx[text] for text in cat['default_common'] if text in idx]
+ui_main_indices = [int(value) for value in cat.get('ui_main_category_indices', [])]
+ui_other_indices = [int(value) for value in cat.get('ui_other_category_indices', [])]
 
 
 def origin_normalized_text(text):
@@ -75,18 +77,22 @@ def origin_normalized_text(text):
     )
 
 
-# Pick one useful source location for every compiled symbol.  The generated
-# “全部符号” category is deliberately last in the preference order, otherwise
-# every search result would report that synthetic category instead of the
-# hand-maintained source category.  “补充符号” is used only when no regular
-# visible category contains the symbol.
+# Pick one useful source location for every compiled symbol.  Priority is
+# structural, never based on display titles: hand-maintained categories first,
+# generated orphan storage next, and the generated all-symbol union last.
 origin_rows = [None] * len(symbols)
-category_priorities = []
-for excluded in ({'全部符号', '补充符号'}, {'全部符号'}, set()):
-    for ci, category in enumerate(cat['categories']):
-        if category['name'] in excluded or ci in category_priorities:
-            continue
-        category_priorities.append(ci)
+category_priorities = [
+    ci for ci, category in enumerate(cat['categories'])
+    if category.get('role') not in ('all', 'generated-supplement')
+]
+category_priorities.extend(
+    ci for ci, category in enumerate(cat['categories'])
+    if category.get('role') == 'generated-supplement'
+)
+category_priorities.extend(
+    ci for ci, category in enumerate(cat['categories'])
+    if category.get('role') == 'all'
+)
 
 for ci in category_priorities:
     category = cat['categories'][ci]
@@ -163,6 +169,8 @@ parts = [
     'const YSSymbolOriginRecord g_ys_symbol_origins[] = {\n' + format_array(origin_rows, lambda row: '{%du,%du,%du,%du,%du,%du}' % row, 2) + '\n};\n',
     'const uint32_t g_ys_group_items[] = {\n' + format_array(irefs, lambda value: f'{value}u', 12) + '\n};\n',
     'const uint32_t g_ys_default_common_items[] = {\n' + format_array(dinds, lambda value: f'{value}u', 12) + '\n};\n',
+    'const uint16_t g_ys_ui_main_categories[] = {\n' + format_array(ui_main_indices, lambda value: f'{value}u', 12) + '\n};\n',
+    'const uint16_t g_ys_ui_other_categories[] = {\n' + format_array(ui_other_indices, lambda value: f'{value}u', 12) + '\n};\n',
     'static const uint32_t g_ys_symbol_hash_table[] = {\n' + format_array(hash_table, lambda value: f'{value}u', 16) + '\n};\n',
     'static uint32_t ys_symbol_hash_value(const WCHAR *text) {\n'
     '    uint32_t hash = 2166136261u;\n'
@@ -189,6 +197,8 @@ parts = [
     f'const size_t g_ys_category_count = {len(crows)}u;\n',
     f'const size_t g_ys_group_item_count = {len(irefs)}u;\n',
     f'const size_t g_ys_default_common_count = {len(dinds)}u;\n',
+    f'const size_t g_ys_ui_main_category_count = {len(ui_main_indices)}u;\n',
+    f'const size_t g_ys_ui_other_category_count = {len(ui_other_indices)}u;\n',
 ]
 
 

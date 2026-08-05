@@ -11,6 +11,9 @@ if /i "%ACTION%"=="data" goto :data
 if /i "%ACTION%"=="cldr" goto :cldr
 if /i "%ACTION%"=="all" goto :all
 if /i "%ACTION%"=="run" goto :run
+if /i "%ACTION%"=="web" goto :web
+if /i "%ACTION%"=="web-serve" goto :web_serve
+if /i "%ACTION%"=="web-clean" goto :web_clean
 if /i "%ACTION%"=="help" goto :help
 if /i "%ACTION%"=="-h" goto :help
 if /i "%ACTION%"=="--help" goto :help
@@ -82,7 +85,12 @@ exit /b 0
 
 :data
 echo [YeSymbol] Regenerating catalog data...
-call regenerate-data.cmd
+rem Fully qualified on purpose: when NoDefaultCurrentDirectoryInExePath=1 is
+rem set in the environment (a common security/policy setting), cmd.exe does
+rem not search the current directory for commands, so a bare
+rem "call regenerate-data.cmd" fails with "is not recognized as an internal
+rem or external command" even though the file sits right next to this script.
+call "%~dp0regenerate-data.cmd"
 if errorlevel 1 (
   echo [ERROR] Catalog regeneration failed. Build/run has been stopped.
   exit /b 1
@@ -115,12 +123,6 @@ exit /b %errorlevel%
 echo [YeSymbol] Stopping existing yesymbol.exe...
 taskkill /F /IM yesymbol.exe >nul 2>nul
 
-call "%~f0" data
-if errorlevel 1 exit /b 1
-
-call "%~f0" clean
-if errorlevel 1 exit /b 1
-
 call "%~f0" build
 if errorlevel 1 exit /b 1
 
@@ -137,6 +139,19 @@ if errorlevel 1 (
 )
 exit /b 0
 
+rem Fully qualified for the same reason as regenerate-data.cmd above.
+:web
+call "%~dp0build-web.bat" build
+exit /b %errorlevel%
+
+:web_serve
+call "%~dp0build-web.bat" serve
+exit /b %errorlevel%
+
+:web_clean
+call "%~dp0build-web.bat" clean
+exit /b %errorlevel%
+
 :help
 echo.
 echo Usage:
@@ -146,7 +161,10 @@ echo   build.bat clean   Delete build and dist only
 echo   build.bat data    Regenerate JSON and C symbol data
 echo   build.bat cldr    Refresh CLDR Chinese names and regenerate data
 echo   build.bat all     Regenerate data, clean and build
-echo   build.bat run     Kill, regenerate data, clean, build and run
+echo   build.bat run     Kill, incrementally build and run
+echo   build.bat web     Regenerate shared data and build dist-web
+echo   build.bat web-serve Build dist-web and serve on http://127.0.0.1:8080/
+echo   build.bat web-clean Delete dist-web only
 echo   build.bat help    Show this help
 echo.
 exit /b 0

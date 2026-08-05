@@ -17,6 +17,27 @@ provenance/reference file; the Windows application does not load JavaScript.
 Copyright Mathias Bynens and emoji-regex contributors.
 
 
+## Twemoji artwork
+
+Emoji images embedded in `src/emoji_image_data.c` are Twemoji artwork, taken
+unmodified from:
+
+```text
+jdecked/twemoji
+tag v17.0.3
+assets/72x72/*.png
+```
+
+The PNG files are embedded verbatim and decoded at runtime; they are used
+for consistent, fast rendering. The copied or inserted value remains the
+original Unicode sequence.
+
+Twemoji graphics are licensed under CC-BY 4.0
+(<https://creativecommons.org/licenses/by/4.0/>).
+
+Copyright © Twitter, Inc and other contributors. Graphics licensed under
+CC-BY 4.0.
+
 ## Unicode CLDR Chinese annotations
 
 Build-time Chinese short names are sourced from:

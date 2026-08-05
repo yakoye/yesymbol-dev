@@ -147,7 +147,7 @@ include\yesymbol.h
 
 ```c
 #define YESYMBOL_PRODUCT_NAME L"符号大全"
-#define YESYMBOL_VERSION L"1.0.3-rc1"
+#define YESYMBOL_VERSION L"1.1.0"
 ```
 
 窗口标题在 `src/ui.c` 的 `CreateWindowExW` 调用处设置。

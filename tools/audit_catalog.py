@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Audit generated YeSymbol catalog invariants that should never regress."""
+"""Audit YeSymbol catalog invariants without depending on display headings.
+
+``#`` and ``##`` titles are user-facing text.  They may be renamed, removed,
+merged or reordered.  This audit therefore identifies important series from
+their Unicode contents and generated structural metadata, never from Chinese or
+English heading strings.
+"""
 from __future__ import annotations
 
 import json
@@ -12,43 +18,79 @@ CATALOG = ROOT / "data-source" / "catalog.generated.json"
 SERIES_MANIFEST = ROOT / "data-source" / "catalog-series-manifest.json"
 
 
-def load_series() -> Dict[str, Set[str]]:
+def load_series() -> Dict[str, List[str]]:
     payload = json.loads(SERIES_MANIFEST.read_text(encoding="utf-8"))
     return {
-        name: {chr(int(value, 16)) for value in values}
+        name: [chr(int(value, 16)) for value in values]
         for name, values in payload.get("series", {}).items()
     }
 
 
-def category(data: Dict[str, Any], name: str) -> Dict[str, Any]:
-    for item in data.get("categories", []):
-        if item.get("name") == name:
-            return item
-    raise AssertionError(f"missing category: {name}")
+def category_items(category: Dict[str, Any]) -> List[str]:
+    return [
+        str(item)
+        for group in category.get("groups", [])
+        if not group.get("spacer")
+        for item in group.get("items", [])
+    ]
 
 
-def category_items(cat: Dict[str, Any]) -> List[str]:
-    return [item for group in cat.get("groups", []) if not group.get("spacer") for item in group.get("items", [])]
+def source_categories(data: Dict[str, Any]) -> List[Dict[str, Any]]:
+    return [
+        category
+        for category in data.get("categories", [])
+        if category.get("role") != "all"
+    ]
 
 
-def block_items(cat: Dict[str, Any], title: str) -> List[str]:
-    output: List[str] = []
-    active = False
-    for group in cat.get("groups", []):
-        if group.get("spacer"):
-            if active:
-                break
-            continue
-        group_title = str(group.get("title", ""))
-        if group_title:
-            if active:
-                break
-            active = group_title == title
-        if active:
-            output.extend(group.get("items", []))
-    if not active and not output:
-        raise AssertionError(f"missing group: {cat.get('name')}/{title}")
-    return output
+def find_subsequence(haystack: Sequence[str], needle: Sequence[str]) -> int:
+    if not needle or len(needle) > len(haystack):
+        return -1
+    first = needle[0]
+    limit = len(haystack) - len(needle) + 1
+    for start in range(limit):
+        if haystack[start] == first and list(haystack[start : start + len(needle)]) == list(needle):
+            return start
+    return -1
+
+
+def require_ordered_series(
+    label: str,
+    expected: Sequence[str],
+    categories: Sequence[Dict[str, Any]],
+    errors: List[str],
+) -> None:
+    for category in categories:
+        if find_subsequence(category_items(category), expected) >= 0:
+            return
+    visible = {item for category in categories for item in category_items(category)}
+    missing = [item for item in expected if item not in visible]
+    if missing:
+        errors.append(f"{label}: missing {len(missing)} items, first={missing[:8]!r}")
+    else:
+        errors.append(f"{label}: all items exist but are no longer in Unicode order")
+
+
+def require_complete_series(
+    label: str,
+    expected: Sequence[str],
+    categories: Sequence[Dict[str, Any]],
+    errors: List[str],
+) -> None:
+    """Check that every symbol of a series is present, ignoring its order.
+
+    Used for series whose on-screen arrangement is deliberately curated in
+    catalog.txt rather than following code point order -- mahjong tiles are
+    grouped by suit, tile/card backs are moved out of the middle of the
+    run, and so on.  Enforcing Unicode order there would report a false
+    failure for an intentional layout, so only completeness is checked:
+    losing or duplicating a symbol is still caught (here and by the global
+    duplicate checks), while rearranging one is allowed.
+    """
+    visible = {item for category in categories for item in category_items(category)}
+    missing = [item for item in expected if item not in visible]
+    if missing:
+        errors.append(f"{label}: missing {len(missing)} items, first={missing[:8]!r}")
 
 
 def regional_flag(text: str) -> bool:
@@ -59,30 +101,67 @@ def tag_flag(text: str) -> bool:
     return len(text) >= 3 and ord(text[0]) == 0x1F3F4 and ord(text[-1]) == 0xE007F
 
 
-def require_exact(label: str, actual: Iterable[str], expected: Set[str], errors: List[str]) -> None:
-    actual_set = set(actual)
-    if actual_set != expected:
-        missing = sorted(expected - actual_set, key=lambda text: tuple(map(ord, text)))
-        extra = sorted(actual_set - expected, key=lambda text: tuple(map(ord, text)))
-        errors.append(f"{label}: expected {len(expected)}, got {len(actual_set)}; missing={missing[:8]!r}, extra={extra[:8]!r}")
+def variant_key(text: str) -> str:
+    return "".join(
+        char for char in str(text)
+        if ord(char) != 0xFE0F and not (0x1F3FB <= ord(char) <= 0x1F3FF)
+    )
+
+
+def ordered_unique(items: Iterable[str]) -> List[str]:
+    seen: Set[str] = set()
+    output: List[str] = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            output.append(item)
+    return output
 
 
 def main() -> int:
     data = json.loads(CATALOG.read_text(encoding="utf-8"))
     series = load_series()
     errors: List[str] = []
+    categories = data.get("categories", [])
+    source = source_categories(data)
 
-    names = [item.get("name") for item in data.get("categories", [])]
-    for required in ["序号字母", "东亚字符", "大篆", "小篆", "俄文字符", "象形文字", "古埃及文字"]:
-        if required not in names:
-            errors.append(f"missing category: {required}")
+    if not categories or categories[0].get("role") != "all":
+        errors.append("generated all-symbol category must be category index 0 with role=all")
 
-    number_cat = category(data, "序号字母")
-    circled_21_50 = set(chr(cp) for cp in range(0x3251, 0x3260)) | set(chr(cp) for cp in range(0x32B1, 0x32C0))
-    require_exact("带圈数字 21–50", block_items(number_cat, "带圈数字 21–50"), circled_21_50, errors)
+    # Structural checks: row/column metadata and category-local deduplication.
+    for category_index, category in enumerate(source, 1):
+        seen: Set[str] = set()
+        expected_row = 0
+        for group in category.get("groups", []):
+            if group.get("spacer"):
+                continue
+            expected_row += 1
+            items = [str(item) for item in group.get("items", [])]
+            cols = int(group.get("cols", 0) or 0)
+            row = int(group.get("row", 0) or 0)
+            if not (1 <= cols <= 12):
+                errors.append(f"category {category_index}: invalid cols={cols}")
+            if len(items) > 12:
+                errors.append(f"category {category_index}, row {row}: more than 12 items")
+            if row != expected_row:
+                errors.append(
+                    f"category {category_index}: row numbering is not structural "
+                    f"(expected {expected_row}, got {row})"
+                )
+            duplicates = [item for item in items if item in seen]
+            if duplicates:
+                errors.append(
+                    f"category {category_index}: duplicate references remain, first={duplicates[:8]!r}"
+                )
+            seen.update(items)
 
-    letter_cat = number_cat
-    expected_letters: List[str] = []
+    # Important Unicode series are found by content, not by category/group name.
+    circled_21_50 = [chr(cp) for cp in range(0x3251, 0x3260)] + [
+        chr(cp) for cp in range(0x32B1, 0x32C0)
+    ]
+    require_ordered_series("circled numbers 21-50", circled_21_50, source, errors)
+
+    letter_series: List[str] = []
     for start, end in (
         (0x24B6, 0x24D0),
         (0x24D0, 0x24EA),
@@ -92,113 +171,128 @@ def main() -> int:
         (0x1F150, 0x1F16A),
         (0x1F170, 0x1F18A),
     ):
-        expected_letters.extend(chr(cp) for cp in range(start, end))
-    actual_letters = block_items(letter_cat, "字母序号")
-    if actual_letters != expected_letters:
-        errors.append(f"序号字母/字母序号 should contain seven complete A-Z series in order; got {len(actual_letters)} items")
+        letter_series.extend(chr(cp) for cp in range(start, end))
+    require_ordered_series("seven A-Z enclosed-letter series", letter_series, source, errors)
 
-    for seal_name in ("大篆", "小篆"):
-        seal = category(data, seal_name)
-        if category_items(seal):
-            errors.append(f"{seal_name} must not fake separate Unicode code points; keep it as a font-dependent reserved category")
-        if "Unicode" not in str(seal.get("desc", "")):
-            errors.append(f"{seal_name} description must explain the Unicode/font limitation")
-
-    special = category(data, "特殊符号")
-    require_exact("麻将牌", block_items(special, "麻将牌（Unicode 顺序）"), series["mahjong"], errors)
-    require_exact("多米诺骨牌", block_items(special, "多米诺骨牌（Unicode 顺序）"), series["domino"], errors)
-    require_exact("扑克牌", block_items(special, "扑克牌（Unicode 顺序）"), series["playing_cards"], errors)
-    require_exact("国际象棋扩展符号", block_items(special, "国际象棋扩展符号（Unicode 顺序）"), series["chess_symbols"], errors)
-
-    pictographic = category(data, "象形文字")
-    pictographic_items = set(category_items(pictographic))
+    # Game tiles and cards are laid out for the picker, not by code point:
+    # mahjong is grouped by suit, tile/card backs are pulled out of the
+    # middle of their runs.  Only completeness is enforced for these.
     for label, key in (
-        ("斐斯托斯圆盘文字", "phaistos"),
-        ("楔形文字", "cuneiform"),
-        ("楔形数字与标点", "cuneiform_numbers"),
-        ("安纳托利亚象形文字", "anatolian_hieroglyphs"),
+        ("mahjong", "mahjong"),
+        ("domino", "domino"),
+        ("playing cards", "playing_cards"),
     ):
-        expected = series[key]
-        if not expected.issubset(pictographic_items):
-            errors.append(f"象形文字 missing items from {label}: {len(expected - pictographic_items)}")
+        require_complete_series(label, series[key], source, errors)
 
-    egyptian = category(data, "古埃及文字")
-    egyptian_items = set(category_items(egyptian))
-    require_exact("古埃及文字", egyptian_items, series["egyptian_hieroglyphs_and_controls"], errors)
+    for label, key in (
+        ("chess symbols", "chess_symbols"),
+        ("Phaistos disc", "phaistos"),
+        ("Anatolian hieroglyphs", "anatolian_hieroglyphs"),
+        ("cuneiform", "cuneiform"),
+        ("cuneiform numbers", "cuneiform_numbers"),
+        ("Egyptian hieroglyphs and controls", "egyptian_hieroglyphs_and_controls"),
+    ):
+        require_ordered_series(label, series[key], source, errors)
 
-    flags = category(data, "Emoji·符号与旗帜")
-    region_items = block_items(flags, "国家和地区旗帜（Unicode 17.0）")
-    tag_items = block_items(flags, "地区旗帜（英格兰、苏格兰、威尔士）")
-    if len(region_items) != 259 or len(set(region_items)) != 259 or not all(regional_flag(item) for item in region_items):
-        errors.append(f"regional flags should contain 259 unique RGI sequences, got {len(region_items)}/{len(set(region_items))}")
-    territories = json.loads((ROOT / "data-source" / "territory_names_zh.json").read_text(encoding="utf-8"))
+    all_source_items = [item for category in source for item in category_items(category)]
+    regional_items = ordered_unique(item for item in all_source_items if regional_flag(item))
+    tag_items = ordered_unique(item for item in all_source_items if tag_flag(item))
+    if len(regional_items) != 259:
+        errors.append(f"regional flags: expected 259 unique sequences, got {len(regional_items)}")
+    if len(tag_items) != 3:
+        errors.append(f"subdivision flags: expected 3 unique sequences, got {len(tag_items)}")
+
+    territories = json.loads(
+        (ROOT / "data-source" / "territory_names_zh.json").read_text(encoding="utf-8")
+    )
     pseudo_regions = {"XA", "XB", "QO", "EZ", "ZZ"}
-    expected_codes = {code for code in territories if len(code) == 2 and code.isalpha() and code.isupper() and code not in pseudo_regions}
-    actual_codes = {"".join(chr(ord("A") + ord(ch) - 0x1F1E6) for ch in flag) for flag in region_items}
+    expected_codes = {
+        code
+        for code in territories
+        if len(code) == 2 and code.isalpha() and code.isupper() and code not in pseudo_regions
+    }
+    actual_codes = {
+        "".join(chr(ord("A") + ord(ch) - 0x1F1E6) for ch in flag)
+        for flag in regional_items
+    }
     if actual_codes != expected_codes:
-        errors.append(f"regional flag codes differ from territory table: missing={sorted(expected_codes-actual_codes)[:8]!r}, extra={sorted(actual_codes-expected_codes)[:8]!r}")
-    if len(tag_items) != 3 or len(set(tag_items)) != 3 or not all(tag_flag(item) for item in tag_items):
-        errors.append(f"subdivision tag flags should contain 3 unique sequences, got {len(tag_items)}/{len(set(tag_items))}")
-    sark = chr(0x1F1E8) + chr(0x1F1F6)
-    if sark not in region_items:
-        errors.append("missing Sark flag (CQ)")
-    records_by_text = {record.get("text"): record for record in data.get("symbols", [])}
+        errors.append(
+            "regional flag codes differ from territory table: "
+            f"missing={sorted(expected_codes-actual_codes)[:8]!r}, "
+            f"extra={sorted(actual_codes-expected_codes)[:8]!r}"
+        )
+
+    records = data.get("symbols", [])
+    records_by_text = {str(record.get("text", "")): record for record in records}
     bad_flag_names = [
-        flag for flag in region_items + tag_items
+        flag
+        for flag in regional_items + tag_items
         if "旗" not in str(records_by_text.get(flag, {}).get("name_zh", ""))
         or not records_by_text.get(flag, {}).get("emoji")
     ]
     if bad_flag_names:
         errors.append(f"flag records need Chinese flag names and Emoji flags: {bad_flag_names[:8]!r}")
 
-    supplement = category(data, "补充符号")
-    bad_prefixes = ("标点与排版 ·", "括号与引号 ·", "货币与单位 ·", "箭头与方向 ·", "图形与制表 ·", "数学符号 ·", "数字·分数·编号 ·", "拉丁扩展与音标 ·")
-    residual_titles = [str(group.get("title", "")) for group in supplement.get("groups", [])]
-    leaked = [title for title in residual_titles if title.startswith(bad_prefixes)]
-    if leaked:
-        errors.append(f"supplement still contains groups that should be classified above: {leaked[:8]!r}")
-    # Build-generated orphan placement is allowed and required: every ordinary
-    # searchable symbol needs a real source row for tooltip metadata and
-    # “跳到所在位置”.  Only Emoji presentation/skin variants may remain hidden.
-    all_visible = {
-        item
-        for cat in data.get("categories", [])[1:]
-        for group in cat.get("groups", [])
-        for item in group.get("items", [])
-    }
-    def variant_key(text: str) -> str:
-        return "".join(
-            char for char in str(text)
-            if ord(char) != 0xFE0F and not (0x1F3FB <= ord(char) <= 0x1F3FF)
-        )
-    visible_keys = {variant_key(item) for item in all_visible}
-    unlocatable = [
-        record.get("text") for record in data.get("symbols", [])
-        if record.get("text") not in all_visible
-        and variant_key(record.get("text", "")) not in visible_keys
+    bad_names = [
+        record.get("text")
+        for record in records
+        if not record.get("name_zh")
+        or record.get("name_zh") == "未标注"
+        or not record.get("name_en")
     ]
-    if unlocatable:
-        errors.append(f"searchable symbols without a source location: {unlocatable[:8]!r} (total {len(unlocatable)})")
-    misplaced = {"萨顿手语书写", "带圈表意文字补充", "杂项符号和象形文字", "装饰性印刷符号", "交通和地图符号", "补充符号和象形文字", "传统计算机符号"}
-    leaked_exact = sorted(misplaced.intersection(residual_titles))
-    if leaked_exact:
-        errors.append(f"supplement still has movable groups: {leaked_exact!r}")
-
-    symbol_records = data.get("symbols", [])
-    bad_names = [record.get("text") for record in symbol_records if not record.get("name_zh") or record.get("name_zh") == "未标注" or not record.get("name_en")]
     if bad_names:
         errors.append(f"missing bilingual names: {bad_names[:12]!r} (total {len(bad_names)})")
+
+    visible = set(all_source_items)
+    visible_keys = {variant_key(item) for item in visible}
+    unlocatable = [
+        record.get("text")
+        for record in records
+        if record.get("text") not in visible
+        and variant_key(str(record.get("text", ""))) not in visible_keys
+    ]
+    if unlocatable:
+        errors.append(
+            f"searchable symbols without a source location: {unlocatable[:8]!r} "
+            f"(total {len(unlocatable)})"
+        )
+
+    # Generated all-symbol category must be the unique source-order union.
+    if categories:
+        expected_all = ordered_unique(all_source_items)
+        actual_all = category_items(categories[0])
+        if actual_all != expected_all:
+            errors.append(
+                f"generated all-symbol union differs: expected {len(expected_all)}, got {len(actual_all)}"
+            )
+
+    main_indices = [int(value) for value in data.get("ui_main_category_indices", [])]
+    other_indices = [int(value) for value in data.get("ui_other_category_indices", [])]
+    if len(main_indices) != len(set(main_indices)) or len(other_indices) != len(set(other_indices)):
+        errors.append("UI category index lists contain duplicates")
+    if set(main_indices).intersection(other_indices):
+        errors.append("a category cannot be both main and other")
+    for index in main_indices + other_indices:
+        if not (1 <= index < len(categories)):
+            errors.append(f"UI category index out of range: {index}")
+    for index in main_indices:
+        if categories[index].get("ui_section", "main") != "main":
+            errors.append(f"UI main index {index} does not point to a main category")
+    for index in other_indices:
+        if categories[index].get("ui_section") != "other":
+            errors.append(f"UI other index {index} does not point to an other category")
 
     if errors:
         for error in errors:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
+    egyptian_count = len(series["egyptian_hieroglyphs_and_controls"])
     print(
         "catalog audit passed: "
-        f"{len(symbol_records)} symbol records, 259 regional flags + 3 subdivision flags, "
-        "complete 21–50 circled numbers, complete card/tile series, "
-        f"{len(egyptian_items)} Egyptian characters, all searchable records locatable"
+        f"{len(records)} symbol records, headings are display-only, "
+        "259 regional flags + 3 subdivision flags, complete card/tile series, "
+        f"{egyptian_count} Egyptian characters, all searchable records locatable"
     )
     return 0
 

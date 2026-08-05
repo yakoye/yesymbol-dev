@@ -27,35 +27,39 @@ void ys_show_about_dialog(HWND owner, HINSTANCE instance) {
     if (has_web) {
         StringCchPrintfW(content, ARRAYSIZE(content),
             L"版本：%s\n"
-            L"开发日期：%s\n\n"
+            L"修改日期：%s\n\n"
             L"开发目的：\n%s\n\n"
             L"联系作者：<a href=\"mailto:%s\">%s</a>\n"
-            L"github：<a href=\"%s\">%s</a>\n"
+            L"GitHub：<a href=\"%s\">%s</a>\n"
+            L"Unicode List：<a href=\"%s\">emoji-list.html</a>\n"
             L"网页版：<a href=\"%s\">%s</a>",
             YESYMBOL_VERSION,
-            YESYMBOL_DEVELOPMENT_DATE,
+            YESYMBOL_MODIFIED_DATE,
             YESYMBOL_DEVELOPMENT_PURPOSE,
             YESYMBOL_AUTHOR_EMAIL,
             YESYMBOL_AUTHOR_EMAIL,
             YESYMBOL_GITHUB_URL,
             YESYMBOL_GITHUB_LABEL,
+            YESYMBOL_UNICODE_LIST_URL,
             YESYMBOL_WEB_URL,
             YESYMBOL_WEB_LABEL);
     } else {
         StringCchPrintfW(content, ARRAYSIZE(content),
             L"版本：%s\n"
-            L"开发日期：%s\n\n"
+            L"修改日期：%s\n\n"
             L"开发目的：\n%s\n\n"
             L"联系作者：<a href=\"mailto:%s\">%s</a>\n"
-            L"github：<a href=\"%s\">%s</a>\n"
+            L"GitHub：<a href=\"%s\">%s</a>\n"
+            L"Unicode List：<a href=\"%s\">emoji-list.html</a>\n"
             L"网页版：开发中，敬请期待。",
             YESYMBOL_VERSION,
-            YESYMBOL_DEVELOPMENT_DATE,
+            YESYMBOL_MODIFIED_DATE,
             YESYMBOL_DEVELOPMENT_PURPOSE,
             YESYMBOL_AUTHOR_EMAIL,
             YESYMBOL_AUTHOR_EMAIL,
             YESYMBOL_GITHUB_URL,
-            YESYMBOL_GITHUB_LABEL);
+            YESYMBOL_GITHUB_LABEL,
+            YESYMBOL_UNICODE_LIST_URL);
     }
 
     StringCchCopyW(footer, ARRAYSIZE(footer),

@@ -10,7 +10,7 @@
 ![Language](https://img.shields.io/badge/language-C11%20%2B%20DirectWrite%20bridge-00599C)
 ![UI](https://img.shields.io/badge/UI-Win32%20%2B%20DirectWrite-5C2D91)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.0.3--rc1-orange)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 
 仓库：<https://github.com/yakoye/yesymbol-dev>
 
@@ -52,7 +52,7 @@ YeSymbol 的开发目标是：
 - 常用符号固定每行显示 12 个，顺序由用户维护，不再按次数自动重排；
 - 支持自定义符号和完整 Unicode 序列；
 - 支持 Emoji 肤色、ZWJ 组合和区域指示符序列；
-- 使用 DirectWrite + Direct2D 彩色字体绘制 Emoji；
+- Emoji 优先使用构建期嵌入的 Twemoji 图片，以 36×36 px 显示；点击时仍复制或插入原始 Unicode 序列；
 - DirectWrite 初始化失败时自动退回 GDI 单色绘制，不影响复制；
 - 可选“自动插入”，并记住用户设置；
 - 支持窗口置顶和系统托盘；
@@ -74,10 +74,11 @@ YeSymbol 的开发目标是：
 托盘图标右键 → 退出
 ```
 
-“关于 YeSymbol”中包含可点击仓库链接：
+“关于 YeSymbol”中包含可点击仓库和 Unicode List 链接：
 
 ```text
-github：yesymbol-dev
+GitHub：yesymbol-dev
+Unicode List：emoji-list.html
 ```
 
 ### 从源码编译运行
@@ -104,7 +105,7 @@ Shell API
 
 Python不是 `yesymbol.exe` 的运行依赖。
 
-#### 一键清理、编译并运行
+#### 一键编译并运行
 
 在项目根目录打开 PowerShell：
 
@@ -116,10 +117,6 @@ Python不是 `yesymbol.exe` 的运行依赖。
 
 ```text
 结束正在运行的 yesymbol.exe
-→ catalog.txt 生成 catalog.generated.json
-→ 审计数据
-→ JSON 生成 src\symbol_data.c
-→ 清理 build 和 dist
 → CMake 配置
 → Release 编译
 → 运行 dist\yesymbol.exe
@@ -134,7 +131,7 @@ Python不是 `yesymbol.exe` 的运行依赖。
 .\build.bat data     # TXT → JSON → C，不编译 EXE
 .\build.bat cldr     # 刷新固定版本 CLDR 中文名称并重新生成数据
 .\build.bat all      # 生成数据、清理并完整编译
-.\build.bat run      # 清理、生成、编译并运行
+.\build.bat run      # 增量编译并运行（不重新生成数据）
 .\build.bat help     # 查看帮助
 ```
 
@@ -157,7 +154,7 @@ CMake 中必须保留：
 ### 复制符号
 
 - 单击符号：复制到剪贴板；
-- 勾选“自动插入”：复制后恢复此前窗口并发送 `Ctrl+V`；
+- 勾选“自动插入”：单击图片后向此前窗口直接发送对应 Unicode 文本；
 - 鼠标悬浮：查看中英文名称、分类、位置信息和编码；
 - 右键符号：加入常用、移出常用、删除记录、切换肤色或跳转原位置。
 
@@ -218,6 +215,7 @@ Esc    清空搜索
 - 右键任意符号可以加入常用或从常用删除；
 - 非常用符号累计使用达到 5 次后，会自动追加到常用符号末尾；
 - 手工加入、自动加入、拖动后的顺序和删除结果都会持久化保存。
+- 初始内容来自 `catalog.txt` 中可编辑的 `# 常用符号`；重新生成后会合并新默认项，同时保留用户追加、排序和删除结果。
 
 #### 自定义
 
@@ -240,7 +238,7 @@ HKEY_CURRENT_USER\Software\YeTools\YeSymbol
 自动插入设置
 ```
 
-其中常用符号使用 `CommonV2` 保存固定顺序，非当前常用符号的累计次数使用 `UsageV1` 保存。旧版 `CommonV1` 会在首次启动时自动迁移，已有常用符号不会丢失。
+其中常用符号使用 `CommonV3` 保存固定顺序、来源和默认项删除记录，非当前常用符号的累计次数使用 `UsageV1` 保存。旧版 `CommonV1`/`CommonV2` 会自动迁移，已有用户项目不会丢失。
 
 自动加入阈值可在 `include\ui_config.h` 中修改：
 
@@ -356,6 +354,18 @@ data-source\cldr-annotations-zh.tts.json
 ## 箭头
 ```
 
+`#` 和 `##` 后面的文字都是显示名称，可以自由修改。转换器只根据行首标记识别层级，不会根据“大篆”“扑克牌”等标题文字猜测分类含义。完全同名的一级或二级标题会按首次出现位置自动合并，但为了便于人工维护，仍建议主动整理重复标题。
+
+侧边栏位置使用独立结构指令控制：
+
+```text
+@ui-section main     普通侧边栏分类
+@ui-section other    折叠到“其他符号”下面
+@ui-section hidden   不显示在侧边栏，但参与搜索和全部符号
+```
+
+该指令会影响它后面的一级分类，直到出现新的 `@ui-section`。修改分类名称、分组名称和 `@desc` 不需要同步修改程序源码。
+
 符号行使用逗号分隔：
 
 ```text
@@ -399,6 +409,7 @@ python tools\catalog_text.py check
 python tools\catalog_text.py build
 python tools\audit_catalog.py
 python tools\generate_bilingual_data.py
+python tools\build_emoji_images.py all
 ```
 
 生成文件：
@@ -406,31 +417,19 @@ python tools\generate_bilingual_data.py
 ```text
 data-source\catalog.generated.json
 src\symbol_data.c
+src\emoji_image_data.c
 ```
 
 ##### 如何再次编译生成并运行
 
-完成 TXT 修改后执行：
+完成 TXT 修改后先生成数据，再编译运行：
 
 ```powershell
+.\build.bat data
 .\build.bat run
 ```
 
-##### 完整生成链路和关系：
-```text
-catalog.txt
-    ↓ tools\catalog_text.py build
-→ catalog.generated.json
-    | tools\generate_bilingual_data.py
-    ↓ tools\generate_bilingual_data.py
-→ src\symbol_data.c
-    ↓ MSVC/CMake
-→ yesymbol.exe
-
-```
-
-
-数据格式、重复项、分类完整性或C数据生成失败时，脚本会停止，不会继续运行旧版程序。
+数据格式、重复项、分类完整性、图片下载或 C 数据生成失败时，`build.bat data` 会停止。
 
 ## 技术说明
 
@@ -440,7 +439,7 @@ catalog.txt
 语言：C11 主体；DirectWrite 渲染桥接单元使用 C++ 编译器模式
 界面：Win32 API
 普通符号：GDI
-彩色 Emoji：DirectWrite + Direct2D
+彩色 Emoji：内嵌 Twemoji PNG + WIC + GDI AlphaBlend
 构建：CMake + MSVC
 数据生成：Python，仅构建期使用
 用户数据：HKCU 注册表
@@ -453,26 +452,14 @@ Emoji 网格和顶部最近使用区域使用同一套底层绘制流程：
 
 ```text
 GDI绘制背景、边框和普通符号
-→ 收集当前可见的 Emoji
-→ DirectWrite进行文本整形和字体选择
-→ Direct2D DrawText启用颜色字体选项
-→ 一次批量绘制到双缓冲内存DC
+→ 按需从 EXE 内嵌数据解码 36×36 Emoji 图片
+→ 保存到最多 384 项的 LRU 位图缓存
+→ AlphaBlend 绘制当前可见图片
+→ 缺图时使用 DirectWrite/Direct2D 字体回退
 → BitBlt显示到窗口
 ```
 
-启用颜色字体的核心是：
-
-```text
-D2D1_DRAW_TEXT_OPTIONS_ENABLE_COLOR_FONT
-```
-
-字体优先使用系统自带：
-
-```text
-Segoe UI Emoji
-```
-
-DirectWrite或Direct2D初始化失败时，程序自动使用原有 GDI 路径，符号仍可正常搜索和复制。
+图片只参与显示。单击后查找对应记录，剪贴板和自动插入始终使用原始 Unicode 文本。缺少嵌入图片或图片解码失败时，程序使用系统 `Segoe UI Emoji` 与 DirectWrite/Direct2D 回退；所有渲染失败都不影响搜索和复制。
 
 ### 数据为什么经过 JSON
 
@@ -520,15 +507,40 @@ Emoji彩色绘制
 README本地链接
 ```
 
+
+## 网页版
+
+项目同时提供纯静态 HTML 版本。网页版和 Windows 桌面版共用同一个构建期数据文件：
+
+```text
+data-source\catalog.txt
+        ↓
+data-source\catalog.generated.json
+        ├─→ src\symbol_data.c      Windows 单 EXE
+        └─→ dist-web\data\catalog.generated.json  网页发布目录
+```
+
+修改 `catalog.txt` 后构建网页版：
+
+```powershell
+.\build.bat web
+```
+
+本地预览：
+
+```powershell
+.\build.bat web-serve
+```
+
+将 `dist-web` 中的全部内容上传到 GitHub Pages、Cloudflare Pages、Netlify 或普通静态服务器即可发布。网页版的最近使用、常用、自定义和搜索历史保存在浏览器 `localStorage`，不会修改共享目录数据。详细说明见 [web/README.md](web/README.md)。
+
 ## 已知限制
 
-- 彩色 Emoji 依赖 Windows 系统的 `Segoe UI Emoji` 和 DirectWrite/Direct2D 支持；
-- Windows 的系统 Emoji 字体可能不提供所有国家旗帜图形，部分旗帜可能仍显示为区域指示字母，但复制的 Unicode 序列保持正确；
-- 不同 Windows 版本所包含的 Emoji 图形和新 Unicode 版本支持程度可能不同；
-- “自动插入”通过恢复目标窗口并发送 `Ctrl+V` 实现，管理员权限隔离、远程桌面、沙箱或特殊编辑器可能阻止自动粘贴；
+- 未包含在 Twemoji v17.0.3 中的字符会回退到 Windows 系统字体，显示效果取决于系统版本和字体覆盖；
+- “自动插入”使用 Windows Unicode 输入事件；管理员权限隔离、远程桌面、沙箱或特殊编辑器仍可能阻止注入；
 - 大篆和小篆属于字形风格，Unicode没有分别编码一整套独立字符；显示真实篆体需要用户系统已安装相应字体，本项目不分发字体；
 - 古文字是否显示取决于用户系统字体覆盖范围；缺少字体时可能出现方框；
-- 当前项目主要面向 Windows 10/11，不提供 macOS、Linux 或移动端版本。
+- 原生桌面程序主要面向 Windows 10/11；其他桌面和移动平台可以使用静态网页版，但触控布局仍以符号浏览和复制为主。
 
 ## 许可证
 
