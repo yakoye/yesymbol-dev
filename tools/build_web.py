@@ -10,7 +10,7 @@ import shutil
 import sys
 from pathlib import Path
 
-WEB_VERSION = "1.0.0-rc1"
+WEB_VERSION = "1.1.1"
 REQUIRED_KEYS = {
     "categories",
     "symbols",

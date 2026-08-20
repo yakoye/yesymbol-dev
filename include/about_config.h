@@ -5,7 +5,7 @@
  * 设置网页版地址后，关于窗口中的“打开网页版”会自动变为可点击链接。
  */
 #define YESYMBOL_AUTHOR_EMAIL L"yuxiang_163com@163.com"
-#define YESYMBOL_MODIFIED_DATE L"2026-08-05"
+#define YESYMBOL_MODIFIED_DATE L"2026-08-20"
 #define YESYMBOL_WEB_URL L""
 #define YESYMBOL_WEB_LABEL L"打开网页版"
 #define YESYMBOL_GITHUB_URL L"https://github.com/yakoye/yesymbol-dev"

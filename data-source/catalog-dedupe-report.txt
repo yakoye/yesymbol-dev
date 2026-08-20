@@ -1,6 +1,6 @@
 YeSymbol catalog normalization report
 =====================================
-categories (including generated 全部符号): 24
+categories (including generated 全部符号): 33
 unique symbol definitions: 16679
 symbol definition duplicates removed: 0
 duplicates removed inside the same group: 0
@@ -12,7 +12,7 @@ unreferenced definitions removed: 0
 missing definitions created: 0
 Chinese names replaced from pinned CLDR TTS cache: 1798
 default-common duplicates removed: 0
-unreferenced non-Emoji records placed in generated supplement: 1059
+unreferenced non-Emoji records placed in generated supplement: 1069
 
 Deduplication boundary:
 - exact duplicates inside one group are removed;

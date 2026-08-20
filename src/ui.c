@@ -33,6 +33,10 @@
 #define ID_TRAY_EXIT 2203
 #define ID_SYSTEM_ABOUT 0x1F00u
 #define YS_TRAY_ICON_ID 1u
+#define YS_BASE_UI_DPI 120u
+#define YS_MAIN_WINDOW_STYLE \
+    (WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_CLIPCHILDREN)
+#define YS_MAIN_WINDOW_EX_STYLE WS_EX_TOPMOST
 
 #define YS_ITEM_HEADER 1u
 #define YS_ITEM_SYMBOL 2u
@@ -50,17 +54,20 @@
 #define YS_CATEGORY_MAP_COMMON (-1)
 #define YS_CATEGORY_MAP_CUSTOM (-2)
 #define YS_CATEGORY_MAP_OTHER_HEADER (-3)
+#define YS_CATEGORY_MAP_EMOJI_HEADER (-4)
 
 #define YS_TIMER_FOREGROUND 1u
 #define YS_TIMER_SEARCH 2u
 #define YS_TIMER_STORAGE 3u
 #define YS_TIMER_SEARCH_HISTORY 4u
 #define YS_TIMER_CLIPBOARD 5u
+#define YS_TIMER_CATEGORY_BOUNDARY 6u
 #define YS_SEARCH_DEBOUNCE_MS 90u
 #define YS_STORAGE_FLUSH_MS 350u
 #define YS_SEARCH_HISTORY_COMMIT_MS 650u
 #define YS_FOREGROUND_POLL_MS 150u
 #define YS_CLIPBOARD_RETRY_MS 10u
+#define YS_CATEGORY_GESTURE_END_MS 120u
 #define YS_STORAGE_DIRTY_RECENT 0x01u
 #define YS_STORAGE_DIRTY_COMMON 0x02u
 #define YS_STORAGE_DIRTY_CUSTOM 0x04u
@@ -132,6 +139,7 @@ typedef struct YSEmojiDrawBatch {
 typedef struct YSAppState {
     HINSTANCE instance;
     HWND hwnd;
+    UINT dpi;
     HWND recent_toggle;
     HWND search;
     HWND search_clear;
@@ -193,7 +201,10 @@ typedef struct YSAppState {
     int recent_hover_index;
     int category_hover_index;
     int search_history_nav;
+    int category_boundary_direction;
+    BOOL category_boundary_ready;
     BOOL recent_expanded;
+    BOOL emoji_expanded;
     BOOL other_expanded;
     BOOL suppress_search_change;
     BOOL pending_common_rebuild;
@@ -215,6 +226,7 @@ typedef struct YSAppState {
 
 static void ys_jump_to_symbol_origin(YSAppState *state, uint32_t symbol_index);
 static void ys_layout_controls(YSAppState *state);
+static BOOL ys_switch_to_adjacent_category(YSAppState *state, int direction);
 static LRESULT CALLBACK ys_search_subclass_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
                                                 UINT_PTR subclass_id, DWORD_PTR reference_data);
 static LRESULT CALLBACK ys_categories_subclass_proc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam,
@@ -242,14 +254,119 @@ static void ys_set_font(HWND hwnd, HFONT font) {
     if (hwnd && font) SendMessageW(hwnd, WM_SETFONT, (WPARAM)font, TRUE);
 }
 
-static HFONT ys_create_ui_font(void) {
+typedef UINT (WINAPI *YSGetDpiForWindowFn)(HWND);
+typedef UINT (WINAPI *YSGetDpiForSystemFn)(void);
+typedef BOOL (WINAPI *YSAdjustWindowRectExForDpiFn)(LPRECT, DWORD, BOOL, DWORD, UINT);
+typedef BOOL (WINAPI *YSSystemParametersInfoForDpiFn)(UINT, UINT, PVOID, UINT, UINT);
+typedef int (WINAPI *YSGetSystemMetricsForDpiFn)(int, UINT);
+
+static FARPROC ys_user32_proc(const char *name) {
+    HMODULE user32 = GetModuleHandleW(L"user32.dll");
+    return user32 ? GetProcAddress(user32, name) : NULL;
+}
+
+static UINT ys_system_dpi(void) {
+    YSGetDpiForSystemFn get_dpi =
+        (YSGetDpiForSystemFn)(void *)ys_user32_proc("GetDpiForSystem");
+    HDC dc;
+    UINT dpi;
+    if (get_dpi) {
+        dpi = get_dpi();
+        if (dpi) return dpi;
+    }
+    dc = GetDC(NULL);
+    dpi = dc ? (UINT)GetDeviceCaps(dc, LOGPIXELSX) : 96u;
+    if (dc) ReleaseDC(NULL, dc);
+    return dpi ? dpi : 96u;
+}
+
+static UINT ys_window_dpi(HWND hwnd) {
+    YSGetDpiForWindowFn get_dpi =
+        (YSGetDpiForWindowFn)(void *)ys_user32_proc("GetDpiForWindow");
+    UINT dpi = get_dpi && hwnd ? get_dpi(hwnd) : 0u;
+    return dpi ? dpi : ys_system_dpi();
+}
+
+static BOOL ys_adjust_window_rect_for_dpi(RECT *rect, UINT dpi) {
+    YSAdjustWindowRectExForDpiFn adjust =
+        (YSAdjustWindowRectExForDpiFn)(void *)ys_user32_proc("AdjustWindowRectExForDpi");
+    if (adjust) {
+        return adjust(rect, YS_MAIN_WINDOW_STYLE, FALSE, YS_MAIN_WINDOW_EX_STYLE, dpi);
+    }
+    return AdjustWindowRectEx(rect, YS_MAIN_WINDOW_STYLE, FALSE, YS_MAIN_WINDOW_EX_STYLE);
+}
+
+static int ys_system_metric_for_dpi(int metric, UINT dpi) {
+    YSGetSystemMetricsForDpiFn get_metric =
+        (YSGetSystemMetricsForDpiFn)(void *)ys_user32_proc("GetSystemMetricsForDpi");
+    return get_metric ? get_metric(metric, dpi) : GetSystemMetrics(metric);
+}
+
+static int ys_scale_ui_width(int value, UINT dpi) {
+    return max(1, MulDiv(value, (int)(dpi ? dpi : YS_BASE_UI_DPI), YS_BASE_UI_DPI));
+}
+
+static void ys_target_window_size(UINT dpi, int *width, int *height) {
+    RECT baseline = {0, 0, 0, 0};
+    RECT target;
+    int baseline_chrome_width, baseline_chrome_height;
+    int client_width, client_height;
+    int grid_chrome_extra;
+    int baseline_grid_chrome, current_grid_chrome;
+    dpi = dpi ? dpi : YS_BASE_UI_DPI;
+    ys_adjust_window_rect_for_dpi(&baseline, YS_BASE_UI_DPI);
+    baseline_chrome_width = baseline.right - baseline.left;
+    baseline_chrome_height = baseline.bottom - baseline.top;
+    client_width = max(1, YS_WINDOW_WIDTH - baseline_chrome_width);
+    client_height = max(1, YS_WINDOW_HEIGHT - baseline_chrome_height);
+
+    baseline_grid_chrome = ys_system_metric_for_dpi(SM_CXVSCROLL, YS_BASE_UI_DPI) +
+                           2 * ys_system_metric_for_dpi(SM_CXEDGE, YS_BASE_UI_DPI);
+    current_grid_chrome = ys_system_metric_for_dpi(SM_CXVSCROLL, dpi) +
+                          2 * ys_system_metric_for_dpi(SM_CXEDGE, dpi);
+    grid_chrome_extra = max(0, current_grid_chrome - baseline_grid_chrome);
+    client_width += grid_chrome_extra;
+
+    target.left = 0;
+    target.top = 0;
+    target.right = client_width;
+    target.bottom = client_height;
+    ys_adjust_window_rect_for_dpi(&target, dpi);
+    if (width) *width = target.right - target.left;
+    if (height) *height = target.bottom - target.top;
+}
+
+static HFONT ys_create_ui_font(UINT dpi) {
     NONCLIENTMETRICSW metrics;
+    YSSystemParametersInfoForDpiFn get_metrics =
+        (YSSystemParametersInfoForDpiFn)(void *)ys_user32_proc("SystemParametersInfoForDpi");
     ZeroMemory(&metrics, sizeof(metrics));
     metrics.cbSize = sizeof(metrics);
-    if (SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0)) {
+    if ((get_metrics && get_metrics(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0, dpi)) ||
+        (!get_metrics && SystemParametersInfoW(SPI_GETNONCLIENTMETRICS, sizeof(metrics), &metrics, 0))) {
         return CreateFontIndirectW(&metrics.lfMessageFont);
     }
     return (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+}
+
+static void ys_refresh_ui_font(YSAppState *state) {
+    HFONT previous;
+    HFONT replacement;
+    if (!state) return;
+    replacement = ys_create_ui_font(state->dpi);
+    if (!replacement) return;
+    previous = state->ui_font;
+    state->ui_font = replacement;
+    ys_set_font(state->recent_toggle, state->ui_font);
+    ys_set_font(state->search, state->ui_font);
+    ys_set_font(state->search_clear, state->ui_font);
+    ys_set_font(state->auto_insert, state->ui_font);
+    ys_set_font(state->topmost, state->ui_font);
+    ys_set_font(state->categories, state->ui_font);
+    ys_set_font(state->custom_text, state->ui_font);
+    ys_set_font(state->add_custom, state->ui_font);
+    ys_set_font(state->status, state->ui_font);
+    if (previous && previous != GetStockObject(DEFAULT_GUI_FONT)) DeleteObject(previous);
 }
 
 static BOOL ys_is_high_surrogate(WCHAR c) { return c >= 0xD800 && c <= 0xDBFF; }
@@ -2030,6 +2147,9 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         if (state) {
             int target = state->scroll_y -
                          (GET_WHEEL_DELTA_WPARAM(wparam) / WHEEL_DELTA) * 3 * YS_CELL_H;
+            RECT client;
+            int maximum;
+            int wheel_direction;
             MSG queued;
             /* A single physical wheel spin can post several WM_MOUSEWHEEL
              * messages before this thread gets back to the queue. Each one
@@ -2041,6 +2161,45 @@ static LRESULT CALLBACK ys_grid_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
              * without changing the feel of a single, deliberate notch. */
             while (PeekMessageW(&queued, hwnd, WM_MOUSEWHEEL, WM_MOUSEWHEEL, PM_REMOVE)) {
                 target -= (GET_WHEEL_DELTA_WPARAM(queued.wParam) / WHEEL_DELTA) * 3 * YS_CELL_H;
+            }
+            wheel_direction = target > state->scroll_y ? 1 :
+                              (target < state->scroll_y ? -1 : 0);
+            GetClientRect(hwnd, &client);
+            maximum = max(0, state->content_height - (client.bottom - client.top));
+            if (GetWindowTextLengthW(state->search) == 0) {
+                /* Windows does not report a wheel-release event. Treat a short
+                 * gap after the last boundary message as the end of the current
+                 * gesture. Continuous wheel/touchpad inertia keeps restarting
+                 * the timer and therefore can never leave the category. */
+                if (wheel_direction > 0 && target >= maximum) {
+                    if (state->scroll_y >= maximum &&
+                        state->category_boundary_direction == 1 &&
+                        state->category_boundary_ready &&
+                        ys_switch_to_adjacent_category(state, 1)) return 0;
+                    state->category_boundary_direction = 1;
+                    state->category_boundary_ready = FALSE;
+                    KillTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY);
+                    SetTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY,
+                             YS_CATEGORY_GESTURE_END_MS, NULL);
+                } else if (wheel_direction < 0 && target <= 0) {
+                    if (state->scroll_y <= 0 &&
+                        state->category_boundary_direction == -1 &&
+                        state->category_boundary_ready &&
+                        ys_switch_to_adjacent_category(state, -1)) return 0;
+                    state->category_boundary_direction = -1;
+                    state->category_boundary_ready = FALSE;
+                    KillTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY);
+                    SetTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY,
+                             YS_CATEGORY_GESTURE_END_MS, NULL);
+                } else if (wheel_direction != 0) {
+                    state->category_boundary_direction = 0;
+                    state->category_boundary_ready = FALSE;
+                    KillTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY);
+                }
+            } else {
+                state->category_boundary_direction = 0;
+                state->category_boundary_ready = FALSE;
+                KillTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY);
             }
             ys_grid_scroll(state, target);
         }
@@ -2299,28 +2458,34 @@ static void ys_layout_controls(YSAppState *state) {
     int grid_top, grid_height;
     int footer_y;
     int recent_clear_x;
+    int recent_toggle_width;
+    int auto_insert_width;
+    int topmost_width;
     BOOL custom_page;
     if (!state || !state->hwnd) return;
     GetClientRect(state->hwnd, &client);
     width = client.right;
     height = client.bottom;
+    recent_toggle_width = ys_scale_ui_width(YS_RECENT_TOGGLE_WIDTH, state->dpi);
+    auto_insert_width = ys_scale_ui_width(YS_AUTO_INSERT_WIDTH, state->dpi);
+    topmost_width = ys_scale_ui_width(YS_TOPMOST_WIDTH, state->dpi);
 
-    topmost_x = width - YS_UI_MARGIN - YS_TOPMOST_WIDTH;
-    auto_x = topmost_x - YS_PANEL_GAP - YS_AUTO_INSERT_WIDTH;
-    search_x = YS_UI_MARGIN + YS_RECENT_TOGGLE_WIDTH + YS_PANEL_GAP;
+    topmost_x = width - YS_UI_MARGIN - topmost_width;
+    auto_x = topmost_x - YS_PANEL_GAP - auto_insert_width;
+    search_x = YS_UI_MARGIN + recent_toggle_width + YS_PANEL_GAP;
     search_width = max(180, auto_x - YS_PANEL_GAP - search_x);
 
     MoveWindow(state->recent_toggle, YS_UI_MARGIN, header_y,
-               YS_RECENT_TOGGLE_WIDTH, YS_HEADER_ROW_HEIGHT, TRUE);
+               recent_toggle_width, YS_HEADER_ROW_HEIGHT, TRUE);
     MoveWindow(state->search, search_x, header_y,
                search_width, YS_HEADER_ROW_HEIGHT, TRUE);
     MoveWindow(state->search_clear,
                search_x + search_width - YS_SEARCH_CLEAR_WIDTH - 2, header_y + 2,
                YS_SEARCH_CLEAR_WIDTH, YS_HEADER_ROW_HEIGHT - 4, TRUE);
     MoveWindow(state->auto_insert, auto_x, header_y + 1,
-               YS_AUTO_INSERT_WIDTH, YS_HEADER_ROW_HEIGHT - 2, TRUE);
+               auto_insert_width, YS_HEADER_ROW_HEIGHT - 2, TRUE);
     MoveWindow(state->topmost, topmost_x, header_y + 1,
-               YS_TOPMOST_WIDTH, YS_HEADER_ROW_HEIGHT - 2, TRUE);
+               topmost_width, YS_HEADER_ROW_HEIGHT - 2, TRUE);
 
     recent_y = header_y + YS_HEADER_ROW_HEIGHT + YS_TOP_SECTION_GAP;
     recent_clear_x = width - YS_UI_MARGIN - YS_RECENT_CLEAR_WIDTH;
@@ -2421,6 +2586,15 @@ static void ys_add_category_items(YSAppState *state, int preferred_mapping) {
                              &selected_index, preferred_mapping);
     }
 
+    ys_add_category_mapping_item(state, state->emoji_expanded ? L"Emoji v" : L"Emoji >",
+                                 YS_CATEGORY_MAP_EMOJI_HEADER);
+    if (state->emoji_expanded) {
+        for (i = 0; i < g_ys_ui_emoji_category_count; ++i) {
+            ys_add_data_category(state, g_ys_ui_emoji_categories[i], TRUE,
+                                 &selected_index, preferred_mapping);
+        }
+    }
+
     ys_add_category_mapping_item(state, state->other_expanded ? L"其他符号 v" : L"其他符号 >",
                                  YS_CATEGORY_MAP_OTHER_HEADER);
     if (state->other_expanded) {
@@ -2443,6 +2617,7 @@ static void ys_add_category_items(YSAppState *state, int preferred_mapping) {
     if (preferred_mapping == YS_CATEGORY_MAP_CUSTOM) selected_index = state->custom_ui_index;
 
     if (selected_index < 0 || (size_t)selected_index >= state->category_item_count ||
+        ys_category_map_value(state, selected_index) == YS_CATEGORY_MAP_EMOJI_HEADER ||
         ys_category_map_value(state, selected_index) == YS_CATEGORY_MAP_OTHER_HEADER) {
         selected_index = 0;
     }
@@ -2468,11 +2643,77 @@ static BOOL ys_is_other_category_index(int data_index) {
     return FALSE;
 }
 
+static BOOL ys_is_emoji_category_index(int data_index) {
+    size_t index;
+    if (data_index < 0 || (size_t)data_index >= g_ys_category_count) return FALSE;
+    for (index = 0; index < g_ys_ui_emoji_category_count; ++index) {
+        if ((int)g_ys_ui_emoji_categories[index] == data_index) return TRUE;
+    }
+    return FALSE;
+}
+
 static BOOL ys_is_main_category_index(int data_index) {
     size_t index;
     if (data_index < 0 || (size_t)data_index >= g_ys_category_count) return FALSE;
     for (index = 0; index < g_ys_ui_main_category_count; ++index) {
         if ((int)g_ys_ui_main_categories[index] == data_index) return TRUE;
+    }
+    return FALSE;
+}
+
+static int ys_logical_category_mapping_at(size_t position) {
+    size_t offset;
+    if (position == 0u) return YS_CATEGORY_MAP_COMMON;
+    offset = position - 1u;
+    if (offset < g_ys_ui_main_category_count) return (int)g_ys_ui_main_categories[offset];
+    offset -= g_ys_ui_main_category_count;
+    if (offset < g_ys_ui_emoji_category_count) return (int)g_ys_ui_emoji_categories[offset];
+    offset -= g_ys_ui_emoji_category_count;
+    if (offset < g_ys_ui_other_category_count) return (int)g_ys_ui_other_categories[offset];
+    offset -= g_ys_ui_other_category_count;
+    if (offset == 0u && g_ys_category_count) return 0;
+    return YS_CATEGORY_MAP_CUSTOM;
+}
+
+static BOOL ys_activate_category_mapping(YSAppState *state, int mapping, BOOL scroll_to_end) {
+    int ui_index;
+    if (!state || mapping == YS_CATEGORY_MAP_CUSTOM) return FALSE;
+    if (ys_is_emoji_category_index(mapping)) state->emoji_expanded = TRUE;
+    if (ys_is_other_category_index(mapping)) state->other_expanded = TRUE;
+    ys_add_category_items(state, mapping);
+    ui_index = ys_find_category_ui_index(state, mapping);
+    if (ui_index < 0) return FALSE;
+    state->selected_ui = ui_index;
+    state->active_category_mapping = mapping;
+    state->category_boundary_direction = 0;
+    state->category_boundary_ready = FALSE;
+    KillTimer(state->hwnd, YS_TIMER_CATEGORY_BOUNDARY);
+    SendMessageW(state->categories, LB_SETCURSEL, ui_index, 0);
+    ys_set_search_text(state, L"");
+    ys_layout_controls(state);
+    ys_rebuild(state, TRUE);
+    if (scroll_to_end) ys_grid_scroll(state, state->content_height);
+    InvalidateRect(state->categories, NULL, FALSE);
+    return TRUE;
+}
+
+static BOOL ys_switch_to_adjacent_category(YSAppState *state, int direction) {
+    size_t position;
+    size_t count = 1u + g_ys_ui_main_category_count + g_ys_ui_emoji_category_count +
+                   g_ys_ui_other_category_count + (g_ys_category_count ? 1u : 0u);
+    int current;
+    if (!state || !count || direction == 0) return FALSE;
+    current = state->active_category_mapping;
+    for (position = 0; position < count; ++position) {
+        if (ys_logical_category_mapping_at(position) != current) continue;
+        if (direction > 0) {
+            if (position + 1u >= count) return FALSE;
+            return ys_activate_category_mapping(
+                state, ys_logical_category_mapping_at(position + 1u), FALSE);
+        }
+        if (position == 0u) return FALSE;
+        return ys_activate_category_mapping(
+            state, ys_logical_category_mapping_at(position - 1u), TRUE);
     }
     return FALSE;
 }
@@ -2562,6 +2803,7 @@ static void ys_jump_to_symbol_origin(YSAppState *state, uint32_t symbol_index) {
        preferred origin is hidden, jump to the generated all-symbol category
        while preserving the original category in the hover metadata. */
     if (target_category != 0 && !ys_is_main_category_index(target_category) &&
+        !ys_is_emoji_category_index(target_category) &&
         !ys_is_other_category_index(target_category)) {
         int all_category = g_ys_category_count ? 0 : -1;
         if (all_category >= 0 &&
@@ -2571,6 +2813,7 @@ static void ys_jump_to_symbol_origin(YSAppState *state, uint32_t symbol_index) {
         }
     }
 
+    if (ys_is_emoji_category_index(target_category)) state->emoji_expanded = TRUE;
     if (ys_is_other_category_index(target_category)) state->other_expanded = TRUE;
     ys_add_category_items(state, target_category);
     ui_index = ys_find_category_ui_index(state, target_category);
@@ -2650,6 +2893,7 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         if (!state) return -1;
         state->instance = create->hInstance;
         state->hwnd = hwnd;
+        state->dpi = ys_window_dpi(hwnd);
         state->selected_ui = 0;
         state->active_category_mapping = YS_CATEGORY_MAP_COMMON;
         state->hover_layout = -1;
@@ -2661,11 +2905,12 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         state->common_drag_source = -1;
         state->common_drag_target = -1;
         state->recent_expanded = TRUE;
+        state->emoji_expanded = FALSE;
         state->other_expanded = FALSE;
         state->virtual_category_index = -1;
         ys_capture_external_target(state);
         state->taskbar_created_message = RegisterWindowMessageW(L"TaskbarCreated");
-        state->ui_font = ys_create_ui_font();
+        state->ui_font = ys_create_ui_font(state->dpi);
         state->group_font = CreateFontW(YS_GROUP_FONT_HEIGHT, 0, 0, 0, FW_SEMIBOLD, FALSE, FALSE, FALSE,
                                         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                                         CLEARTYPE_QUALITY, DEFAULT_PITCH, L"Segoe UI");
@@ -2797,10 +3042,29 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         return 0;
     }
     case WM_GETMINMAXINFO:
-        ((MINMAXINFO *)lparam)->ptMinTrackSize.x = YS_WINDOW_WIDTH;
-        ((MINMAXINFO *)lparam)->ptMinTrackSize.y = YS_WINDOW_HEIGHT;
-        ((MINMAXINFO *)lparam)->ptMaxTrackSize.x = YS_WINDOW_WIDTH;
-        ((MINMAXINFO *)lparam)->ptMaxTrackSize.y = YS_WINDOW_HEIGHT;
+        {
+            int width, height;
+            UINT dpi = state && state->dpi ? state->dpi : ys_window_dpi(hwnd);
+            ys_target_window_size(dpi, &width, &height);
+            ((MINMAXINFO *)lparam)->ptMinTrackSize.x = width;
+            ((MINMAXINFO *)lparam)->ptMinTrackSize.y = height;
+            ((MINMAXINFO *)lparam)->ptMaxTrackSize.x = width;
+            ((MINMAXINFO *)lparam)->ptMaxTrackSize.y = height;
+        }
+        return 0;
+    case WM_DPICHANGED:
+        if (state) {
+            RECT *suggested = (RECT *)lparam;
+            int width, height;
+            state->dpi = HIWORD(wparam) ? HIWORD(wparam) : LOWORD(wparam);
+            if (!state->dpi) state->dpi = ys_window_dpi(hwnd);
+            ys_target_window_size(state->dpi, &width, &height);
+            ys_refresh_ui_font(state);
+            SetWindowPos(hwnd, NULL, suggested->left, suggested->top, width, height,
+                         SWP_NOZORDER | SWP_NOACTIVATE);
+            ys_layout_controls(state);
+            ys_rebuild(state, FALSE);
+        }
         return 0;
     case WM_SIZE:
         if (state) { ys_layout_controls(state); ys_rebuild(state, FALSE); }
@@ -2829,7 +3093,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             BOOL hovered;
             if (draw->itemID == (UINT)-1) return TRUE;
             mapping = ys_category_map_value(state, (int)draw->itemID);
-            header = mapping == YS_CATEGORY_MAP_OTHER_HEADER;
+            header = mapping == YS_CATEGORY_MAP_EMOJI_HEADER ||
+                     mapping == YS_CATEGORY_MAP_OTHER_HEADER;
             selected = (draw->itemState & ODS_SELECTED) != 0;
             hovered = state->category_hover_index == (int)draw->itemID;
             SendMessageW(state->categories, LB_GETTEXT, draw->itemID, (LPARAM)text);
@@ -2903,19 +3168,44 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
         if (LOWORD(wparam) == ID_CATEGORIES && HIWORD(wparam) == LBN_SELCHANGE) {
             int selection = (int)SendMessageW(state->categories, LB_GETCURSEL, 0, 0);
             int mapping = ys_category_map_value(state, selection);
-            if (mapping == YS_CATEGORY_MAP_OTHER_HEADER) {
-                int active_mapping = state->active_category_mapping;
-                int header_index;
-                state->other_expanded = !state->other_expanded;
-                ys_add_category_items(state, active_mapping);
-                state->active_category_mapping = active_mapping;
-                header_index = ys_find_category_ui_index(state, YS_CATEGORY_MAP_OTHER_HEADER);
-                if (header_index >= 0) {
-                    state->selected_ui = header_index;
-                    SendMessageW(state->categories, LB_SETCURSEL, header_index, 0);
+            if (mapping == YS_CATEGORY_MAP_EMOJI_HEADER) {
+                if (state->emoji_expanded) {
+                    int active_mapping = state->active_category_mapping;
+                    int header_index;
+                    state->emoji_expanded = FALSE;
+                    ys_add_category_items(state, active_mapping);
+                    state->active_category_mapping = active_mapping;
+                    header_index = ys_find_category_ui_index(state, YS_CATEGORY_MAP_EMOJI_HEADER);
+                    if (header_index >= 0) {
+                        state->selected_ui = header_index;
+                        SendMessageW(state->categories, LB_SETCURSEL, header_index, 0);
+                    }
+                    ys_layout_controls(state);
+                    InvalidateRect(state->categories, NULL, FALSE);
+                } else if (g_ys_ui_emoji_category_count) {
+                    state->emoji_expanded = TRUE;
+                    ys_activate_category_mapping(state, (int)g_ys_ui_emoji_categories[0], FALSE);
                 }
-                ys_layout_controls(state);
-                InvalidateRect(state->categories, NULL, FALSE);
+                return 0;
+            }
+            if (mapping == YS_CATEGORY_MAP_OTHER_HEADER) {
+                if (state->other_expanded) {
+                    int active_mapping = state->active_category_mapping;
+                    int header_index;
+                    state->other_expanded = FALSE;
+                    ys_add_category_items(state, active_mapping);
+                    state->active_category_mapping = active_mapping;
+                    header_index = ys_find_category_ui_index(state, YS_CATEGORY_MAP_OTHER_HEADER);
+                    if (header_index >= 0) {
+                        state->selected_ui = header_index;
+                        SendMessageW(state->categories, LB_SETCURSEL, header_index, 0);
+                    }
+                    ys_layout_controls(state);
+                    InvalidateRect(state->categories, NULL, FALSE);
+                } else if (g_ys_ui_other_category_count) {
+                    state->other_expanded = TRUE;
+                    ys_activate_category_mapping(state, (int)g_ys_ui_other_categories[0], FALSE);
+                }
                 return 0;
             }
             if (selection >= 0) {
@@ -2953,6 +3243,9 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             ys_search_history_commit_current(state);
         } else if (wparam == YS_TIMER_CLIPBOARD) {
             ys_flush_pending_clipboard(state);
+        } else if (wparam == YS_TIMER_CATEGORY_BOUNDARY) {
+            KillTimer(hwnd, YS_TIMER_CATEGORY_BOUNDARY);
+            state->category_boundary_ready = state->category_boundary_direction != 0;
         }
         return 0;
     case YESYMBOL_DEFERRED_INIT_MESSAGE:
@@ -3002,6 +3295,7 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
             KillTimer(hwnd, YS_TIMER_STORAGE);
             KillTimer(hwnd, YS_TIMER_SEARCH_HISTORY);
             KillTimer(hwnd, YS_TIMER_CLIPBOARD);
+            KillTimer(hwnd, YS_TIMER_CATEGORY_BOUNDARY);
             ys_flush_pending_clipboard(state);
             ys_flush_storage(state);
             if (state->search) RemoveWindowSubclass(state->search, ys_search_subclass_proc, 1u);
@@ -3037,6 +3331,8 @@ static LRESULT CALLBACK ys_main_proc(HWND hwnd, UINT message, WPARAM wparam, LPA
 int ys_run_ui(HINSTANCE instance, int show_command) {
     WNDCLASSEXW main_class, grid_class, recent_class;
     HWND hwnd;
+    int window_width;
+    int window_height;
     MSG message;
     ZeroMemory(&grid_class, sizeof(grid_class));
     grid_class.cbSize = sizeof(grid_class);
@@ -3070,9 +3366,10 @@ int ys_run_ui(HINSTANCE instance, int show_command) {
     main_class.hbrBackground = GetSysColorBrush(COLOR_BTNFACE);
     if (!RegisterClassExW(&main_class) && GetLastError() != ERROR_CLASS_ALREADY_EXISTS) return 5;
 
-    hwnd = CreateWindowExW(WS_EX_TOPMOST, YESYMBOL_WINDOW_CLASS, L"符号大全 - 添加符号",
-                           WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_CLIPCHILDREN,
-                           CW_USEDEFAULT, CW_USEDEFAULT, YS_WINDOW_WIDTH, YS_WINDOW_HEIGHT,
+    ys_target_window_size(ys_system_dpi(), &window_width, &window_height);
+    hwnd = CreateWindowExW(YS_MAIN_WINDOW_EX_STYLE, YESYMBOL_WINDOW_CLASS, L"符号大全 - 添加符号",
+                           YS_MAIN_WINDOW_STYLE,
+                           CW_USEDEFAULT, CW_USEDEFAULT, window_width, window_height,
                            NULL, NULL, instance, NULL);
     if (!hwnd) return 6;
     ys_center_window(hwnd);

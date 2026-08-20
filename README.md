@@ -10,7 +10,7 @@
 ![Language](https://img.shields.io/badge/language-C11%20%2B%20DirectWrite%20bridge-00599C)
 ![UI](https://img.shields.io/badge/UI-Win32%20%2B%20DirectWrite-5C2D91)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.1-blue)
 
 仓库：<https://github.com/yakoye/yesymbol-dev>
 
@@ -52,10 +52,13 @@ YeSymbol 的开发目标是：
 - 常用符号固定每行显示 12 个，顺序由用户维护，不再按次数自动重排；
 - 支持自定义符号和完整 Unicode 序列；
 - 支持 Emoji 肤色、ZWJ 组合和区域指示符序列；
+- Emoji 在左侧统一归入一个可展开/折叠的父级，并细分为 14 类；展开时直接进入“笑脸”；
 - Emoji 优先使用构建期嵌入的 Twemoji 图片，以 36×36 px 显示；点击时仍复制或插入原始 Unicode 序列；
+- 滚轮到达分类底部或顶部时先停住；短暂停顿后重新滚动才衔接相邻分类，连续滚动和触摸板惯性不会误跳；
 - DirectWrite 初始化失败时自动退回 GDI 单色绘制，不影响复制；
 - 可选“自动插入”，并记住用户设置；
 - 支持窗口置顶和系统托盘；
+- 支持 Per-Monitor V2 DPI，125%/150% 跨屏时自动补偿边框、滚动条和顶部控件宽度，保持 12 列完整显示；
 - 大分类使用虚拟布局，只绘制当前可见区域；
 - 符号查找使用构建期生成的哈希索引；
 - 用户数据保存在当前用户注册表，不写入程序目录；常用符号采用固定顺序模型，并支持旧版数据迁移。
@@ -360,6 +363,7 @@ data-source\cldr-annotations-zh.tts.json
 
 ```text
 @ui-section main     普通侧边栏分类
+@ui-section emoji    归入“Emoji”父级
 @ui-section other    折叠到“其他符号”下面
 @ui-section hidden   不显示在侧边栏，但参与搜索和全部符号
 ```

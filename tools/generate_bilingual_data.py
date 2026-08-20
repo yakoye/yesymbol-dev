@@ -66,15 +66,24 @@ for ci, category in enumerate(cat['categories']):
 
 dinds = [idx[text] for text in cat['default_common'] if text in idx]
 ui_main_indices = [int(value) for value in cat.get('ui_main_category_indices', [])]
+ui_emoji_indices = [int(value) for value in cat.get('ui_emoji_category_indices', [])]
 ui_other_indices = [int(value) for value in cat.get('ui_other_category_indices', [])]
 
 
 def origin_normalized_text(text):
     """Normalize presentation-only differences for source-location fallback."""
-    return ''.join(
+    key = ''.join(
         ch for ch in text
         if ord(ch) != 0xFE0F and not (0x1F3FB <= ord(ch) <= 0x1F3FF)
     )
+    return {
+        '🧑\u200d❤\u200d💋\u200d🧑': '💏',
+        '🧑\u200d❤\u200d🧑': '💑',
+        '👩\u200d🤝\u200d👨': '👫',
+        '👩\u200d🤝\u200d👩': '👭',
+        '👨\u200d🤝\u200d👨': '👬',
+        '': '🧑',
+    }.get(key, key)
 
 
 # Pick one useful source location for every compiled symbol.  Priority is
@@ -170,6 +179,7 @@ parts = [
     'const uint32_t g_ys_group_items[] = {\n' + format_array(irefs, lambda value: f'{value}u', 12) + '\n};\n',
     'const uint32_t g_ys_default_common_items[] = {\n' + format_array(dinds, lambda value: f'{value}u', 12) + '\n};\n',
     'const uint16_t g_ys_ui_main_categories[] = {\n' + format_array(ui_main_indices, lambda value: f'{value}u', 12) + '\n};\n',
+    'const uint16_t g_ys_ui_emoji_categories[] = {\n' + format_array(ui_emoji_indices, lambda value: f'{value}u', 12) + '\n};\n',
     'const uint16_t g_ys_ui_other_categories[] = {\n' + format_array(ui_other_indices, lambda value: f'{value}u', 12) + '\n};\n',
     'static const uint32_t g_ys_symbol_hash_table[] = {\n' + format_array(hash_table, lambda value: f'{value}u', 16) + '\n};\n',
     'static uint32_t ys_symbol_hash_value(const WCHAR *text) {\n'
@@ -198,6 +208,7 @@ parts = [
     f'const size_t g_ys_group_item_count = {len(irefs)}u;\n',
     f'const size_t g_ys_default_common_count = {len(dinds)}u;\n',
     f'const size_t g_ys_ui_main_category_count = {len(ui_main_indices)}u;\n',
+    f'const size_t g_ys_ui_emoji_category_count = {len(ui_emoji_indices)}u;\n',
     f'const size_t g_ys_ui_other_category_count = {len(ui_other_indices)}u;\n',
 ]
 

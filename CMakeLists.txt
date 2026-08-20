@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(yesymbol VERSION 1.1.0 LANGUAGES C CXX RC)
+project(yesymbol VERSION 1.1.1 LANGUAGES C CXX RC)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)

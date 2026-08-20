@@ -91,8 +91,11 @@ TXT 使用标准 CSV 转义规则：字段内部的 `"` 写成两个 `""`。不�
 @ui-section main
 # 普通分类
 
+@ui-section emoji
+# Emoji 子分类
+
 @ui-section other
-# 折叠分类
+# 其他符号子分类
 
 @ui-section hidden
 # 仅搜索、不在侧边栏显示的分类
@@ -101,6 +104,7 @@ TXT 使用标准 CSV 转义规则：字段内部的 `"` 写成两个 `""`。不�
 可用值：
 
 - `main`：直接显示在侧边栏；
+- `emoji`：放在侧边栏 `Emoji` 父级下面；
 - `other`：折叠到“其他符号”下面；
 - `hidden`：不显示在侧边栏，但仍参与搜索和“全部符号”。
 

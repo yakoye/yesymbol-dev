@@ -14,13 +14,13 @@ RELEASE_NOTES.md
 当前发布版本：
 
 ```text
-1.1.0
+1.1.1
 ```
 
 Git 标签：
 
 ```text
-v1.1.0
+v1.1.1
 ```
 
 ## 2. 数据生成和检查
@@ -85,7 +85,7 @@ Get-FileHash .\dist\yesymbol.exe -Algorithm SHA256 |
 建议把结果保存为：
 
 ```text
-yesymbol-v1.1.0.sha256
+yesymbol-v1.1.1.sha256
 ```
 
 ## 6. GitHub Release 内容
@@ -94,8 +94,8 @@ yesymbol-v1.1.0.sha256
 
 ```text
 yesymbol.exe                        用户运行文件
-yesymbol-v1.1.0-windows-x64.zip    Windows 便携包
-yesymbol-v1.1.0.sha256             校验值
+yesymbol-v1.1.1-windows-x64.zip    Windows 便携包
+yesymbol-v1.1.1.sha256             校验值
 ```
 
 Release 说明至少包含：

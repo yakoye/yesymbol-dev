@@ -35,16 +35,26 @@ for category in D["categories"][1:]:
         seen.update(items)
 
 main_indices = D.get("ui_main_category_indices", [])
+emoji_indices = D.get("ui_emoji_category_indices", [])
 other_indices = D.get("ui_other_category_indices", [])
 assert len(main_indices) == len(set(main_indices))
+assert len(emoji_indices) == len(set(emoji_indices))
 assert len(other_indices) == len(set(other_indices))
+assert not set(main_indices).intersection(emoji_indices)
 assert not set(main_indices).intersection(other_indices)
+assert not set(emoji_indices).intersection(other_indices)
 assert all(D["categories"][i].get("ui_section") == "main" for i in main_indices)
+assert all(D["categories"][i].get("ui_section") == "emoji" for i in emoji_indices)
 assert all(D["categories"][i].get("ui_section") == "other" for i in other_indices)
 assert all(D["categories"][i].get("ui_section") == "hidden"
            for i in range(1, len(D["categories"]))
-           if i not in set(main_indices) | set(other_indices)
+           if i not in set(main_indices) | set(emoji_indices) | set(other_indices)
            and D["categories"][i].get("role") != "common")
+assert [D["categories"][i]["name"] for i in emoji_indices] == [
+    "笑脸", "手势", "人物", "人物活动", "家庭", "情绪", "植物",
+    "动物", "食物", "活动", "旅行", "物体", "符号", "旗帜",
+]
+assert D["categories"][other_indices[0]]["name"] == "日文字符"
 
 # Normal project regeneration checks.
 for command in (
@@ -72,6 +82,7 @@ audit_spec.loader.exec_module(audit_module)
 
 text_catalog = (R / "data-source/catalog.txt").read_text(encoding="utf-8")
 assert "@ui-section other" in text_catalog
+assert "@ui-section emoji" in text_catalog
 assert "@ui-section hidden" in text_catalog
 assert "@default-common" not in text_catalog
 assert "@cols " not in text_catalog and "@row " not in text_catalog
@@ -88,7 +99,8 @@ common_items = [
 ]
 assert D["default_common"] == common_items
 assert len(common_items) <= 256
-assert all(D["categories"][index].get("role") != "common" for index in main_indices + other_indices)
+assert all(D["categories"][index].get("role") != "common"
+           for index in main_indices + emoji_indices + other_indices)
 
 variant = text_catalog.replace("## 扑克牌（Unicode 顺序）", "## 扑克牌")
 variant = variant.replace("# 特殊符号\n", "# 任意修改后的一级标题\n", 1)
@@ -126,6 +138,7 @@ emoji_renderer_h = (R / "include/emoji_renderer.h").read_text(encoding="utf-8")
 emoji_renderer_c = (R / "src/emoji_renderer.c").read_text(encoding="utf-8")
 for token in (
     "ui_main_category_indices",
+    "ui_emoji_category_indices",
     "ui_other_category_indices",
     "generated-supplement",
     "category.get('role')",
@@ -133,8 +146,10 @@ for token in (
     assert token in generator
 for token in (
     "g_ys_ui_main_categories",
+    "g_ys_ui_emoji_categories",
     "g_ys_ui_other_categories",
     "g_ys_ui_main_category_count",
+    "g_ys_ui_emoji_category_count",
     "g_ys_ui_other_category_count",
 ):
     assert token in symbol_h and token in generated_c and token in ui
@@ -145,6 +160,12 @@ assert "ys_layout_symbol_range(state, first, state->view_count - first, 12" in u
 assert "ys_layout_symbol_range_fit_columns(state, first" not in ui
 assert 'L"其他符号 >"' in ui
 assert 'L"其他符号 v"' in ui
+assert 'L"Emoji >"' in ui
+assert 'L"Emoji v"' in ui
+assert "ys_switch_to_adjacent_category" in ui
+assert "WM_DPICHANGED" in ui
+assert "AdjustWindowRectExForDpi" in ui
+assert "GetSystemMetricsForDpi" in ui
 assert "ys_clipboard_try_set" in clipboard_h and "ys_clipboard_try_set" in clipboard_c
 assert "Sleep(" not in clipboard_c and "SwitchToThread(" not in clipboard_c
 assert "YS_TIMER_CLIPBOARD" in ui
@@ -169,13 +190,13 @@ assert "LANGUAGES C CXX RC" in cmake
 assert "set_source_files_properties(src/emoji_renderer.c PROPERTIES LANGUAGE CXX)" in cmake
 assert "/MANIFEST:NO" in cmake
 assert "d2d1" in cmake and "dwrite" in cmake
-assert 'YESYMBOL_VERSION L"1.1.0"' in yesymbol_h
-assert 'YESYMBOL_MODIFIED_DATE L"2026-08-05"' in about_config
+assert 'YESYMBOL_VERSION L"1.1.1"' in yesymbol_h
+assert 'YESYMBOL_MODIFIED_DATE L"2026-08-20"' in about_config
 assert 'YESYMBOL_UNICODE_LIST_URL L"https://unicode.org/emoji/charts/emoji-list.html"' in about_config
 assert "修改日期：%s" in about_c and "Unicode List" in about_c
-assert "FILEVERSION 1,1,0,0" in resource_rc and '"1.1.0\\0"' in resource_rc
-assert 'assemblyIdentity version="1.1.0.0"' in manifest
-assert "project(yesymbol VERSION 1.1.0" in cmake
+assert "FILEVERSION 1,1,1,0" in resource_rc and '"1.1.1\\0"' in resource_rc
+assert 'assemblyIdentity version="1.1.1.0"' in manifest
+assert "project(yesymbol VERSION 1.1.1" in cmake
 run_section = build_bat.split(":run", 1)[1].split(":web", 1)[0]
 assert 'call "%~f0" data' not in run_section
 

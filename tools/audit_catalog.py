@@ -102,10 +102,18 @@ def tag_flag(text: str) -> bool:
 
 
 def variant_key(text: str) -> str:
-    return "".join(
+    key = "".join(
         char for char in str(text)
         if ord(char) != 0xFE0F and not (0x1F3FB <= ord(char) <= 0x1F3FF)
     )
+    return {
+        "🧑\u200d❤\u200d💋\u200d🧑": "💏",
+        "🧑\u200d❤\u200d🧑": "💑",
+        "👩\u200d🤝\u200d👨": "👫",
+        "👩\u200d🤝\u200d👩": "👭",
+        "👨\u200d🤝\u200d👨": "👬",
+        "": "🧑",
+    }.get(key, key)
 
 
 def ordered_unique(items: Iterable[str]) -> List[str]:
@@ -267,17 +275,25 @@ def main() -> int:
             )
 
     main_indices = [int(value) for value in data.get("ui_main_category_indices", [])]
+    emoji_indices = [int(value) for value in data.get("ui_emoji_category_indices", [])]
     other_indices = [int(value) for value in data.get("ui_other_category_indices", [])]
-    if len(main_indices) != len(set(main_indices)) or len(other_indices) != len(set(other_indices)):
+    if (len(main_indices) != len(set(main_indices)) or
+            len(emoji_indices) != len(set(emoji_indices)) or
+            len(other_indices) != len(set(other_indices))):
         errors.append("UI category index lists contain duplicates")
-    if set(main_indices).intersection(other_indices):
-        errors.append("a category cannot be both main and other")
-    for index in main_indices + other_indices:
+    if (set(main_indices).intersection(emoji_indices) or
+            set(main_indices).intersection(other_indices) or
+            set(emoji_indices).intersection(other_indices)):
+        errors.append("a category cannot belong to multiple UI sections")
+    for index in main_indices + emoji_indices + other_indices:
         if not (1 <= index < len(categories)):
             errors.append(f"UI category index out of range: {index}")
     for index in main_indices:
         if categories[index].get("ui_section", "main") != "main":
             errors.append(f"UI main index {index} does not point to a main category")
+    for index in emoji_indices:
+        if categories[index].get("ui_section") != "emoji":
+            errors.append(f"UI emoji index {index} does not point to an emoji category")
     for index in other_indices:
         if categories[index].get("ui_section") != "other":
             errors.append(f"UI other index {index} does not point to an other category")

@@ -16,9 +16,10 @@ extern const YSSymbolOriginRecord g_ys_symbol_origins[];
 extern const uint32_t g_ys_group_items[];
 extern const uint32_t g_ys_default_common_items[];
 extern const uint16_t g_ys_ui_main_categories[];
+extern const uint16_t g_ys_ui_emoji_categories[];
 extern const uint16_t g_ys_ui_other_categories[];
 extern const size_t g_ys_symbol_count, g_ys_group_count, g_ys_category_count, g_ys_group_item_count, g_ys_default_common_count;
-extern const size_t g_ys_ui_main_category_count, g_ys_ui_other_category_count;
+extern const size_t g_ys_ui_main_category_count, g_ys_ui_emoji_category_count, g_ys_ui_other_category_count;
 static __inline const WCHAR *ys_pool_string(uint32_t offset) { return g_ys_string_pool + offset; }
 static __inline const WCHAR *ys_symbol_text(uint32_t index) { return ys_pool_string(g_ys_symbols[index].text_offset); }
 static __inline const WCHAR *ys_symbol_name_zh(uint32_t index) { return ys_pool_string(g_ys_symbols[index].name_zh_offset); }

@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const WEB_VERSION = '1.0.0-rc1';
+  const WEB_VERSION = '1.1.1';
   const DATA_URL = './data/catalog.generated.json';
   const BUILD_INFO_URL = './data/build-info.json';
   const SEARCH_DEBOUNCE_MS = 90;
@@ -39,6 +39,7 @@
       copyOnClick: true,
       stickyHeader: true,
       recentOpen: true,
+      emojiOpen: false,
       otherOpen: false
     },
     currentCategory: '常用符号',
@@ -232,8 +233,9 @@
       state.locationByCategory.set(category.name, map);
     }
 
+    const groupParents = new Set(Object.keys(state.data.ui_category_groups || {}));
     const uiOrder = state.data.ui_categories.filter(name =>
-      !['常用符号', '其他符号', '全部符号', '自定义'].includes(name)
+      !['常用符号', '全部符号', '自定义'].includes(name) && !groupParents.has(name)
     );
     for (const name of uiOrder) {
       const map = state.locationByCategory.get(name);
@@ -317,13 +319,18 @@
 
   function renderSidebar() {
     refs.sidebar.replaceChildren();
-    const childNames = new Set((state.data.ui_category_groups?.['其他符号']) || []);
+    const groups = state.data.ui_category_groups || {};
+    const childToParent = new Map();
+    for (const [parent, children] of Object.entries(groups)) {
+      for (const child of children || []) childToParent.set(child, parent);
+    }
     const counts = getCategoryCounts();
 
     for (const name of state.data.ui_categories) {
-      if (childNames.has(name) && !state.settings.otherOpen) continue;
-      const isParent = name === '其他符号';
-      const isChild = childNames.has(name);
+      const parentName = childToParent.get(name);
+      if (parentName && !isGroupOpen(parentName)) continue;
+      const isParent = Object.hasOwn(groups, name);
+      const isChild = Boolean(parentName);
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'category-button';
@@ -332,8 +339,9 @@
       button.classList.toggle('is-child', isChild);
       button.classList.toggle('is-active', state.activeNav === name);
       if (isParent) {
-        button.setAttribute('aria-expanded', String(state.settings.otherOpen));
-        button.textContent = `其他符号${state.settings.otherOpen ? '⯆' : '⯈'}`;
+        const open = isGroupOpen(name);
+        button.setAttribute('aria-expanded', String(open));
+        button.textContent = `${name} ${open ? 'v' : '>'}`;
       } else {
         const label = document.createElement('span');
         label.textContent = name;
@@ -350,6 +358,18 @@
     }
   }
 
+  function groupSettingName(parent) {
+    return parent === 'Emoji' ? 'emojiOpen' : 'otherOpen';
+  }
+
+  function isGroupOpen(parent) {
+    return Boolean(state.settings[groupSettingName(parent)]);
+  }
+
+  function setGroupOpen(parent, open) {
+    state.settings[groupSettingName(parent)] = Boolean(open);
+  }
+
   function getCategoryCounts() {
     const counts = new Map();
     counts.set('常用符号', state.common.length);
@@ -364,11 +384,16 @@
     const button = event.target.closest('.category-button');
     if (!button) return;
     const name = button.dataset.category;
-    if (name === '其他符号') {
-      state.settings.otherOpen = !state.settings.otherOpen;
-      state.activeNav = '其他符号';
+    const children = state.data.ui_category_groups?.[name];
+    if (Array.isArray(children)) {
+      const opening = !isGroupOpen(name);
+      setGroupOpen(name, opening);
       saveSettings();
-      renderSidebar();
+      if (opening && children.length) selectCategory(children[0]);
+      else {
+        state.activeNav = name;
+        renderSidebar();
+      }
       return;
     }
     selectCategory(name);
@@ -382,10 +407,11 @@
     state.pendingTarget = options.target || null;
     if (!options.preserveSearch) clearSearch(false);
 
-    const children = state.data.ui_category_groups?.['其他符号'] || [];
-    if (children.includes(name) && !state.settings.otherOpen) {
-      state.settings.otherOpen = true;
-      saveSettings();
+    for (const [parent, children] of Object.entries(state.data.ui_category_groups || {})) {
+      if (children.includes(name) && !isGroupOpen(parent)) {
+        setGroupOpen(parent, true);
+        saveSettings();
+      }
     }
 
     renderSidebar();

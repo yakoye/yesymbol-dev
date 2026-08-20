@@ -17,7 +17,7 @@ include\ui_config.h
 #define YS_WINDOW_HEIGHT 650
 ```
 
-这两个值传给 `CreateWindowExW`，表示主窗口外框尺寸。
+这两个值表示 125% 显示缩放下的基准外框尺寸。程序会按当前显示器 DPI 补偿标题栏、边框和滚动条占用，并在跨屏时自动重新计算；符号格和 36px Emoji 图片保持固定像素尺寸。
 
 窗口当前使用固定样式：
 
@@ -29,7 +29,8 @@ WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
 
 - 不能拖动边框调整大小；
 - 没有最大化按钮；
-- 修改尺寸需要重新编译。
+- 修改尺寸需要重新编译；
+- 4K/150% 下会自动增加少量外框宽度，确保 12 列完整显示。
 
 ## 3. 左侧分类宽度
 
@@ -121,6 +122,8 @@ Segoe UI Emoji    Emoji
 #define YS_RECENT_CLEAR_WIDTH 34
 ```
 
+`YS_RECENT_TOGGLE_WIDTH`、`YS_AUTO_INSERT_WIDTH` 和 `YS_TOPMOST_WIDTH` 会按显示器 DPI 调整，避免高 DPI 字体或复选框被截断；增加的宽度优先从搜索框余量中取得。
+
 左侧分类行高：
 
 ```c
@@ -147,7 +150,7 @@ include\yesymbol.h
 
 ```c
 #define YESYMBOL_PRODUCT_NAME L"符号大全"
-#define YESYMBOL_VERSION L"1.1.0"
+#define YESYMBOL_VERSION L"1.1.1"
 ```
 
 窗口标题在 `src/ui.c` 的 `CreateWindowExW` 调用处设置。

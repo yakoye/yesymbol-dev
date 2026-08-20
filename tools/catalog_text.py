@@ -34,9 +34,10 @@ MAX_COLUMNS = 12
 CLDR_CACHE = ROOT / "data-source" / "cldr-annotations-zh.tts.json"
 _VARIATION_SELECTOR_16 = "\ufe0f"
 UI_SECTION_MAIN = "main"
+UI_SECTION_EMOJI = "emoji"
 UI_SECTION_OTHER = "other"
 UI_SECTION_HIDDEN = "hidden"
-VALID_UI_SECTIONS = {UI_SECTION_MAIN, UI_SECTION_OTHER, UI_SECTION_HIDDEN}
+VALID_UI_SECTIONS = {UI_SECTION_MAIN, UI_SECTION_EMOJI, UI_SECTION_OTHER, UI_SECTION_HIDDEN}
 GENERATED_SUPPLEMENT_ROLE = "generated-supplement"
 COMMON_ROLE = "common"
 MAX_COMMON = 256
@@ -276,10 +277,22 @@ def normalize_visible_variant_key(text: str) -> str:
     they do not need a second visible catalog cell when their base sequence is
     already placed.
     """
-    return "".join(
+    key = "".join(
         char for char in str(text)
         if char != _VARIATION_SELECTOR_16 and not (0x1F3FB <= ord(char) <= 0x1F3FF)
     )
+    # Mixed-skin relationship sequences do not always have their neutral ZWJ
+    # spelling in the catalog.  Associate them with the visible legacy neutral
+    # Emoji in the same Family group.  Standalone tone components inherit the
+    # generic person entry and remain hidden from the main grid.
+    return {
+        "🧑\u200d❤\u200d💋\u200d🧑": "💏",
+        "🧑\u200d❤\u200d🧑": "💑",
+        "👩\u200d🤝\u200d👨": "👫",
+        "👩\u200d🤝\u200d👩": "👭",
+        "👨\u200d🤝\u200d👨": "👬",
+        "": "🧑",
+    }.get(key, key)
 
 
 def load_cldr_tts(path: Path = CLDR_CACHE) -> Dict[str, str]:
@@ -601,26 +614,39 @@ def normalize_catalog(data: MutableMapping[str, Any]) -> Tuple[Dict[str, Any], D
         if category_item.get("ui_section", UI_SECTION_MAIN) == UI_SECTION_MAIN
         and category_item.get("role") not in (GENERATED_SUPPLEMENT_ROLE, COMMON_ROLE)
     ]
+    emoji_indices = [
+        index + 1 for index, category_item in enumerate(categories)
+        if category_item.get("ui_section", UI_SECTION_MAIN) == UI_SECTION_EMOJI
+        and category_item.get("role") not in (GENERATED_SUPPLEMENT_ROLE, COMMON_ROLE)
+    ]
     other_indices = [
         index + 1 for index, category_item in enumerate(categories)
         if category_item.get("ui_section", UI_SECTION_MAIN) == UI_SECTION_OTHER
         and category_item.get("role") not in (GENERATED_SUPPLEMENT_ROLE, COMMON_ROLE)
     ]
     main_names = [output_categories[index]["name"] for index in main_indices]
+    emoji_names = [output_categories[index]["name"] for index in emoji_indices]
     other_names = [output_categories[index]["name"] for index in other_indices]
+    category_groups: Dict[str, List[str]] = {}
+    if emoji_names:
+        category_groups["Emoji"] = emoji_names
+    if other_names:
+        category_groups["其他符号"] = other_names
     output: Dict[str, Any] = {
         "categories": output_categories,
         "symbols": pruned_records,
         "default_common": default_common,
         # Visible order is structural: first-level headings keep source order.
-        # Their display text may be renamed freely.  ``@ui-section other``
-        # controls the collapsible subsection; ``hidden`` remains searchable.
+        # Their display text may be renamed freely. ``@ui-section emoji`` and
+        # ``other`` control the two sidebar subsections; ``hidden`` remains searchable.
         "ui_categories": ["常用符号"]
         + main_names
+        + (["Emoji"] + emoji_names if emoji_names else [])
         + (["其他符号"] + other_names if other_names else [])
         + [GENERATED_CATEGORY_NAME, "自定义"],
-        "ui_category_groups": {"其他符号": other_names} if other_names else {},
+        "ui_category_groups": category_groups,
         "ui_main_category_indices": main_indices,
+        "ui_emoji_category_indices": emoji_indices,
         "ui_other_category_indices": other_indices,
         "name_languages": list(data.get("name_languages", ["zh-CN", "en"])),
         "name_note": str(data.get("name_note", "")),
@@ -880,7 +906,7 @@ def parse_text(source: Path) -> Dict[str, Any]:
             section = line[len("@ui-section ") :].strip().lower()
             if section not in VALID_UI_SECTIONS:
                 raise ValueError(
-                    f"line {line_no}: @ui-section must be one of main, other or hidden"
+                    f"line {line_no}: @ui-section must be one of main, emoji, other or hidden"
                 )
             current_ui_section = section
             continue
